@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Stud.IP</string>
+    <string name="url_field">Server</string>
+    <string name="url_button">weiter</string>
+    <string name="login_button">weiter</string>
+    <string name="username_field">Benutzername</string>
+    <string name="password_field">Passwort</string>
+    <string name="login_error_title">Fehler</string>
+    <string name="login_error_message">Es ist entweder der Hostname, der Benutzername oder das Passwort falsch. Wenn sie sich sicher sind, dass alles richtig ist, hat ihr Stud.ip Admin das API nicht freigeschaltet.</string>
+    <string name="restore_error_message">Es ist ein Fehler beim Wiederherstellen der Verbindung aufgetreten. Überprüfen sie ihre Netzwerkverbindung oder versuchen sie, sich erneut anzumelden.</string>
+    <string name="url_uos">studip.uni-osnabrueck.de</string>
+    <string name="title_activity_home">Home</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_event">Veranstaltungen</string>
+    <string name="menu_files">Dateien</string>
+    <string name="welcome">Willkommen</string>
+</resources>

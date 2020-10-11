@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/course_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toStartOf="@+id/course_info"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/course_meetings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/chat_grey" />
+
+    <ImageView
+        android:id="@+id/course_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/course_forum"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/info_grey" />
+
+    <ImageView
+        android:id="@+id/course_schedule"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/course_courseware"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/schedule_grey" />
+
+    <ImageView
+        android:id="@+id/course_forum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/course_participants"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/forum_grey" />
+
+    <ImageView
+        android:id="@+id/course_courseware"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@+id/course_meetings"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/group3_grey" />
+
+    <ImageView
+        android:id="@+id/course_news"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/course_schedule"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/news_grey" />
+
+    <ImageView
+        android:id="@+id/course_participants"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/course_news"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/persons_grey" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,6 @@
+TODO:
+    To make a new icon from a svg, convert it to a png with GIMP and then use it in android studio
+    The API also seems to work with session cookies, as it works with them in the browser.
+    Fix freezing while refreshing by using a handler that gets called in the UI thread after a request is done-
+    
+    

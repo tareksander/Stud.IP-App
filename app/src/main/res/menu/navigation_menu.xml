@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_home"
+        android:enabled="true"
+        android:icon="@drawable/home"
+        android:title="@string/menu_home"
+        android:visible="true"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_events"
+        android:icon="@drawable/seminar"
+        android:title="@string/menu_event"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_files"
+        android:icon="@drawable/file"
+        android:title="@string/menu_files"
+        app:showAsAction="always" />
+</menu>

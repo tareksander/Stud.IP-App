@@ -1,0 +1,165 @@
+package com.studip;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKey;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+
+import com.studip.api.API;
+
+public class HomeActivity extends AppCompatActivity
+{
+
+
+
+    ViewPager2 pager;
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        
+        pager = (ViewPager2) findViewById(R.id.pager);
+        FragmentStateAdapter pagerAdapter = new ScreenSlidePagerAdapter(this);
+        pager.setAdapter(pagerAdapter);
+
+        try
+        {
+            MasterKey.Builder b = new MasterKey.Builder(this);
+            b.setKeyScheme(MasterKey.KeyScheme.AES256_GCM);
+            MasterKey m = b.build();
+            SharedPreferences sharedPreferences = EncryptedSharedPreferences.create(
+                    this,
+                    "secret_shared_prefs",
+                    m,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            );
+            if (Data.api == null)
+            {
+                Data.api = API.restore(sharedPreferences,this);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Intent intent = new Intent(this,MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        if (Data.api == null  || (! Data.api.logged_in()))
+        {
+            Intent intent = new Intent(this,MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        try
+        {
+            MasterKey.Builder b = new MasterKey.Builder(this);
+            b.setKeyScheme(MasterKey.KeyScheme.AES256_GCM);
+            MasterKey m = b.build();
+            SharedPreferences sharedPreferences = EncryptedSharedPreferences.create(
+                    this,
+                    "secret_shared_prefs",
+                    m,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            );
+            Data.api.save(sharedPreferences);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Intent intent = new Intent(this,MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.navigation_menu, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        //System.out.println("menu item pressed");
+        switch (item.getItemId()) {
+            case R.id.menu_home:
+                //System.out.println("home pressed");
+                pager.setCurrentItem(0);
+                return true;
+            case R.id.menu_events:
+                pager.setCurrentItem(1);
+                return true;
+            case R.id.menu_files:
+                pager.setCurrentItem(2);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    
+    private class ScreenSlidePagerAdapter extends FragmentStateAdapter
+    {
+
+        public ScreenSlidePagerAdapter(@NonNull FragmentActivity fragmentActivity)
+        {
+            super(fragmentActivity);
+        }
+
+        @NonNull
+        @Override
+        public Fragment createFragment(int position)
+        {
+            switch (position)
+            {
+                case 0:
+                    return new HomeFragment();
+                case 1:
+                    return new CoursesFragment();
+                case 2:
+                    return new FileFragment();
+            }
+            return null;
+        }
+        
+        
+        @Override
+        public int getItemCount()
+        {
+            return 3;
+        }
+    }
+
+
+
+
+
+
+
+
+}
