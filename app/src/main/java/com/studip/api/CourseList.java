@@ -1,0 +1,41 @@
+package com.studip.api;
+import android.os.Handler;
+import com.studip.Data;
+import com.studip.api.rest.StudipList;
+public class CourseList extends ManagedObject<StudipList>
+{
+    private final String userID;
+    private String semesterID;
+    public CourseList(String userID, Handler h)
+    {
+        super(StudipList.class,h);
+        this.userID = userID;
+    }
+    public CourseList(String userID,String semesterID, Handler h)
+    {
+        this(userID,h);
+        this.semesterID = semesterID;
+    }
+    @Override
+    public void refresh()
+    {
+        if (ref == null)
+        {
+            if (userID == null)
+            {
+                throw new NullPointerException(); // TODO for now just throw, but if no user id is supplied it should return all courses in the system
+            }
+            else
+            {
+                if (semesterID == null)
+                {
+                    ref = Data.api.submitWithCallback(Data.api.new CallbackRoute(Data.api.new UserRoute("courses?limit=100000", userID),this));
+                }
+                else
+                {
+                    ref = Data.api.submitWithCallback(Data.api.new CallbackRoute(Data.api.new UserRoute("courses?limit=100000&"+semesterID, userID),this));
+                }
+            }
+        }
+    }
+}

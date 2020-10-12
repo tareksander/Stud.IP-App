@@ -3,6 +3,7 @@ package com.studip;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.os.HandlerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.security.crypto.EncryptedSharedPreferences;
@@ -13,10 +14,13 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.gson.Gson;
 import com.studip.api.API;
+import com.studip.api.User;
 
 public class HomeActivity extends AppCompatActivity
 {
@@ -65,6 +69,15 @@ public class HomeActivity extends AppCompatActivity
             Intent intent = new Intent(this,MainActivity.class);
             startActivity(intent);
             finish();
+        }
+        if (Data.gson == null)
+        {
+            Data.gson = new Gson();
+        }
+        if (Data.user == null)
+        {
+            Data.user = new User(HandlerCompat.createAsync(Looper.getMainLooper()));
+            Data.user.refresh();
         }
     }
 

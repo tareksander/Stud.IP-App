@@ -16,10 +16,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.gson.JsonObject;
 import com.studip.api.ResponseParser;
+import com.studip.api.rest.StudipUser;
 
-public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener
+public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, Runnable
 {
-
+    private HomeAdapter ad;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -32,13 +33,21 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         try
         {
             ListView l = v.findViewById(R.id.home_list);
-            
-            String json = Data.api.getUserdata().get();
-            JsonObject tree = ResponseParser.parseQuery(json);
-            String firstname = ResponseParser.getValue(tree,"given");
-            String welcome = getString(R.string.welcome);
-            String welcome_message = welcome+" "+firstname+"!";
-            l.setAdapter(new HomeAdapter(getActivity(),ArrayAdapter.NO_SELECTION,new String[] {welcome_message}));
+
+            StudipUser u = Data.user.getData();
+            if (u != null && u.name != null && u.name.given != null)
+            {
+                String welcome_message = getString(R.string.welcome)+" "+u.name.given+"!";
+                ad = new HomeAdapter(getActivity(),ArrayAdapter.NO_SELECTION,new String[] {welcome_message});
+                l.setAdapter(ad);
+            }
+            else
+            {
+                Data.user.addRefreshListener(this);
+                Data.user.refresh();
+                ad = new HomeAdapter(getActivity(),ArrayAdapter.NO_SELECTION,new String[0]);
+                l.setAdapter(ad);
+            }
         }
         catch (Exception e)
         {
@@ -46,9 +55,17 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         }
         return v;
     }
-
     
-
+    @Override
+    public void run()
+    {
+        Data.user.removeRefreshListener(this);
+        StudipUser u = Data.user.getData();
+        String welcome_message = getString(R.string.welcome)+" "+u.name.given+"!";
+        ad.s = new String[] {welcome_message};
+        ad.notifyDataSetChanged();
+    }
+    
     private class HomeAdapter extends ArrayAdapter
     {
         String[] s;

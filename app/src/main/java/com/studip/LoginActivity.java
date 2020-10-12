@@ -97,7 +97,7 @@ public class LoginActivity extends AppCompatActivity
         TextView password = findViewById(R.id.password);
         try
         {
-            if (Data.api.login(username.getText().toString(),password.getText().toString().toCharArray()).get())
+            if (Data.api.login(username.getText().toString(),password.getText().toString().toCharArray()))
             {
                 Intent intent = new Intent(this,HomeActivity.class);
                 startActivity(intent);
@@ -105,7 +105,7 @@ public class LoginActivity extends AppCompatActivity
                 return;
             }
         }
-        catch (Exception e) { }
+        catch (Exception e) {}
         new AlertDialog.Builder(this).setTitle(R.string.login_error_title).setMessage(R.string.login_error_message).show();
     }
     

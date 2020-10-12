@@ -1,5 +1,6 @@
 package com.studip.api;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.util.concurrent.Callable;
@@ -10,43 +11,42 @@ import java.util.concurrent.Future;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import javax.net.ssl.HttpsURLConnection;
+import android.os.Handler;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.security.crypto.EncryptedSharedPreferences;
 
-import com.google.gson.JsonObject;
 import com.studip.R;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class API
 {
-    
     private final String server; // hostname
     private ExecutorService exec = Executors.newFixedThreadPool(8);
     private ServerAuthenticator auth;
     private final String user_id_monitor = "";
     private volatile String user_id_cached;
-    
+
     private static final String HTTPS = "https://";
-
-
+    private static final String API = "/api.php/";
+    
     private static final String CREDENTIALS_SERVER = "credentials_server";
     private static final String CREDENTIALS_USERNAME = "credentials_username";
     private static final String CREDENTIALS_PASSWORD = "credentials_password";
-
-    static final String api_user = "/api.php/user";
-    static final String api_discovery = "/api.php/discovery";
-    static final String api_global_colors = "/api.php/studip/colors";
-    static final String api_global_settings = "/api.php/studip/settings";
-    static final String api_courses = "/courses";
-    static final String api_course = "/course";
-    static final String api_file = "/api.php/file";
-    static final String api_news_postfix = "/news";
-    static final String api_courses_postfix = "/courses";
-    static final String api_events_postfix = "/events";
-    static final String api_limit_1000 = "?limit=1000";
     
+    
+    private static final String route_discovery = "discovery";
+
+    private static final int METHOD_GET = 1;
+    private static final int METHOD_POST = 2;
+    private static final int METHOD_PUT = 3;
+    private static final int METHOD_DELETE = 4;
+
+    public API(String server)
+    {
+        this.server = server;
+    }
     
     private class ServerAuthenticator extends Authenticator
     {
@@ -58,34 +58,21 @@ public class API
         @Override
         protected PasswordAuthentication getPasswordAuthentication()
         {
-            //System.out.println("Protocol: "+getRequestingProtocol()+"\n Host: "+getRequestingHost());
             if (getRequestingProtocol().equals("https"))
             {
                 if (getRequestingHost() != null)
                 {
                     if (getRequestingHost().equals(server))
                     {
-                        //System.out.println("Allow authentication");
                         return p;
                     }
                 }
             }
-            //System.out.println("Deny authentication");
             return null;
         }
     }
     
-    
-    
-    
-    
-    
-    
-    public API(String server)
-    {
-        this.server = server;
-    }
-    
+
     public void save(SharedPreferences prefs)
     {
         if (prefs instanceof EncryptedSharedPreferences)
@@ -127,7 +114,14 @@ public class API
                     throw new NullPointerException("username found in shared preferences, but no password");
                 }
                 API api = new API(server);
-                if (! api.login(username,password.toCharArray()).get())
+                try
+                {
+                    if (! api.login(username,password.toCharArray()))
+                    {
+                        new AlertDialog.Builder(c).setTitle(R.string.login_error_title).setMessage(R.string.restore_error_message).show();
+                    }
+                }
+                catch (Exception e)
                 {
                     new AlertDialog.Builder(c).setTitle(R.string.login_error_title).setMessage(R.string.restore_error_message).show();
                 }
@@ -145,6 +139,87 @@ public class API
         }
     }
     
+    public boolean serverReachable()
+    {
+        Future<String> f = exec.submit(new BasicRoute(route_discovery));
+        try
+        {
+            f.get();
+        } catch (Exception ex)
+        {
+            if (ex instanceof ExecutionException)
+            {
+                Throwable e = ex.getCause();
+                if (!(e instanceof InvalidMethodException) && !(e instanceof AuthorisationException) && !(e instanceof RouteInactiveException))
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean api_enabled() throws Exception
+    {
+        Future<String> f = exec.submit(new BasicRoute(route_discovery));
+        try
+        {
+            f.get();
+        } catch (Exception e)
+        {
+            if (e instanceof ExecutionException)
+            {
+                if (e.getCause() instanceof RouteInactiveException)
+                    return false;
+                else
+                    throw e;
+            }
+            else
+            {
+                throw e;
+            }
+        }
+        return true;
+    }
+
+    public Future<String> submit(Route r)
+    {
+        return exec.submit(r);
+    }
+    
+    public Future submitWithCallback(CallbackRoute r)
+    {
+        return exec.submit(r);
+    }
+
+    public boolean login(String username,char[] password) throws Exception
+    {
+        try
+        {
+            auth = new ServerAuthenticator(username,password);
+            Authenticator.setDefault(auth);
+            exec.submit(new BasicRoute(route_discovery)).get();
+        } catch (Exception e)
+        {
+            auth = null;
+            Authenticator.setDefault(new DenyAuthenticator());
+            if (e instanceof ExecutionException)
+            {
+                if (e.getCause() instanceof IOException)
+                {
+                    throw (IOException) e.getCause();
+                }
+                if (e.getCause() instanceof AuthorisationException)
+                {
+                    return false;
+                }
+                throw e;
+            }
+            throw e;
+        }
+        return true;
+    }
     
     public boolean logged_in()
     {
@@ -157,293 +232,192 @@ public class API
             return false;
         }
     }
-    public boolean logout(SharedPreferences prefs)
-    {
-        exec.shutdown();
-        while (! exec.isTerminated())
-        {
-            try
-            {
-                Thread.sleep(10);
-            }
-            catch (InterruptedException e) {return false;}
-        }
-        exec = Executors.newFixedThreadPool(4);
-        auth = null;
-        Authenticator.setDefault(new DenyAuthenticator());
-        if (prefs instanceof EncryptedSharedPreferences)
-        {
-            SharedPreferences.Editor edit = prefs.edit();
-            edit.remove(CREDENTIALS_SERVER);
-            edit.remove(CREDENTIALS_USERNAME);
-            edit.remove(CREDENTIALS_PASSWORD);
-            edit.apply();
-        }
-        else
-        {
-            System.err.println("not loading, as the preferences are not encrypted");
-        }
-        return true;
-    }
-    public Future<Boolean> login(String username,char[] password)
-    {
-        return exec.submit(new LoginRequest(username,password));
-    }
     
-    
-    
-    
-    public String getUserID()
+    public class CallbackRoute implements Runnable
     {
-        if (user_id_cached != null)
+        private Route r;
+        private RouteCallback callback;
+        public CallbackRoute(Route r, RouteCallback callback)
         {
-            return user_id_cached;
-        }
-        else
-        {
-            synchronized (user_id_monitor)
-            {
-                try
-                {
-                    String json = (String) exec.submit(new UserDataRequest()).get();
-                    if (json == null)
-                    {
-                        return null;
-                    }
-                    JsonObject tree = ResponseParser.parseQuery(json);
-                    if (tree == null)
-                    {
-                        return null;
-                    }
-                    String userID = ResponseParser.getValue(tree,"user_id");
-                    if (userID == null)
-                    {
-                        return null;
-                    }
-                    user_id_cached = userID;
-                    return user_id_cached;
-                }
-                catch (Exception e)
-                {
-                    return null;
-                }
-            }
-        }
-    }
-
-
-    public Future<String> getUserdata()
-    {
-        return exec.submit(new UserDataRequest());
-    }
-    public Future<String> getUserNews()
-    {
-        return exec.submit(new UserNewsRequest());
-    }
-    
-    public Future<String> getUserCourses()
-    {
-        return exec.submit(new UserCoursesRequest());
-    }
-
-    public Future<String> getCourseEvents(String courseID)
-    {
-        return exec.submit(new CourseEventsRequest(courseID));
-    }
-
-
-    private class CourseEventsRequest implements Callable
-    {
-        String courseID;
-        public CourseEventsRequest(String courseID)
-        {
-            this.courseID = courseID;
+            this.r = r;
+            this.callback = callback;
         }
         @Override
-        public String call() throws Exception
+        public void run()
         {
+            String s;
             try
             {
-                HttpsURLConnection con = (HttpsURLConnection) new URL(HTTPS + server + api_course+"/"+courseID+api_events_postfix+api_limit_1000).openConnection();
-                con.setInstanceFollowRedirects(false);
-                con.setConnectTimeout(5000);
-                con.setReadTimeout(5000);
-                con.connect();
-                if (con.getResponseCode() == 200)
-                {
-                    BufferedReader r = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                    StringBuilder build = new StringBuilder();
-                    String res;
-                    while ((res = r.readLine()) != null)
-                    {
-                        build.append(res);
-                    }
-                    return build.toString();
-                }
-                else
-                {
-                    return "";
-                }
+                s = r.call();
             } catch (Exception e)
             {
-                return "";
+                callback.setError(e);
+                callback.run();
+                return;
             }
+            callback.setResult(s);
+            callback.run();
         }
     }
     
-    private class UserCoursesRequest implements Callable
+    public abstract class Route implements Callable<String>
     {
-        @Override
-        public String call() throws Exception
+        final String route;
+        private final int method;
+        public Route(String route,int method)
         {
-            try
-            {
-                HttpsURLConnection con = (HttpsURLConnection) new URL(HTTPS + server + api_user+"/"+getUserID()+api_courses_postfix+api_limit_1000).openConnection();
-                con.setInstanceFollowRedirects(false);
-                con.setConnectTimeout(5000);
-                con.setReadTimeout(5000);
-                con.connect();
-                if (con.getResponseCode() == 200)
-                {
-                    BufferedReader r = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                    StringBuilder build = new StringBuilder();
-                    String res;
-                    while ((res = r.readLine()) != null)
-                    {
-                        build.append(res);
-                    }
-                    return build.toString();
-                }
-                else
-                {
-                    return "";
-                }
-            } catch (Exception e)
-            {
-                return "";
-            }
+            this.route = route;
+            this.method = method;
         }
-    }
-    
-    private class UserDataRequest implements Callable
-    {
-        @Override
-        public String call() throws Exception
+        public Route(String route)
         {
-            try
-            {
-                HttpsURLConnection con = (HttpsURLConnection) new URL(HTTPS + server + api_user).openConnection();
-                con.setInstanceFollowRedirects(false);
-                con.setConnectTimeout(5000);
-                con.setReadTimeout(5000);
-                con.connect();
-                if (con.getResponseCode() == 200)
-                {
-                    BufferedReader r = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                    StringBuilder build = new StringBuilder();
-                    String res;
-                    while ((res = r.readLine()) != null)
-                    {
-                        build.append(res);
-                    }
-                    return build.toString();
-                }
-                else
-                {
-                    return "";
-                }
-            } catch (Exception e)
-            {
-                return "";
-            }
+            this.route = route;
+            this.method = METHOD_GET;
         }
-    }
-    
-    
-    private class UserNewsRequest implements Callable
-    {
-        @Override
-        public String call() throws Exception
+        public String getFullURL()
         {
-            try
-            {
-                HttpsURLConnection con = (HttpsURLConnection) new URL(HTTPS + server + api_user + "/" + getUserID() + api_news_postfix).openConnection();
-                con.setInstanceFollowRedirects(false);
-                con.setConnectTimeout(5000);
-                con.setReadTimeout(5000);
-                con.connect();
-                if (con.getResponseCode() == 200)
-                {
-                    BufferedReader r = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                    StringBuilder build = new StringBuilder();
-                    String res;
-                    while ((res = r.readLine()) != null)
-                    {
-                        build.append(res);
-                    }
-                    return build.toString();
-                }
-                else
-                {
-                    System.out.print("error code: "+con.getResponseCode());
-                    return "";
-                }
-            } catch (Exception e)
-            {
-                e.printStackTrace();
-                return "";
-            }
-        }
-    }
-    
-    
-    private class LoginRequest implements Callable
-    {
-        String username;
-        char[] password;
-        public LoginRequest(String username,char[] password)
-        {
-            this.username = username;
-            this.password = password.clone();
+            return HTTPS + server + API + route;
         }
         @Override
-        public Boolean call() throws Exception
+        public String call() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
         {
-            try
+            switch (method)
             {
-                auth = new ServerAuthenticator(username, password);
-                Authenticator.setDefault(auth);
-                for (int i = 0; i < password.length; i++)
-                {
-                    password[i] = '*';
-                }
-                HttpsURLConnection con = (HttpsURLConnection) new URL(HTTPS + server + api_discovery).openConnection();
-                con.setInstanceFollowRedirects(false);
-                con.setConnectTimeout(5000);
-                con.setReadTimeout(5000);
-                con.connect();
-                //System.out.println("response code: " + con.getResponseCode());
-                if (con.getResponseCode() == 200)
-                {
-                    con.disconnect();
-                    return new Boolean(true);
-                }
-                else
-                {
-                    con.disconnect();
-                    Authenticator.setDefault(new DenyAuthenticator());
-                    auth = null;
-                    return new Boolean(false);
-                }
-            } catch (Exception e)
+                case METHOD_GET:
+                    return get();
+                case METHOD_POST:
+                    return post();
+                case METHOD_PUT:
+                    return put();
+                case METHOD_DELETE:
+                    return delete();
+            }
+            throw new InvalidMethodException();
+        }
+        public String readConnection(HttpsURLConnection con) throws IOException
+        {
+            BufferedReader r = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            StringBuilder builder = new StringBuilder();
+            String s;
+            while ((s = r.readLine()) != null)
             {
-                //e.printStackTrace();
-                Authenticator.setDefault(new DenyAuthenticator());
-                auth = null;
-                return new Boolean(false);
+                builder.append(s);
+            }
+            con.disconnect();
+            return builder.toString();
+        }
+        public void handleResponseCode(int code) throws AuthorisationException, RouteInactiveException, InvalidMethodException, IOException
+        {
+            switch (code)
+            {
+                case 200:
+                    return;
+                case 401:
+                    throw new AuthorisationException();
+                case 403:
+                    throw new RouteInactiveException();
+                case 404:
+                    throw new InvalidMethodException();
+                default:
+                    throw new IOException("unexpected status code: "+code);
+            }
+        }
+        public abstract String get() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
+        public abstract String post() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
+        public abstract String put() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
+        public abstract String delete() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
+    }
+    public class BasicRoute extends Route
+    {
+        public BasicRoute(String route, int method)
+        {
+            super(route, method);
+        }
+        public BasicRoute(String route)
+        {
+            super(route);
+        }
+        @Override
+        public String get() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            HttpsURLConnection con = (HttpsURLConnection) new URL(getFullURL()).openConnection();
+            con.setInstanceFollowRedirects(false);
+            con.setConnectTimeout(5000);
+            con.setReadTimeout(5000);
+            con.connect();
+            handleResponseCode(con.getResponseCode());
+            return readConnection(con);
+        }
+        @Override
+        public String post() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            HttpsURLConnection con = (HttpsURLConnection) new URL(getFullURL()).openConnection();
+            con.setInstanceFollowRedirects(false);
+            con.setConnectTimeout(5000);
+            con.setReadTimeout(5000);
+            con.setRequestMethod("POST");
+            con.connect();
+            handleResponseCode(con.getResponseCode());
+            return readConnection(con);
+        }
+        @Override
+        public String put() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            HttpsURLConnection con = (HttpsURLConnection) new URL(getFullURL()).openConnection();
+            con.setInstanceFollowRedirects(false);
+            con.setConnectTimeout(5000);
+            con.setReadTimeout(5000);
+            con.setRequestMethod("PUT");
+            con.connect();
+            handleResponseCode(con.getResponseCode());
+            return readConnection(con);
+        }
+        @Override
+        public String delete() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            HttpsURLConnection con = (HttpsURLConnection) new URL(getFullURL()).openConnection();
+            con.setInstanceFollowRedirects(false);
+            con.setConnectTimeout(5000);
+            con.setReadTimeout(5000);
+            con.setRequestMethod("DELETE");
+            con.connect();
+            handleResponseCode(con.getResponseCode());
+            return readConnection(con);
+        }
+    }
+    
+    public class UserRoute extends BasicRoute
+    {
+        String userID;
+        public UserRoute(String route, int method,String userID)
+        {
+            super(route, method);
+            this.userID = userID;
+        }
+        public UserRoute(String route,String userID)
+        {
+            super(route);
+            this.userID = userID;
+        }
+        @Override
+        public String getFullURL()
+        {
+            if (route.equals(""))
+            {
+                return HTTPS + server + API + "user/" + userID;
+            }
+            else
+            {
+                return HTTPS + server + API + "user/" + userID + "/" + route;
             }
         }
     }
+    
+    
+    
+    
+    
+    
     
     
     

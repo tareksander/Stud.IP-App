@@ -2,6 +2,7 @@ package com.studip;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.core.os.HandlerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,14 +19,20 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.studip.api.CourseList;
+import com.studip.api.Courses;
 import com.studip.api.ResponseParser;
+import com.studip.api.rest.StudipCourse;
+import com.studip.api.rest.StudipList;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener
+public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, Runnable
 {
     EventAdapter event_adapter;
+    CourseList l;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -34,8 +42,13 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         View v = inflater.inflate(R.layout.fragment_courses, container, false);
         SwipeRefreshLayout r = v.findViewById(R.id.event_refresh);
         r.setOnRefreshListener(this);
+        
+        // TODO add null checks here, as the object might me malformed or null
+        this.l = new CourseList(Data.user.getData().user_id, HandlerCompat.createAsync(Looper.getMainLooper()));
+        this.l.addRefreshListener(this);
+        
         ListView l = v.findViewById(R.id.event_list);
-        event_adapter = new EventAdapter(getActivity(),ArrayAdapter.NO_SELECTION,new Course[0]);
+        event_adapter = new EventAdapter(getActivity(),ArrayAdapter.NO_SELECTION);
         l.setAdapter(event_adapter);
         return v;
     }
@@ -44,50 +57,23 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        updateCourses();
+        l.refresh();
     }
     
-    private void updateCourses()
+
+    @Override
+    public void run()
     {
         try
         {
-            String json = Data.api.getUserCourses().get();
-            JsonObject root = ResponseParser.parseQuery(json);
-            JsonObject collection = ResponseParser.getCollection(root);
-            Course[] courses = new Course[collection.size()];
-            Iterator<Map.Entry<String,JsonElement>> it =  collection.entrySet().iterator();
-            for (int i = 0;i<courses.length;i++)
-            {
-                boolean forum = false, files = false, events = false;
-                JsonObject course = it.next().getValue().getAsJsonObject();
-                if (ResponseParser.getValue(course,"forum") != null)
-                {
-                    forum = true;
-                }
-                if (ResponseParser.getValue(course,"documents") != null)
-                {
-                    files = true;
-                }
-                String courseID = ResponseParser.getValue(course,"course_id");
-                String events_json = Data.api.getCourseEvents(courseID).get();
-                JsonObject events_root = ResponseParser.parseQuery(events_json);
-                if (events_root != null)
-                {
-                    JsonObject events_collection = ResponseParser.getCollection(events_root);
-                    if (events_collection.size() != 0)
-                    {
-                        events = true;
-                    }
-                }
-                String name = ResponseParser.getValue(course,"title");
-                courses[i] = new Course(courseID,name,forum,false,files,events,false,false,false,false,false,false,false,false);
-            }
-            event_adapter.courses = courses;
-        } catch (Exception e) {e.printStackTrace();}
+            event_adapter.courselist = Courses.ArrayFromList(l.getData());
+            event_adapter.notifyDataSetChanged();
+            SwipeRefreshLayout r = getView().findViewById(R.id.event_refresh);
+            r.setRefreshing(false);
+        }
+        catch (Exception e) {}
     }
-    
-    
-    
+    /*
     private class Course
     {
         String courseID;
@@ -123,17 +109,16 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
             this.meetings_new = meetings_new;
         }
     }
+    */
     
+     
     private class EventAdapter extends ArrayAdapter
     {
-        Course[] courses;
-        public EventAdapter(@NonNull Context context, int resource,Course[] events)
+        StudipCourse[] courselist;
+        public EventAdapter(@NonNull Context context, int resource)
         {
             super(context, resource);
-            this.courses = events;
         }
-
-
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)
         {
@@ -147,28 +132,29 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 v = getLayoutInflater().inflate(R.layout.courses_entry,parent,false);
             }
             TextView t = v.findViewById(R.id.course_name);
-            t.setText(courses[position].name);
-            if (! courses[position].forum)
+            t.setText(courselist[position].title);
+            if (courselist[position].modules == null || (courselist[position].modules.forum == null))
             {
                 ImageView img = v.findViewById(R.id.course_forum);
                 img.setVisibility(View.INVISIBLE);
             }
-            if (! courses[position].news)
+            if (true)
             {
                 ImageView img = v.findViewById(R.id.course_news);
                 img.setVisibility(View.INVISIBLE);
             }
-            if (! courses[position].schedule)
+            if (true)
             {
+                // TODO the events have to be fetched course-by-course, but you can use ?limit=0 to just get the pagination, because for this menu we only want to know if there are any
                 ImageView img = v.findViewById(R.id.course_schedule);
                 img.setVisibility(View.INVISIBLE);
             }
-            if (! courses[position].courseware)
+            if (true)
             {
                 ImageView img = v.findViewById(R.id.course_courseware);
                 img.setVisibility(View.INVISIBLE);
             }
-            if (! courses[position].meetings)
+            if (true)
             {
                 ImageView img = v.findViewById(R.id.course_meetings);
                 img.setVisibility(View.INVISIBLE);
@@ -179,7 +165,11 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         @Override
         public int getCount()
         {
-            return courses.length;
+            if (courselist == null)
+            {
+                return 0;
+            }
+            return courselist.length;
         }
     }
     
@@ -189,8 +179,6 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public void onRefresh()
     {
-        updateCourses();
-        SwipeRefreshLayout r = getView().findViewById(R.id.event_refresh);
-        r.setRefreshing(false);
+        l.refresh();
     }
 }
