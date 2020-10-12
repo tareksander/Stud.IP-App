@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="#000000"
+        android:visibility="visible"
         app:layout_constraintEnd_toStartOf="@+id/course_info"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -28,6 +29,7 @@
         android:id="@+id/course_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="visible"
         app:layout_constraintEnd_toStartOf="@+id/course_forum"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/info_grey" />
@@ -36,6 +38,7 @@
         android:id="@+id/course_schedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/course_courseware"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/schedule_grey" />
@@ -44,6 +47,7 @@
         android:id="@+id/course_forum"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/course_participants"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/forum_grey" />
@@ -61,6 +65,7 @@
         android:id="@+id/course_news"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/course_schedule"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/news_grey" />
@@ -69,6 +74,7 @@
         android:id="@+id/course_participants"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="visible"
         app:layout_constraintEnd_toStartOf="@+id/course_news"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/persons_grey" />

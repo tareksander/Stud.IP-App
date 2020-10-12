@@ -2,6 +2,7 @@ package com.studip;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,22 +18,23 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.studip.api.CourseList;
 import com.studip.api.Courses;
-import com.studip.api.ResponseParser;
+import com.studip.api.EventList;
+import com.studip.api.RouteCallback;
 import com.studip.api.rest.StudipCourse;
-import com.studip.api.rest.StudipList;
+import com.studip.api.rest.StudipListArray;
+import com.studip.api.rest.StudipListObject;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.Arrays;
 
 public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, Runnable
 {
     EventAdapter event_adapter;
     CourseList l;
+    private final String pending_monitor = "";
+    EventList[] pending;
+    Handler h;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -44,10 +46,14 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         r.setOnRefreshListener(this);
         
         // TODO add null checks here, as the object might me malformed or null
-        this.l = new CourseList(Data.user.getData().user_id, HandlerCompat.createAsync(Looper.getMainLooper()));
+        h = HandlerCompat.createAsync(Looper.getMainLooper());
+        this.l = new CourseList(Data.user.getData().user_id,h);
         this.l.addRefreshListener(this);
         
+        
+        
         ListView l = v.findViewById(R.id.event_list);
+        
         event_adapter = new EventAdapter(getActivity(),ArrayAdapter.NO_SELECTION);
         l.setAdapter(event_adapter);
         return v;
@@ -66,13 +72,88 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
     {
         try
         {
+            if (event_adapter.events != null)
+            {
+                event_adapter.events = Arrays.copyOf(event_adapter.events,l.getData().pagination.total);
+            }
+            else
+            {
+                event_adapter.events = new boolean[l.getData().pagination.total];
+            }
             event_adapter.courselist = Courses.ArrayFromList(l.getData());
             event_adapter.notifyDataSetChanged();
-            SwipeRefreshLayout r = getView().findViewById(R.id.event_refresh);
-            r.setRefreshing(false);
+            StudipCourse[] courses = Courses.ArrayFromList(l.getData());
+            pending = new EventList[l.getData().pagination.total];
+            for (int i = 0;i<pending.length;i++)
+            {
+                //System.out.println(Data.api.submit(Data.api.new CourseRoute("events",courses[i].course_id)).get());
+                pending[i] = new EventList(h,courses[i].course_id);
+                pending[i].addRefreshListener(new HasEvents(i));
+                pending[i].refresh();
+            }
         }
-        catch (Exception e) {}
+        catch (Exception e) {e.printStackTrace();}
+        //System.out.println("main refresh done");
+        //SwipeRefreshLayout r = getView().findViewById(R.id.event_refresh);
+        //r.setRefreshing(false);
     }
+    
+    
+    public class HasEvents implements Runnable
+    {
+        int index;
+        public HasEvents(int index)
+        {
+            this.index = index;
+        }
+        @Override
+        public void run()
+        {
+            //System.out.println("finished event route");
+            try
+            {
+                StudipListArray l = pending[index].getData();
+                if (l != null)
+                {
+                    if (l.pagination != null && l.pagination.total > 0)
+                    {
+                        event_adapter.events[index] = true;
+                        event_adapter.notifyDataSetChanged();
+                    }
+                    else 
+                    {
+                        event_adapter.events[index] = false;
+                        event_adapter.notifyDataSetChanged();
+                    }
+                }
+                else
+                {
+                    event_adapter.events[index] = false;
+                    event_adapter.notifyDataSetChanged();
+                }
+            } catch (Exception e)
+            {
+                event_adapter.events[index] = false;
+                event_adapter.notifyDataSetChanged();
+            }
+            synchronized (pending_monitor)
+            {
+                //System.out.println("finished event route for index: "+index);
+                pending[index].removeRefreshListener(this);
+                pending[index] = null;
+                for (int i = 0; i < pending.length; i++)
+                {
+                    if (pending[i] != null)
+                        return;
+                }
+                //System.out.println("all pending requests done");
+                SwipeRefreshLayout r = getView().findViewById(R.id.event_refresh);
+                r.setRefreshing(false);
+                event_adapter.notifyDataSetChanged();
+            }
+        }
+    }
+    
     /*
     private class Course
     {
@@ -115,6 +196,7 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private class EventAdapter extends ArrayAdapter
     {
         StudipCourse[] courselist;
+        boolean[] events;
         public EventAdapter(@NonNull Context context, int resource)
         {
             super(context, resource);
@@ -133,30 +215,38 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
             TextView t = v.findViewById(R.id.course_name);
             t.setText(courselist[position].title);
+            ImageView img;
+            img = v.findViewById(R.id.course_forum);
             if (courselist[position].modules == null || (courselist[position].modules.forum == null))
             {
-                ImageView img = v.findViewById(R.id.course_forum);
                 img.setVisibility(View.INVISIBLE);
             }
+            else
+            {
+                img.setVisibility(View.VISIBLE);
+            }
+            img = v.findViewById(R.id.course_news);
             if (true)
             {
-                ImageView img = v.findViewById(R.id.course_news);
                 img.setVisibility(View.INVISIBLE);
             }
-            if (true)
+            img = v.findViewById(R.id.course_schedule);
+            if (! events[position])
             {
-                // TODO the events have to be fetched course-by-course, but you can use ?limit=0 to just get the pagination, because for this menu we only want to know if there are any
-                ImageView img = v.findViewById(R.id.course_schedule);
                 img.setVisibility(View.INVISIBLE);
             }
+            else
+            {
+                img.setVisibility(View.VISIBLE);
+            }
+            img = v.findViewById(R.id.course_courseware);
             if (true)
             {
-                ImageView img = v.findViewById(R.id.course_courseware);
                 img.setVisibility(View.INVISIBLE);
             }
+            img = v.findViewById(R.id.course_meetings);
             if (true)
             {
-                ImageView img = v.findViewById(R.id.course_meetings);
                 img.setVisibility(View.INVISIBLE);
             }
             return v;

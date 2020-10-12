@@ -38,6 +38,7 @@ public abstract class ManagedObject<T> extends RouteCallback
                 refresh();
                 return;
             }
+            //System.out.println("route finished, calling listeners");
             ref = null;
             for (Runnable listener : listeners)
             {

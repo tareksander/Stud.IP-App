@@ -11,7 +11,6 @@ import java.util.concurrent.Future;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Handler;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.security.crypto.EncryptedSharedPreferences;
@@ -412,8 +411,33 @@ public class API
             }
         }
     }
-    
-    
+
+    public class CourseRoute extends BasicRoute
+    {
+        String courseID;
+        public CourseRoute(String route, int method,String courseID)
+        {
+            super(route, method);
+            this.courseID = courseID;
+        }
+        public CourseRoute(String route,String courseID)
+        {
+            super(route);
+            this.courseID = courseID;
+        }
+        @Override
+        public String getFullURL()
+        {
+            if (route.equals(""))
+            {
+                return HTTPS + server + API + "course/" + courseID;
+            }
+            else
+            {
+                return HTTPS + server + API + "course/" + courseID + "/" + route;
+            }
+        }
+    }
     
     
     

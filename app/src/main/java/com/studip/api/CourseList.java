@@ -1,14 +1,14 @@
 package com.studip.api;
 import android.os.Handler;
 import com.studip.Data;
-import com.studip.api.rest.StudipList;
-public class CourseList extends ManagedObject<StudipList>
+import com.studip.api.rest.StudipListObject;
+public class CourseList extends ManagedObject<StudipListObject>
 {
     private final String userID;
     private String semesterID;
     public CourseList(String userID, Handler h)
     {
-        super(StudipList.class,h);
+        super(StudipListObject.class,h);
         this.userID = userID;
     }
     public CourseList(String userID,String semesterID, Handler h)

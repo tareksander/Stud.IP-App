@@ -1,16 +1,15 @@
 package com.studip.api;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.studip.Data;
 import com.studip.api.rest.StudipCourse;
-import com.studip.api.rest.StudipList;
+import com.studip.api.rest.StudipListObject;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 public class Courses
 {
-    public static StudipCourse[] ArrayFromList(StudipList l) throws IOException
+    public static StudipCourse[] ArrayFromList(StudipListObject l) throws IOException
     {
         StudipCourse[] courses = new StudipCourse[l.pagination.total-l.pagination.offset];
         Iterator<Map.Entry<String, JsonElement>> it = l.collection.entrySet().iterator();
