@@ -1,5 +1,6 @@
 package com.studip.api.rest;
-public class StudipEvent
+import java.io.Serializable;
+public class StudipEvent  implements Serializable
 {
     public String event_id;
     public String start;

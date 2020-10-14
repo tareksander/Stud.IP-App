@@ -9,9 +9,22 @@
     <string name="login_error_message">Es ist entweder der Hostname, der Benutzername oder das Passwort falsch. Wenn sie sich sicher sind, dass alles richtig ist, hat ihr Stud.ip Admin das API nicht freigeschaltet.</string>
     <string name="restore_error_message">Es ist ein Fehler beim Wiederherstellen der Verbindung aufgetreten. Überprüfen sie ihre Netzwerkverbindung oder versuchen sie, sich erneut anzumelden.</string>
     <string name="url_uos">studip.uni-osnabrueck.de</string>
-    <string name="title_activity_home">Home</string>
     <string name="menu_home">Home</string>
     <string name="menu_event">Veranstaltungen</string>
     <string name="menu_files">Dateien</string>
     <string name="welcome">Willkommen</string>
+    <string name="settings">Einstellungen</string>
+    <string name="settings_main">Einstellungen:</string>
+    <string name="clear_credentials">Anmeldedaten löschen</string>
+    <string name="clear_credentials_dialog">Anmeldedaten wirklich löschen?</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="settings_experimental">Hier können experimentelle Features aktiviert werden:</string>
+    <string name="auth_setting">Authentifizierungsmethode</string>
+    <string name="auth_basic">HTTP Basic Authentication</string>
+    <string name="auth_cookie">Session Cookie</string>
+    <string name="auth_oauth">OAuth 2</string>
+    <string name="settings_developer">Entwicklereinstellungen:<br></br>Diese Einstellungen können die App instabil machen oder die Sicherheit herabsetzen. Benutzen auf eigene Gefahr.</string>
+    
+    
 </resources>

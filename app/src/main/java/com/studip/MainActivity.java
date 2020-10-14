@@ -37,6 +37,10 @@ public class MainActivity extends AppCompatActivity
                     EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             );
+            if (Data.settings == null)
+            {
+                Data.settings = Settings.load(sharedPreferences);
+            }
             if (Data.api == null)
             {
                 Data.api = API.restore(sharedPreferences,this);
@@ -57,6 +61,13 @@ public class MainActivity extends AppCompatActivity
         super.onStop();
     }
 
+    public void onSettingsButton(View v)
+    {
+        Intent intent = new Intent(this,SettingsActivity.class);
+        startActivity(intent);
+    }
+    
+    
     private void toLoginActivity()
     {
         Intent intent = new Intent(this,LoginActivity.class);

@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.gson.JsonObject;
 import com.studip.api.CourseList;
 import com.studip.api.Courses;
 import com.studip.api.EventList;
@@ -30,6 +31,9 @@ import java.util.Arrays;
 
 public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, Runnable
 {
+    private static final String courselist_key = "coursefragment_courselist";
+    private static final String courselist_lecturers_key = "coursefragment_courselist_lecturers";
+    private static final String eventlist_key = "coursefragment_eventlist";
     EventAdapter event_adapter;
     CourseList l;
     private final String pending_monitor = "";
@@ -53,17 +57,45 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         
         
         ListView l = v.findViewById(R.id.event_list);
-        
-        event_adapter = new EventAdapter(getActivity(),ArrayAdapter.NO_SELECTION);
+
+        event_adapter = new EventAdapter(getActivity(), ArrayAdapter.NO_SELECTION);
+        if (savedInstanceState != null)
+        {
+            //System.out.println("restoring courses state");
+            event_adapter.events = (boolean[]) savedInstanceState.getSerializable(eventlist_key);
+            event_adapter.courselist = (StudipCourse[]) savedInstanceState.getSerializable(courselist_key);
+            for (int i = 0;i<event_adapter.courselist.length;i++)
+            {
+                event_adapter.courselist[i].lecturers = Data.gson.fromJson(savedInstanceState.getString(courselist_lecturers_key+i), JsonObject.class);
+            }
+        }
         l.setAdapter(event_adapter);
+        
         return v;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        //System.out.println("saving courses state");
+        outState.putSerializable(courselist_key,event_adapter.courselist);
+        for (int i = 0;i<event_adapter.courselist.length;i++)
+        {
+            outState.putString(courselist_lecturers_key+i,Data.gson.toJson(event_adapter.courselist[i].lecturers));
+        }
+        outState.putSerializable(eventlist_key,event_adapter.events);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        l.refresh();
+        if (savedInstanceState == null)
+        {
+            //System.out.println("getting courses information");
+            l.refresh();
+        }
     }
     
 
@@ -153,44 +185,6 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         }
     }
-    
-    /*
-    private class Course
-    {
-        String courseID;
-        String name;
-        boolean forum;
-        boolean news;
-        boolean files;
-        boolean schedule;
-        boolean courseware;
-        boolean meetings;
-        boolean forum_new;
-        boolean news_new;
-        boolean files_new;
-        boolean schedule_new;
-        boolean courseware_new;
-        boolean meetings_new;
-        public Course(String courseID,String name,boolean forum,boolean news,boolean files,boolean schedule,boolean courseware,boolean meetings
-                                               ,boolean forum_new,boolean news_new,boolean files_new,boolean schedule_new,boolean courseware_new,boolean meetings_new)
-        {
-            this.courseID = courseID;
-            this.name = name;
-            this.forum = forum;
-            this.news = news;
-            this.files = files;
-            this.schedule = schedule;
-            this.courseware = courseware;
-            this.meetings = meetings;
-            this.forum_new = forum_new;
-            this.news_new = news_new;
-            this.files_new = files_new;
-            this.schedule_new = schedule_new;
-            this.courseware_new = courseware_new;
-            this.meetings_new = meetings_new;
-        }
-    }
-    */
     
      
     private class EventAdapter extends ArrayAdapter

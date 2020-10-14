@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,6 +16,7 @@ import android.content.SharedPreferences;
 import androidx.appcompat.app.AlertDialog;
 import androidx.security.crypto.EncryptedSharedPreferences;
 
+import com.studip.Data;
 import com.studip.R;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -22,7 +24,8 @@ import javax.net.ssl.HttpsURLConnection;
 public class API
 {
     private final String server; // hostname
-    private ExecutorService exec = Executors.newFixedThreadPool(8);
+    private final int EXECUTOR_THREADS_NUM = 8;
+    private ExecutorService exec = Executors.newFixedThreadPool(EXECUTOR_THREADS_NUM);
     private ServerAuthenticator auth;
     private final String user_id_monitor = "";
     private volatile String user_id_cached;
@@ -30,9 +33,9 @@ public class API
     private static final String HTTPS = "https://";
     private static final String API = "/api.php/";
     
-    private static final String CREDENTIALS_SERVER = "credentials_server";
-    private static final String CREDENTIALS_USERNAME = "credentials_username";
-    private static final String CREDENTIALS_PASSWORD = "credentials_password";
+    public static final String CREDENTIALS_SERVER = "credentials_server";
+    public static final String CREDENTIALS_USERNAME = "credentials_username";
+    public static final String CREDENTIALS_PASSWORD = "credentials_password";
     
     
     private static final String route_discovery = "discovery";
@@ -41,7 +44,8 @@ public class API
     private static final int METHOD_POST = 2;
     private static final int METHOD_PUT = 3;
     private static final int METHOD_DELETE = 4;
-
+    private static final int METHOD_HEAD = 5;
+    
     public API(String server)
     {
         this.server = server;
@@ -220,6 +224,22 @@ public class API
         return true;
     }
     
+    public void logout(SharedPreferences prefs)
+    {
+        exec.shutdown();
+        try
+        {
+            exec.awaitTermination(1000, TimeUnit.MILLISECONDS);
+        }
+        catch (InterruptedException e) {}
+        exec.shutdownNow();
+        Authenticator.setDefault(new DenyAuthenticator());
+        auth = null;
+        save(prefs);
+        Data.user = null;
+        exec = Executors.newFixedThreadPool(EXECUTOR_THREADS_NUM);
+    }
+    
     public boolean logged_in()
     {
         if (auth != null)
@@ -234,8 +254,8 @@ public class API
     
     public class CallbackRoute implements Runnable
     {
-        private Route r;
-        private RouteCallback callback;
+        private final Route r;
+        private final RouteCallback callback;
         public CallbackRoute(Route r, RouteCallback callback)
         {
             this.r = r;
@@ -290,6 +310,8 @@ public class API
                     return put();
                 case METHOD_DELETE:
                     return delete();
+                case METHOD_HEAD:
+                    return head();
             }
             throw new InvalidMethodException();
         }
@@ -325,6 +347,7 @@ public class API
         public abstract String post() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
         public abstract String put() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
         public abstract String delete() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
+        public abstract String head() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
     }
     public class BasicRoute extends Route
     {
@@ -350,26 +373,12 @@ public class API
         @Override
         public String post() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
         {
-            HttpsURLConnection con = (HttpsURLConnection) new URL(getFullURL()).openConnection();
-            con.setInstanceFollowRedirects(false);
-            con.setConnectTimeout(5000);
-            con.setReadTimeout(5000);
-            con.setRequestMethod("POST");
-            con.connect();
-            handleResponseCode(con.getResponseCode());
-            return readConnection(con);
+            throw new InvalidMethodException();
         }
         @Override
         public String put() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
         {
-            HttpsURLConnection con = (HttpsURLConnection) new URL(getFullURL()).openConnection();
-            con.setInstanceFollowRedirects(false);
-            con.setConnectTimeout(5000);
-            con.setReadTimeout(5000);
-            con.setRequestMethod("PUT");
-            con.connect();
-            handleResponseCode(con.getResponseCode());
-            return readConnection(con);
+            throw new InvalidMethodException();
         }
         @Override
         public String delete() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
@@ -383,11 +392,17 @@ public class API
             handleResponseCode(con.getResponseCode());
             return readConnection(con);
         }
+
+        @Override
+        public String head() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            throw new InvalidMethodException();
+        }
     }
     
     public class UserRoute extends BasicRoute
     {
-        String userID;
+        final String userID;
         public UserRoute(String route, int method,String userID)
         {
             super(route, method);
@@ -414,7 +429,7 @@ public class API
 
     public class CourseRoute extends BasicRoute
     {
-        String courseID;
+        final String courseID;
         public CourseRoute(String route, int method,String courseID)
         {
             super(route, method);

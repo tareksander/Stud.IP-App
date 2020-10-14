@@ -34,6 +34,10 @@ public class LoginActivity extends AppCompatActivity
                     EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             );
+            if (Data.settings == null)
+            {
+                Data.settings = Settings.load(sharedPreferences);
+            }
             if (Data.api == null)
             {
                 Data.api = API.restore(sharedPreferences,this);
@@ -99,6 +103,27 @@ public class LoginActivity extends AppCompatActivity
         {
             if (Data.api.login(username.getText().toString(),password.getText().toString().toCharArray()))
             {
+                try
+                {
+                    MasterKey.Builder b = new MasterKey.Builder(this);
+                    b.setKeyScheme(MasterKey.KeyScheme.AES256_GCM);
+                    MasterKey m = b.build();
+                    SharedPreferences sharedPreferences = EncryptedSharedPreferences.create(
+                            this,
+                            "secret_shared_prefs",
+                            m,
+                            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                    );
+                    Data.api.save(sharedPreferences);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Intent intent = new Intent(this,MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
                 Intent intent = new Intent(this,HomeActivity.class);
                 startActivity(intent);
                 finish();

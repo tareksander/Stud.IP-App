@@ -1,6 +1,7 @@
 package com.studip.api.rest;
 import com.google.gson.JsonObject;
-public class StudipCourse
+import java.io.Serializable;
+public class StudipCourse implements Serializable
 {
     public String course_id;
     public String number;
@@ -9,9 +10,12 @@ public class StudipCourse
     public String type;
     public String description;
     public String location;
-    public JsonObject lecturers; // can't be easily represented in Java
+    
+    // because the Gson instance is created to include transient fields, you just have to serialize it manually with Gson
+    // when using java serialization
+    public transient JsonObject lecturers; // can't be easily represented in Java
     public Members members;
-    public class Members
+    public class Members  implements Serializable
     {
         public String user;
         public int user_count;
@@ -25,7 +29,7 @@ public class StudipCourse
     public String start_semester;
     public String end_semester;
     public Modules modules;
-    public class Modules
+    public class Modules  implements Serializable
     {
         public String forum;
         public String documents;

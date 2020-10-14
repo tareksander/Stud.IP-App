@@ -1,6 +1,49 @@
 TODO:
-    To make a new icon from a svg, convert it to a png with GIMP and then use it in android studio
-    The API also seems to work with session cookies, as it works with them in the browser.
-    Fix freezing while refreshing by using a handler that gets called in the UI thread after a request is done-
+    rework the api to also get session cookies on login, to use in VideoViews and WebViews
+    login: index.php
+    form variables: loginname, password
+    https://en.wikipedia.org/wiki/POST_(HTTP)
+    https://www.edureka.co/community/5406/how-to-send-http-post-requests-on-java
+    POST, set the media type, connect,
+    get the output stream and write the encoded data, 
+    gwt the cookie from the response header
+    how do you know if the login succeeded?
+    just try another request to a protected ressource?
+
+
+    general:
+        To make a new icon from a svg, convert it to a png with GIMP and then use it in android studio
+         The API also seems to work with session cookies, as it works with them in the browser.
+        Fix freezing while refreshing by using a handler that gets called in the UI thread after a request is done-
+    
+    plugins:
+        plugins don't seem to have a REST api defined, probably because there wasn't an app for so long
+        courseware:
+            to get the courseware html for a course: /plugins.php/courseware/courseware?cid=
+            cid is the course-id
+        opencast:
+            to get the opencast html for a course: /plugins.php/opencast/course/index/false?cid=
+            cid is the course-id
+            page for the individual videos:
+            /paella/ui/watch.html?cid=&id=
+            id is the video id
+            but the video pages use a special opencast video player.
+            but the links to the actual files are in the source of the course page near the download button
+        meetings:
+            url: /plugins.php/meetingplugin/index?cid=
+            BigBlueButton is already made for mobile use, so a WebView with the session cookie should be enough
+        vips:
+            url: /plugins.php/vipsplugin/sheets?cid=
+            
+            
+        
+        
+        maybe use WebViews to display the plugins? or just include a html parser library and filter out the important parts?
+        html parsing+VideoView is viable for opencast, as you just need to get the individual video URLs
+        you can set the URI for VideoView, as well as the HTML-headers, so the cookies
+        
+    
+    
+    
     
     

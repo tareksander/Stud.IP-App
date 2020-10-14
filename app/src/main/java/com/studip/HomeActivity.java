@@ -19,8 +19,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.studip.api.API;
 import com.studip.api.User;
+
+import java.lang.reflect.Modifier;
 
 public class HomeActivity extends AppCompatActivity
 {
@@ -39,7 +42,6 @@ public class HomeActivity extends AppCompatActivity
         pager = (ViewPager2) findViewById(R.id.pager);
         FragmentStateAdapter pagerAdapter = new ScreenSlidePagerAdapter(this);
         pager.setAdapter(pagerAdapter);
-
         try
         {
             MasterKey.Builder b = new MasterKey.Builder(this);
@@ -52,6 +54,10 @@ public class HomeActivity extends AppCompatActivity
                     EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             );
+            if (Data.settings == null)
+            {
+                Data.settings = Settings.load(sharedPreferences);
+            }
             if (Data.api == null)
             {
                 Data.api = API.restore(sharedPreferences,this);
@@ -72,7 +78,8 @@ public class HomeActivity extends AppCompatActivity
         }
         if (Data.gson == null)
         {
-            Data.gson = new Gson();
+            Data.gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.STATIC).create();
+            // include transient fields, we just don't want java serialization to try to serialize them
         }
         if (Data.user == null)
         {
@@ -85,27 +92,6 @@ public class HomeActivity extends AppCompatActivity
     protected void onStop()
     {
         super.onStop();
-        try
-        {
-            MasterKey.Builder b = new MasterKey.Builder(this);
-            b.setKeyScheme(MasterKey.KeyScheme.AES256_GCM);
-            MasterKey m = b.build();
-            SharedPreferences sharedPreferences = EncryptedSharedPreferences.create(
-                    this,
-                    "secret_shared_prefs",
-                    m,
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            );
-            Data.api.save(sharedPreferences);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Intent intent = new Intent(this,MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
     }
 
     @Override
@@ -130,6 +116,10 @@ public class HomeActivity extends AppCompatActivity
                 return true;
             case R.id.menu_files:
                 pager.setCurrentItem(2);
+                return true;
+            case R.id.menu_app_settings:
+                Intent intent = new Intent(this,SettingsActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
