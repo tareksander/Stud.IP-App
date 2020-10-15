@@ -2,6 +2,7 @@ package com.studip;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;
 
@@ -13,11 +14,17 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.Switch;
 
 import com.studip.api.API;
 
-public class SettingsActivity extends AppCompatActivity
+import java.util.Arrays;
+
+public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
 
     SharedPreferences sharedPreferences;
@@ -25,7 +32,6 @@ public class SettingsActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
         try
         {
             MasterKey.Builder b = new MasterKey.Builder(this);
@@ -51,6 +57,7 @@ public class SettingsActivity extends AppCompatActivity
             startActivity(intent);
             finish();
         }
+        setContentView(R.layout.activity_settings);
         RadioGroup auth_group = findViewById(R.id.auth_group);
         switch (Data.settings.authentification_method)
         {
@@ -79,7 +86,18 @@ public class SettingsActivity extends AppCompatActivity
                 theme_group.check(R.id.theme_dark);
                 break;
         }
+        SwitchCompat sw = findViewById(R.id.notification_service_enabled);
+        sw.setChecked(Data.settings.notification_service_enabled);
+        Spinner s = findViewById(R.id.notification_service_period);
         
+        ArrayAdapter<Integer> a = new ArrayAdapter<Integer>(this,android.R.layout.simple_spinner_item,Arrays.stream( getResources().getIntArray(R.array.service_periods)).boxed().toArray(Integer[]::new));
+        s.setAdapter(a);
+        s.setSelection(a.getPosition(Data.settings.notification_period));
+        if (! Data.settings.notification_service_enabled)
+        {
+            s.setEnabled(false);
+        }
+        s.setOnItemSelectedListener(this);
     }
 
 
@@ -105,6 +123,14 @@ public class SettingsActivity extends AppCompatActivity
             Data.settings.theme = AppCompatDelegate.MODE_NIGHT_NO;
         }
         AppCompatDelegate.setDefaultNightMode(Data.settings.theme);
+    }
+
+    public void onNotificationServiceClicked(View v)
+    {
+        SwitchCompat s = (SwitchCompat) v;
+        Data.settings.notification_service_enabled = s.isChecked();
+        Spinner sp = findViewById(R.id.notification_service_period);
+        sp.setEnabled(Data.settings.notification_service_enabled);
     }
     
     public void onAuthMethodClicked(View v)
@@ -177,10 +203,18 @@ public class SettingsActivity extends AppCompatActivity
         });
         b.show();
     }
-    
-    
-    
-    
-    
-    
+
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+    {
+        Spinner s = (Spinner) parent;
+        Data.settings.notification_period = (Integer) s.getAdapter().getItem(position);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent)
+    {
+
+    }
 }

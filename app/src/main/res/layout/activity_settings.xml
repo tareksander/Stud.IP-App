@@ -2,6 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SettingsActivity">
@@ -27,12 +29,6 @@
                 android:layout_height="wrap_content"
                 android:onClick="onDeleteCredentials"
                 android:text="@string/clear_credentials" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/switch1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -64,7 +60,30 @@
                     android:layout_height="wrap_content"
                     android:onClick="onThemeClicked"
                     android:text="@string/settings_theme_auto" />
+
             </RadioGroup>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/notification_service_enabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onNotificationServiceClicked"
+                android:text="@string/settings_notification_service" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_notification_service2" />
+
+            <Spinner
+                android:id="@+id/notification_service_period"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_notification_service3" />
 
             <Space
                 android:layout_width="match_parent"

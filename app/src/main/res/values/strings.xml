@@ -28,12 +28,15 @@
     <string name="settings_theme_dark">Dunkel</string>
     <string name="settings_theme_light">Hell</string>
     <string name="settings_theme_auto">Automatisch</string>
+    <string name="settings_notification_service">Service für Hintergrundbenachrichtigungen</string>
+    <string name="settings_notification_service2">Läuft alle</string>
+    <string name="settings_notification_service3">Minuten</string>
     <string name="settings_experimental">Hier können experimentelle Features aktiviert werden:</string>
     <string name="auth_setting">Authentifizierungsmethode</string>
     <string name="auth_basic">HTTP Basic Authentication</string>
     <string name="auth_cookie">Session Cookie</string>
     <string name="auth_oauth">OAuth 2</string>
-    <string name="settings_developer">Entwicklereinstellungen:<br></br>Diese Einstellungen können die App instabil machen oder die Sicherheit herabsetzen. Benutzen auf eigene Gefahr.</string>
+    <string name="settings_developer">Entwicklereinstellungen:\nDiese Einstellungen können die App instabil machen oder die Sicherheit herabsetzen. Benutzen auf eigene Gefahr.</string>
     
     
 </resources>

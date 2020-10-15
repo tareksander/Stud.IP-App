@@ -27,7 +27,6 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         try
         {
             MasterKey.Builder b = new MasterKey.Builder(this);
@@ -57,6 +56,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
             finish();
         }
+        setContentView(R.layout.activity_main);
     }
 
     @Override

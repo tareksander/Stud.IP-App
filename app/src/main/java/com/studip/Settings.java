@@ -20,6 +20,14 @@ public class Settings
     private static final String theme_key = "theme";
     public volatile int theme;
     
+    
+    private static final String notification_period_key = "notification_period";
+    public volatile int notification_period;
+    
+    
+    private static final String notification_service_enabled_key = "notification_service_enabled";
+    public volatile boolean notification_service_enabled;
+    
     private Settings() {}
     public static Settings load(SharedPreferences prefs)
     {
@@ -29,11 +37,15 @@ public class Settings
         {
             s.authentification_method = prefs.getInt(authentification_method_key,authentification_method_default);
             s.theme = prefs.getInt(theme_key,AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+            s.notification_period = prefs.getInt(notification_period_key,30);
+            s.notification_service_enabled = prefs.getBoolean(notification_service_enabled_key,false);
         }
         else
         {
             s.authentification_method = authentification_method_default;
             s.theme = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+            s.notification_period = 30;
+            s.notification_service_enabled = false;
         }
         return s;
     }
@@ -46,6 +58,8 @@ public class Settings
             SharedPreferences.Editor e = prefs.edit();
             e.putInt(authentification_method_key,authentification_method);
             e.putInt(theme_key,theme);
+            e.putInt(notification_period_key,notification_period);
+            e.putBoolean(notification_service_enabled_key,notification_service_enabled);
             
             
             e.apply();

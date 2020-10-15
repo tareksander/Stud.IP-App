@@ -36,13 +36,6 @@ public class HomeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        
-        pager = (ViewPager2) findViewById(R.id.pager);
-        FragmentStateAdapter pagerAdapter = new ScreenSlidePagerAdapter(this);
-        pager.setAdapter(pagerAdapter);
         try
         {
             MasterKey.Builder b = new MasterKey.Builder(this);
@@ -88,6 +81,13 @@ public class HomeActivity extends AppCompatActivity
             Data.user = new User(HandlerCompat.createAsync(Looper.getMainLooper()));
             Data.user.refresh();
         }
+        setContentView(R.layout.activity_home);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        pager = (ViewPager2) findViewById(R.id.pager);
+        FragmentStateAdapter pagerAdapter = new ScreenSlidePagerAdapter(this);
+        pager.setAdapter(pagerAdapter);
     }
 
     @Override
@@ -107,10 +107,8 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        //System.out.println("menu item pressed");
         switch (item.getItemId()) {
             case R.id.menu_home:
-                //System.out.println("home pressed");
                 pager.setCurrentItem(0);
                 return true;
             case R.id.menu_events:
