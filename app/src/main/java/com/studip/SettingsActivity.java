@@ -1,6 +1,7 @@
 package com.studip;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;
 
@@ -25,8 +26,6 @@ public class SettingsActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-
-
         try
         {
             MasterKey.Builder b = new MasterKey.Builder(this);
@@ -42,6 +41,7 @@ public class SettingsActivity extends AppCompatActivity
             if (Data.settings == null)
             {
                 Data.settings = Settings.load(sharedPreferences);
+                AppCompatDelegate.setDefaultNightMode(Data.settings.theme);
             }
         }
         catch (Exception e)
@@ -65,9 +65,20 @@ public class SettingsActivity extends AppCompatActivity
                 auth_group.check(R.id.auth_oauth);
                 break;
         }
-        
-        
-        
+        RadioGroup theme_group = findViewById(R.id.theme_group);
+        switch (Data.settings.theme)
+        {
+            default:
+            case AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM:
+                theme_group.check(R.id.theme_auto);
+                break;
+            case AppCompatDelegate.MODE_NIGHT_NO:
+                theme_group.check(R.id.theme_light);
+                break;
+            case AppCompatDelegate.MODE_NIGHT_YES:
+                theme_group.check(R.id.theme_dark);
+                break;
+        }
         
     }
 
@@ -79,6 +90,23 @@ public class SettingsActivity extends AppCompatActivity
         Data.settings.safe(sharedPreferences);
     }
 
+    public void onThemeClicked(View v)
+    {
+        if (v.equals(findViewById(R.id.theme_auto)))
+        {
+            Data.settings.theme = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+        }
+        if (v.equals(findViewById(R.id.theme_dark)))
+        {
+            Data.settings.theme = AppCompatDelegate.MODE_NIGHT_YES;
+        }
+        if (v.equals(findViewById(R.id.theme_light)))
+        {
+            Data.settings.theme = AppCompatDelegate.MODE_NIGHT_NO;
+        }
+        AppCompatDelegate.setDefaultNightMode(Data.settings.theme);
+    }
+    
     public void onAuthMethodClicked(View v)
     {
         if (v.equals(findViewById(R.id.auth_basic)))

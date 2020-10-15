@@ -453,8 +453,33 @@ public class API
             }
         }
     }
-    
-    
+
+    public class FolderRoute extends BasicRoute
+    {
+        final String folderID;
+        public FolderRoute(String route, int method,String courseID)
+        {
+            super(route, method);
+            this.folderID = courseID;
+        }
+        public FolderRoute(String route,String courseID)
+        {
+            super(route);
+            this.folderID = courseID;
+        }
+        @Override
+        public String getFullURL()
+        {
+            if (route.equals(""))
+            {
+                return HTTPS + server + API + "folder/" + folderID;
+            }
+            else
+            {
+                return HTTPS + server + API + "folder/" + folderID + "/" + route;
+            }
+        }
+    }
     
     
     

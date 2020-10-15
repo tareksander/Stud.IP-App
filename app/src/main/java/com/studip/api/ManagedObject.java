@@ -7,7 +7,7 @@ public abstract class ManagedObject<T> extends RouteCallback
 {
     Future ref;
     private ArrayList<Runnable> listeners = new ArrayList<>();
-    private T obj;
+    T obj;
     private final Class<T> c;
     private final Handler h;
     public ManagedObject(Class<T> c,Handler h)
@@ -49,39 +49,6 @@ public abstract class ManagedObject<T> extends RouteCallback
         refresh();
         //error.printStackTrace();
     }
-    /*
-        void process_pending_refresh()
-        {
-            if (ref != null)
-            {
-                if (obj == null || ref.isDone())
-                {
-                    try
-                    {
-                        String json = ref.get();
-                        obj = (T) Data.gson.fromJson(json,c);
-                    } catch (Exception e)
-                    {
-                        refresh();
-                        return;
-                    }
-                    ref = null;
-                    if (listener != null && h != null)
-                    {
-                        h.post(listener);
-                    }
-                }
-            }
-            else
-            {
-                if (obj == null)
-                {
-                    refresh();
-                    process_pending_refresh();
-                }
-            }
-        }
-         */
     public abstract void refresh();
     public boolean refreshed()
     {
@@ -102,7 +69,7 @@ public abstract class ManagedObject<T> extends RouteCallback
             {
                 ref.get();
             }
-            catch (Exception e) {}
+            catch (Exception ignored) {}
         }
         return obj;
     }

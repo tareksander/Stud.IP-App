@@ -9,8 +9,7 @@
         android:id="@+id/course_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="#000000"
+        android:textAppearance="@style/AppTheme"
         android:visibility="visible"
         app:layout_constraintEnd_toStartOf="@+id/course_info"
         app:layout_constraintStart_toStartOf="parent"
@@ -48,7 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="invisible"
-        app:layout_constraintEnd_toStartOf="@+id/course_participants"
+        app:layout_constraintEnd_toStartOf="@+id/course_members"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/forum_grey" />
 
@@ -71,7 +70,7 @@
         app:srcCompat="@drawable/news_grey" />
 
     <ImageView
-        android:id="@+id/course_participants"
+        android:id="@+id/course_members"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="visible"

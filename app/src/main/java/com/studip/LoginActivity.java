@@ -2,6 +2,7 @@ package com.studip;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;
 
@@ -37,6 +38,7 @@ public class LoginActivity extends AppCompatActivity
             if (Data.settings == null)
             {
                 Data.settings = Settings.load(sharedPreferences);
+                AppCompatDelegate.setDefaultNightMode(Data.settings.theme);
             }
             if (Data.api == null)
             {

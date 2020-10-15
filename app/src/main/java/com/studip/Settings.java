@@ -3,6 +3,7 @@ package com.studip;
 
 import android.content.SharedPreferences;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.security.crypto.EncryptedSharedPreferences;
 
 public class Settings
@@ -13,9 +14,11 @@ public class Settings
     
     
     public static final int authentification_method_default = AUTHENTICATION_BASIC;
-    public static final String authentification_method_key = "authentification_method";
+    private static final String authentification_method_key = "authentification_method";
     public volatile int authentification_method;
     
+    private static final String theme_key = "theme";
+    public volatile int theme;
     
     private Settings() {}
     public static Settings load(SharedPreferences prefs)
@@ -25,10 +28,12 @@ public class Settings
         if (prefs instanceof EncryptedSharedPreferences)
         {
             s.authentification_method = prefs.getInt(authentification_method_key,authentification_method_default);
+            s.theme = prefs.getInt(theme_key,AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         }
         else
         {
             s.authentification_method = authentification_method_default;
+            s.theme = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
         }
         return s;
     }
@@ -40,7 +45,7 @@ public class Settings
         {
             SharedPreferences.Editor e = prefs.edit();
             e.putInt(authentification_method_key,authentification_method);
-            
+            e.putInt(theme_key,theme);
             
             
             e.apply();

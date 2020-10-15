@@ -19,8 +19,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_main"
-                android:textColor="@color/black" />
+                android:text="@string/settings_main" />
 
             <Button
                 android:id="@+id/clear_credentials"
@@ -35,6 +34,38 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/black" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_theme" />
+
+            <RadioGroup
+                android:id="@+id/theme_group"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <RadioButton
+                    android:id="@+id/theme_dark"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="onThemeClicked"
+                    android:text="@string/settings_theme_dark" />
+
+                <RadioButton
+                    android:id="@+id/theme_light"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="onThemeClicked"
+                    android:text="@string/settings_theme_light" />
+
+                <RadioButton
+                    android:id="@+id/theme_auto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="onThemeClicked"
+                    android:text="@string/settings_theme_auto" />
+            </RadioGroup>
+
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="40dp" />
@@ -42,15 +73,13 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_experimental"
-                android:textColor="@color/black" />
+                android:text="@string/settings_experimental" />
 
             <TextView
                 android:id="@+id/auth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/auth_setting"
-                android:textColor="@color/black" />
+                android:text="@string/auth_setting" />
 
             <RadioGroup
                 android:id="@+id/auth_group"
@@ -93,8 +122,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_developer"
-                android:textColor="@color/black" />
+                android:text="@string/settings_developer" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switch3"

@@ -1,5 +1,6 @@
 package com.studip;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,13 +32,7 @@ import java.util.Arrays;
 
 public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, Runnable
 {
-    private static final String courselist_key = "coursefragment_courselist";
-    private static final String courselist_lecturers_key = "coursefragment_courselist_lecturers";
-    private static final String eventlist_key = "coursefragment_eventlist";
     EventAdapter event_adapter;
-    CourseList l;
-    private final String pending_monitor = "";
-    EventList[] pending;
     Handler h;
     @Nullable
     @Override
@@ -49,43 +44,34 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         SwipeRefreshLayout r = v.findViewById(R.id.event_refresh);
         r.setOnRefreshListener(this);
         
-        // TODO add null checks here, as the object might me malformed or null
-        h = HandlerCompat.createAsync(Looper.getMainLooper());
-        this.l = new CourseList(Data.user.getData().user_id,h);
-        this.l.addRefreshListener(this);
+        
         
         
         
         ListView l = v.findViewById(R.id.event_list);
-
         event_adapter = new EventAdapter(getActivity(), ArrayAdapter.NO_SELECTION);
+        Data.coursesfragment = this;
+        if (Data.courses == null)
+        {
+            h = HandlerCompat.createAsync(Looper.getMainLooper());
+            // TODO add null checks, as the user data might be deformed or null, in case of a network disconnection
+            Data.courses = new CourseList(Data.user.getData().user_id,h);
+        }
+        Data.courses.addRefreshListener(this);
         if (savedInstanceState != null)
         {
-            //System.out.println("restoring courses state");
-            event_adapter.events = (boolean[]) savedInstanceState.getSerializable(eventlist_key);
-            event_adapter.courselist = (StudipCourse[]) savedInstanceState.getSerializable(courselist_key);
-            for (int i = 0;i<event_adapter.courselist.length;i++)
+            try
             {
-                event_adapter.courselist[i].lecturers = Data.gson.fromJson(savedInstanceState.getString(courselist_lecturers_key+i), JsonObject.class);
+                event_adapter.courselist = Courses.ArrayFromList(Data.courses.getData());
+                event_adapter.notifyDataSetChanged();
             }
+            catch (Exception e) {e.printStackTrace();}
         }
         l.setAdapter(event_adapter);
         
         return v;
     }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-        //System.out.println("saving courses state");
-        outState.putSerializable(courselist_key,event_adapter.courselist);
-        for (int i = 0;i<event_adapter.courselist.length;i++)
-        {
-            outState.putString(courselist_lecturers_key+i,Data.gson.toJson(event_adapter.courselist[i].lecturers));
-        }
-        outState.putSerializable(eventlist_key,event_adapter.events);
-    }
+    
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
@@ -93,8 +79,48 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState == null)
         {
-            //System.out.println("getting courses information");
-            l.refresh();
+            Data.courses.refresh();
+        }
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        Data.courses.removeRefreshListener(this);
+    }
+
+    private class OnMembersClicked implements View.OnClickListener
+    {
+        private class DialogOnMemberClicked implements View.OnClickListener
+        {
+            @Override
+            public void onClick(View v)
+            {
+                
+            }
+        }
+        private class DialogAdapter extends ArrayAdapter<TextView>
+        {
+            public DialogAdapter(@NonNull Context context, int resource)
+            {
+                super(context, resource);
+            }
+            
+        }
+        
+        @Override
+        public void onClick(View v)
+        {
+            if (v.getVisibility() == View.VISIBLE)
+            {
+                View layout = getLayoutInflater().inflate(R.layout.dialog_course_members,null);
+                DialogAdapter ad = new DialogAdapter(getActivity(), ArrayAdapter.NO_SELECTION);
+                // TODO finish
+                
+                
+                new AlertDialog.Builder(getActivity()).setTitle(R.string.members_dialog_title).setView(layout).show();
+            }
         }
     }
     
@@ -104,24 +130,24 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
     {
         try
         {
-            if (event_adapter.events != null)
+            event_adapter.courselist = Courses.ArrayFromList(Data.courses.getData());
+            event_adapter.notifyDataSetChanged();
+            StudipCourse[] courses = Courses.ArrayFromList(Data.courses.getData());
+            Data.courses_events_pending = new EventList[Data.courses.getData().pagination.total];
+            if (Data.courses_hasevents != null)
             {
-                event_adapter.events = Arrays.copyOf(event_adapter.events,l.getData().pagination.total);
+                Data.courses_hasevents = Arrays.copyOf(Data.courses_hasevents,courses.length);
             }
             else
             {
-                event_adapter.events = new boolean[l.getData().pagination.total];
+                Data.courses_hasevents = new boolean[courses.length];
             }
-            event_adapter.courselist = Courses.ArrayFromList(l.getData());
-            event_adapter.notifyDataSetChanged();
-            StudipCourse[] courses = Courses.ArrayFromList(l.getData());
-            pending = new EventList[l.getData().pagination.total];
-            for (int i = 0;i<pending.length;i++)
+            for (int i = 0;i<Data.courses_events_pending.length;i++)
             {
                 //System.out.println(Data.api.submit(Data.api.new CourseRoute("events",courses[i].course_id)).get());
-                pending[i] = new EventList(h,courses[i].course_id);
-                pending[i].addRefreshListener(new HasEvents(i));
-                pending[i].refresh();
+                Data.courses_events_pending[i] = new EventList(h,courses[i].course_id);
+                Data.courses_events_pending[i].addRefreshListener(new HasEvents(i));
+                Data.courses_events_pending[i].refresh();
             }
         }
         catch (Exception e) {e.printStackTrace();}
@@ -144,44 +170,52 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
             //System.out.println("finished event route");
             try
             {
-                StudipListArray l = pending[index].getData();
+                StudipListArray l = Data.courses_events_pending[index].getData();
                 if (l != null)
                 {
                     if (l.pagination != null && l.pagination.total > 0)
                     {
-                        event_adapter.events[index] = true;
-                        event_adapter.notifyDataSetChanged();
+                        Data.courses_hasevents[index] = true;
+                        Data.coursesfragment.event_adapter.notifyDataSetChanged();
                     }
                     else 
                     {
-                        event_adapter.events[index] = false;
-                        event_adapter.notifyDataSetChanged();
+                        Data.courses_hasevents[index] = false;
+                        Data.coursesfragment.event_adapter.notifyDataSetChanged();
                     }
                 }
                 else
                 {
-                    event_adapter.events[index] = false;
-                    event_adapter.notifyDataSetChanged();
+                    Data.courses_hasevents[index] = false;
+                    Data.coursesfragment.event_adapter.notifyDataSetChanged();
                 }
             } catch (Exception e)
             {
-                event_adapter.events[index] = false;
-                event_adapter.notifyDataSetChanged();
+                Data.courses_hasevents[index] = false;
+                Data.coursesfragment.event_adapter.notifyDataSetChanged();
             }
-            synchronized (pending_monitor)
+            synchronized (Data.pending_monitor)
             {
                 //System.out.println("finished event route for index: "+index);
-                pending[index].removeRefreshListener(this);
-                pending[index] = null;
-                for (int i = 0; i < pending.length; i++)
+                if (Data.courses_events_pending[index] != null)
                 {
-                    if (pending[i] != null)
+                    Data.courses_events_pending[index].removeRefreshListener(this);
+                    Data.courses_events_pending[index] = null;
+                }
+                for (int i = 0; i < Data.courses_events_pending.length; i++)
+                {
+                    if (Data.courses_events_pending[i] != null)
                         return;
                 }
                 //System.out.println("all pending requests done");
-                SwipeRefreshLayout r = getView().findViewById(R.id.event_refresh);
-                r.setRefreshing(false);
-                event_adapter.notifyDataSetChanged();
+                
+                View v = getView(); // getView returns null if the fragment is recreated when changing orientation and pending requests are running
+                if (v != null)
+                {
+                    SwipeRefreshLayout r = getView().findViewById(R.id.event_refresh);
+                    r.setRefreshing(false);
+                    Data.coursesfragment.event_adapter.notifyDataSetChanged();
+                }
             }
         }
     }
@@ -190,7 +224,6 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private class EventAdapter extends ArrayAdapter
     {
         StudipCourse[] courselist;
-        boolean[] events;
         public EventAdapter(@NonNull Context context, int resource)
         {
             super(context, resource);
@@ -225,7 +258,7 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 img.setVisibility(View.INVISIBLE);
             }
             img = v.findViewById(R.id.course_schedule);
-            if (! events[position])
+            if (Data.courses_hasevents == null || (! Data.courses_hasevents[position]))
             {
                 img.setVisibility(View.INVISIBLE);
             }
@@ -243,6 +276,7 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
             {
                 img.setVisibility(View.INVISIBLE);
             }
+            v.findViewById(R.id.course_members).setOnClickListener(new OnMembersClicked());
             return v;
         }
         
@@ -263,6 +297,6 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public void onRefresh()
     {
-        l.refresh();
+        Data.courses.refresh();
     }
 }

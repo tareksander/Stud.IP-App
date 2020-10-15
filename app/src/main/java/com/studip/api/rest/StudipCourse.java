@@ -10,12 +10,11 @@ public class StudipCourse implements Serializable
     public String type;
     public String description;
     public String location;
-    
-    // because the Gson instance is created to include transient fields, you just have to serialize it manually with Gson
-    // when using java serialization
+    // because the Gson instance is created to include transient fields, you just have to serialize
+    // it manually with Gson when using java serialization
     public transient JsonObject lecturers; // can't be easily represented in Java
     public Members members;
-    public class Members  implements Serializable
+    public static class Members  implements Serializable
     {
         public String user;
         public int user_count;
@@ -29,7 +28,7 @@ public class StudipCourse implements Serializable
     public String start_semester;
     public String end_semester;
     public Modules modules;
-    public class Modules  implements Serializable
+    public static class Modules  implements Serializable
     {
         public String forum;
         public String documents;

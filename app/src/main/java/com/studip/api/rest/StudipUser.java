@@ -2,11 +2,11 @@ package com.studip.api.rest;
 import java.io.Serializable;
 public class StudipUser  implements Serializable
 {
-    // This is just a container for variable to use for deserializing the JSON data with GSON
+    // This is just a container for variables to use for deserializing the JSON data with GSON
     public String user_id;
     public String username;
     public Name name;
-    public class Name  implements Serializable
+    public static class Name  implements Serializable
     {
         public String username;
         public String formatted;
@@ -25,7 +25,7 @@ public class StudipUser  implements Serializable
     public String homepage;
     public String privadr;
     public Datafield[] datafields;
-    public class Datafield  implements Serializable
+    public static class Datafield  implements Serializable
     {
         public String type;
         public String id;
