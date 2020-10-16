@@ -18,7 +18,7 @@ public class Data
     public static Gson gson;
     public static Jsoup jsoup; // TODO initialize in onCreate of HomeActivity if null, used to parse plugin pages
     
-    
+    public static HomeActivity home_activity;
     
     // Data used by specific Fragments:
     // TODO reset all values to null on logout, as they are all user-specific

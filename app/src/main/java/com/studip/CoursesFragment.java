@@ -23,6 +23,7 @@ import com.google.gson.JsonObject;
 import com.studip.api.CourseList;
 import com.studip.api.Courses;
 import com.studip.api.EventList;
+import com.studip.api.Folder;
 import com.studip.api.RouteCallback;
 import com.studip.api.rest.StudipCourse;
 import com.studip.api.rest.StudipListArray;
@@ -92,6 +93,11 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     private class OnMembersClicked implements View.OnClickListener
     {
+        String courseID;
+        public OnMembersClicked(String courseID)
+        {
+            this.courseID = courseID;
+        }
         private class DialogOnMemberClicked implements View.OnClickListener
         {
             @Override
@@ -125,6 +131,34 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
     
 
+    public class OnFilesClicked implements View.OnClickListener
+    {
+        String courseID;
+        public OnFilesClicked(String courseID)
+        {
+            this.courseID = courseID;
+        }
+        @Override
+        public void onClick(View v)
+        {
+            if (v.getVisibility() == View.VISIBLE)
+            {
+                if (Data.folder_provider == null)
+                {
+                    Data.folder_provider = new Folder(HandlerCompat.createAsync(Looper.getMainLooper()), Folder.TYPE_COURSE_TOP_FOLDER,courseID);
+                    // refreshing is done after the creation of the FileFragment
+                }
+                else
+                {
+                    Data.folder_provider.reinit(Folder.TYPE_COURSE_TOP_FOLDER,courseID);
+                    Data.folder_provider.refresh();
+                }
+                Data.home_activity.pager.setCurrentItem(2);
+            }
+        }
+    }
+    
+    
     @Override
     public void run()
     {
@@ -244,13 +278,14 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
             t.setText(courselist[position].title);
             ImageView img;
             img = v.findViewById(R.id.course_forum);
-            if (courselist[position].modules == null || (courselist[position].modules.forum == null))
+            if (courselist[position].modules == null || courselist[position].modules.forum == null)
             {
                 img.setVisibility(View.INVISIBLE);
             }
             else
             {
-                img.setVisibility(View.VISIBLE);
+                if (courselist[position].modules.forum != null)
+                    img.setVisibility(View.VISIBLE);
             }
             img = v.findViewById(R.id.course_news);
             if (true)
@@ -276,7 +311,8 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
             {
                 img.setVisibility(View.INVISIBLE);
             }
-            v.findViewById(R.id.course_members).setOnClickListener(new OnMembersClicked());
+            v.findViewById(R.id.course_members).setOnClickListener(new OnMembersClicked(courselist[position].course_id));
+            v.findViewById(R.id.course_files).setOnClickListener(new OnFilesClicked(courselist[position].course_id));
             return v;
         }
         

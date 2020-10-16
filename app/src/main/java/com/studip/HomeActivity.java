@@ -36,6 +36,7 @@ public class HomeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        Data.home_activity = this;
         try
         {
             MasterKey.Builder b = new MasterKey.Builder(this);

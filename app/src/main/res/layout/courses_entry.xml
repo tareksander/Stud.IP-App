@@ -74,8 +74,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="visible"
-        app:layout_constraintEnd_toStartOf="@+id/course_news"
+        app:layout_constraintEnd_toStartOf="@+id/course_files"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/persons_grey" />
+
+    <ImageView
+        android:id="@+id/course_files"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@+id/course_news"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/file_grey" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

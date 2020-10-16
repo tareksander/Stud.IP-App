@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#204080</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="black">#000000</color>
+    <color name="ic_launcher_background">#ffffff</color>
     <color name="studip_background">#e1e4e9</color>
     <color name="studip_dark">#34578c</color>
     <color name="studip_light">#899ab9</color>
