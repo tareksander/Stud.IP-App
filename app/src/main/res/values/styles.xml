@@ -8,12 +8,23 @@
         <item name="android:buttonStyle">@style/Button</item>
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">18sp</item>
+        <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>
     </style>
 
+    <style name="ActionButtonStyle" parent="Widget.AppCompat.ActionButton">
+        <item name="android:minWidth">0dip</item>
+        <item name="android:paddingStart">0dip</item>
+        <item name="android:paddingEnd">0dip</item>
+    </style>
     
     
     <style name="Button" parent="Widget.AppCompat.Button">
         <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="NoTitleText">
+        <item name="android:textSize">0sp</item>
+        <item name="android:textColor">#00000000</item>
     </style>
 
 </resources>

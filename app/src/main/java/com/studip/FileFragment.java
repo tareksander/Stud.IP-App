@@ -1,9 +1,14 @@
 package com.studip;
 
+import android.Manifest;
+import android.app.Instrumentation;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +18,27 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.ActivityCompat;
 import androidx.core.os.HandlerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.studip.api.API;
+import com.studip.api.ByteRouteCallback;
 import com.studip.api.Folder;
+import com.studip.api.RouteCallback;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class FileFragment extends Fragment implements Runnable, SwipeRefreshLayout.OnRefreshListener
 {
@@ -59,6 +78,12 @@ public class FileFragment extends Fragment implements Runnable, SwipeRefreshLayo
             Data.folder_provider.refresh();
             //System.out.println("refreshing, new instance");
         }
+
+        Downloads.initDownloads(getActivity());
+        
+        // TODO download
+        // https://stackoverflow.com/questions/28183893/how-to-store-files-generated-from-app-in-downloads-folder-of-android
+        
         
         ListView l = getView().findViewById(R.id.file_list);
         l.setAdapter(file_adapter);
@@ -88,17 +113,40 @@ public class FileFragment extends Fragment implements Runnable, SwipeRefreshLayo
     }
 
 
-    private class FileClicked implements View.OnClickListener
+    private class FileClicked extends ByteRouteCallback implements View.OnClickListener
     {
         String id;
-        public FileClicked(String id)
+        String name;
+        public FileClicked(String id,String name)
         {
             this.id = id;
+            this.name = name;
         }
         @Override
         public void onClick(View v)
         {
-            
+             SwipeRefreshLayout ref = getView().findViewById(R.id.file_refresh);
+             ref.setRefreshing(true);
+             Data.api.submitWithByteCallback(Data.api.new CallbackByteRoute(Data.api.new DownloadFileRoute(id),this));
+        }
+
+        @Override
+        public void routeFinished(byte[] result, Exception error)
+        {
+            SwipeRefreshLayout ref = getView().findViewById(R.id.file_refresh);
+            ref.setRefreshing(false);
+            //System.out.println("download finished");
+            if (result != null)
+            {
+                try
+                {
+                    OutputStream out = Downloads.openInDownloads(getActivity(),name);
+                    out.write(result);
+                    out.flush();
+                    out.close();
+                    System.out.println("write finished");
+                } catch (Exception ignored) {}
+            }
         }
     }
 
@@ -175,7 +223,7 @@ public class FileFragment extends Fragment implements Runnable, SwipeRefreshLayo
             position -= Data.current_folder.subfolders.length;
             // entries for the files
             v.setText(Data.current_folder.file_refs[position].name);
-            v.setOnClickListener(new FileClicked(Data.current_folder.file_refs[position].id));
+            v.setOnClickListener(new FileClicked(Data.current_folder.file_refs[position].id,Data.current_folder.file_refs[position].name));
             v.setCompoundDrawablesWithIntrinsicBounds(R.drawable.file_blue,0,0,0);
             return v;
         }

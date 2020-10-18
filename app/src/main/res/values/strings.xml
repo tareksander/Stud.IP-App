@@ -12,12 +12,11 @@
     <string name="menu_home">Home</string>
     <string name="menu_event">Veranstaltungen</string>
     <string name="menu_files">Dateien</string>
+    <string name="menu_messages">Nachrichten</string>
     <string name="welcome">Willkommen</string>
     <string name="members_dialog_title">Teilnehmer</string>
-    
-    
-    
-    
+    <string name="cache_service">Speichert Datenvon Stud.IP zwischen, um Netzwerkbandbreite zu sparen</string>
+
     <string name="settings">Einstellungen</string>
     <string name="settings_main">Einstellungen:</string>
     <string name="clear_credentials">Anmeldedaten löschen</string>
@@ -37,6 +36,9 @@
     <string name="auth_cookie">Session Cookie</string>
     <string name="auth_oauth">OAuth 2</string>
     <string name="settings_developer">Entwicklereinstellungen:\nDiese Einstellungen können die App instabil machen oder die Sicherheit herabsetzen. Benutzen auf eigene Gefahr.</string>
-    
-    
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="empty"> </string>
+
+
 </resources>

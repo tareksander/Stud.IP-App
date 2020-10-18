@@ -1,8 +1,10 @@
 package com.studip.api;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -190,8 +192,18 @@ public class API
     {
         return exec.submit(r);
     }
+
+    public Future<byte[]> submitByteRoute(ByteRoute r)
+    {
+        return exec.submit(r);
+    }
     
     public Future submitWithCallback(CallbackRoute r)
+    {
+        return exec.submit(r);
+    }
+
+    public Future submitWithByteCallback(CallbackByteRoute r)
     {
         return exec.submit(r);
     }
@@ -278,7 +290,32 @@ public class API
             callback.run();
         }
     }
-    
+    public class CallbackByteRoute implements Runnable
+    {
+        private final ByteRoute r;
+        private final ByteRouteCallback callback;
+        public CallbackByteRoute(ByteRoute r, ByteRouteCallback callback)
+        {
+            this.r = r;
+            this.callback = callback;
+        }
+        @Override
+        public void run()
+        {
+            byte[] b;
+            try
+            {
+                b = r.call();
+            } catch (Exception e)
+            {
+                callback.setError(e);
+                callback.run();
+                return;
+            }
+            callback.setResult(b);
+            callback.run();
+        }
+    }
     public abstract class Route implements Callable<String>
     {
         final String route;
@@ -349,6 +386,76 @@ public class API
         public abstract String delete() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
         public abstract String head() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
     }
+    public abstract class ByteRoute implements Callable<byte[]>
+    {
+        final String route;
+        private final int method;
+        public ByteRoute(String route,int method)
+        {
+            this.route = route;
+            this.method = method;
+        }
+        public ByteRoute(String route)
+        {
+            this.route = route;
+            this.method = METHOD_GET;
+        }
+        public String getFullURL()
+        {
+            return HTTPS + server + API + route;
+        }
+        @Override
+        public byte[] call() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            switch (method)
+            {
+                case METHOD_GET:
+                    return get();
+                case METHOD_POST:
+                    return post();
+                case METHOD_PUT:
+                    return put();
+                case METHOD_DELETE:
+                    return delete();
+                case METHOD_HEAD:
+                    return head();
+            }
+            throw new InvalidMethodException();
+        }
+        public byte[] readConnection(HttpsURLConnection con) throws IOException
+        {
+            ByteBuffer b = ByteBuffer.allocate(con.getContentLength());
+            InputStream s = con.getInputStream();
+            byte[] tmp = new byte[100];
+            int read;
+            while ((read = s.read(tmp)) != -1)
+            {
+                b.put(tmp,0,read);
+            }
+            return b.array();
+        }
+        public void handleResponseCode(int code) throws AuthorisationException, RouteInactiveException, InvalidMethodException, IOException
+        {
+            switch (code)
+            {
+                case 200:
+                    return;
+                case 401:
+                    throw new AuthorisationException();
+                case 403:
+                    throw new RouteInactiveException();
+                case 404:
+                    throw new InvalidMethodException();
+                default:
+                    throw new IOException("unexpected status code: "+code);
+            }
+        }
+        public abstract byte[] get() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
+        public abstract byte[] post() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
+        public abstract byte[] put() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
+        public abstract byte[] delete() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
+        public abstract byte[] head() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
+    }
     public class BasicRoute extends Route
     {
         public BasicRoute(String route, int method)
@@ -399,7 +506,6 @@ public class API
             throw new InvalidMethodException();
         }
     }
-    
     public class UserRoute extends BasicRoute
     {
         final String userID;
@@ -457,15 +563,15 @@ public class API
     public class FolderRoute extends BasicRoute
     {
         final String folderID;
-        public FolderRoute(String route, int method,String courseID)
+        public FolderRoute(String route, int method,String folderID)
         {
             super(route, method);
-            this.folderID = courseID;
+            this.folderID = folderID;
         }
-        public FolderRoute(String route,String courseID)
+        public FolderRoute(String route,String folderID)
         {
             super(route);
-            this.folderID = courseID;
+            this.folderID = folderID;
         }
         @Override
         public String getFullURL()
@@ -480,9 +586,83 @@ public class API
             }
         }
     }
-    
-    
-    
+
+    public class FileRoute extends BasicRoute
+    {
+        final String fileID;
+        public FileRoute(String route, int method,String fileID)
+        {
+            super(route, method);
+            this.fileID = fileID;
+        }
+        public FileRoute(String route,String fileID)
+        {
+            super(route);
+            this.fileID = fileID;
+        }
+        @Override
+        public String getFullURL()
+        {
+            if (route.equals(""))
+            {
+                return HTTPS + server + API + "file/" + fileID;
+            }
+            else
+            {
+                return HTTPS + server + API + "file/" + fileID + "/" + route;
+            }
+        }
+    }
+    public class DownloadFileRoute extends ByteRoute
+    {
+        String fileID;
+        public DownloadFileRoute(String fileID)
+        {
+            super("download");
+            this.fileID = fileID;
+        }
+
+        @Override
+        public String getFullURL()
+        {
+            return HTTPS + server + API + "file/" + fileID + "/download";
+        }
+        @Override
+        public byte[] get() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            HttpsURLConnection con = (HttpsURLConnection) new URL(getFullURL()).openConnection();
+            con.setInstanceFollowRedirects(false);
+            con.setConnectTimeout(5000);
+            con.setReadTimeout(5000);
+            con.connect();
+            handleResponseCode(con.getResponseCode());
+            return readConnection(con);
+        }
+
+        @Override
+        public byte[] post() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            throw new InvalidMethodException();
+        }
+
+        @Override
+        public byte[] put() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            throw new InvalidMethodException();
+        }
+
+        @Override
+        public byte[] delete() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            throw new InvalidMethodException();
+        }
+
+        @Override
+        public byte[] head() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            throw new InvalidMethodException();
+        }
+    }
     
     
     

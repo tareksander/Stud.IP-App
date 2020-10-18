@@ -19,6 +19,11 @@
         android:title="@string/menu_files"
         app:showAsAction="always" />
     <item
+        android:id="@+id/menu_messages"
+        android:icon="@drawable/mail_blue"
+        android:title="@string/menu_messages"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/menu_app_settings"
         android:title="@string/settings"
         app:showAsAction="never" />
