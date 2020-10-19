@@ -1,10 +1,18 @@
 package com.studip.api;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -14,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Base64;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.security.crypto.EncryptedSharedPreferences;
@@ -42,11 +51,13 @@ public class API
     
     private static final String route_discovery = "discovery";
 
-    private static final int METHOD_GET = 1;
-    private static final int METHOD_POST = 2;
-    private static final int METHOD_PUT = 3;
-    private static final int METHOD_DELETE = 4;
-    private static final int METHOD_HEAD = 5;
+    public static final int METHOD_GET = 1;
+    public static final int METHOD_POST = 2;
+    public static final int METHOD_PUT = 3;
+    public static final int METHOD_DELETE = 4;
+    public static final int METHOD_HEAD = 5;
+    
+    public static String multipart_delimiter1 = "aqb2ig8al79fdj0dsj39fm39smb7y35d52xv24bx24dg26bds712ns843bdvaa1a87hnd923n9d2hfzg3r6t2f7623gf632gf67327f67w3tgr";
     
     public API(String server)
     {
@@ -319,16 +330,25 @@ public class API
     public abstract class Route implements Callable<String>
     {
         final String route;
+        final String post_data;
         private final int method;
+        public Route(String route,int method,String post_data)
+        {
+            this.route = route;
+            this.method = method;
+            this.post_data = post_data;
+        }
         public Route(String route,int method)
         {
             this.route = route;
             this.method = method;
+            post_data = null;
         }
         public Route(String route)
         {
             this.route = route;
             this.method = METHOD_GET;
+            post_data = null;
         }
         public String getFullURL()
         {
@@ -361,6 +381,7 @@ public class API
             {
                 builder.append(s);
             }
+            r.close();
             con.disconnect();
             return builder.toString();
         }
@@ -368,6 +389,7 @@ public class API
         {
             switch (code)
             {
+                case 201:
                 case 200:
                     return;
                 case 401:
@@ -389,16 +411,25 @@ public class API
     public abstract class ByteRoute implements Callable<byte[]>
     {
         final String route;
+        final byte[] post_data;
         private final int method;
+        public ByteRoute(String route,int method,byte[] post_data)
+        {
+            this.route = route;
+            this.method = method;
+            this.post_data = post_data;
+        }
         public ByteRoute(String route,int method)
         {
             this.route = route;
             this.method = method;
+            this.post_data = null;
         }
         public ByteRoute(String route)
         {
             this.route = route;
             this.method = METHOD_GET;
+            post_data = null;
         }
         public String getFullURL()
         {
@@ -432,12 +463,15 @@ public class API
             {
                 b.put(tmp,0,read);
             }
+            s.close();
+            con.disconnect();
             return b.array();
         }
         public void handleResponseCode(int code) throws AuthorisationException, RouteInactiveException, InvalidMethodException, IOException
         {
             switch (code)
             {
+                case 201:
                 case 200:
                     return;
                 case 401:
@@ -458,6 +492,10 @@ public class API
     }
     public class BasicRoute extends Route
     {
+        public BasicRoute(String route, int method,String post_data)
+        {
+            super(route, method, post_data);
+        }
         public BasicRoute(String route, int method)
         {
             super(route, method);
@@ -480,12 +518,36 @@ public class API
         @Override
         public String post() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
         {
-            throw new InvalidMethodException();
+            HttpsURLConnection con = (HttpsURLConnection) new URL(getFullURL()).openConnection();
+            con.setRequestMethod("POST");
+            con.setInstanceFollowRedirects(false);
+            con.setConnectTimeout(5000);
+            con.setReadTimeout(5000);
+            con.setDoOutput(true);
+            con.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+            con.connect();
+            BufferedWriter w = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
+            w.write(post_data);
+            w.close();
+            handleResponseCode(con.getResponseCode());
+            return readConnection(con);
         }
         @Override
         public String put() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
         {
-            throw new InvalidMethodException();
+            HttpsURLConnection con = (HttpsURLConnection) new URL(getFullURL()).openConnection();
+            con.setRequestMethod("PUT");
+            con.setInstanceFollowRedirects(false);
+            con.setConnectTimeout(5000);
+            con.setReadTimeout(5000);
+            con.setDoOutput(true);
+            con.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+            con.connect();
+            BufferedWriter w = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
+            w.write(post_data);
+            w.close();
+            handleResponseCode(con.getResponseCode());
+            return readConnection(con);
         }
         @Override
         public String delete() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
@@ -563,6 +625,11 @@ public class API
     public class FolderRoute extends BasicRoute
     {
         final String folderID;
+        public FolderRoute(String route, int method,String folderID,String post_data)
+        {
+            super(route, method,post_data);
+            this.folderID = folderID;
+        }
         public FolderRoute(String route, int method,String folderID)
         {
             super(route, method);
@@ -663,6 +730,98 @@ public class API
             throw new InvalidMethodException();
         }
     }
+    public static byte[] formatUploadData(String filename,byte[] data) throws IOException
+    {
+        ByteArrayOutputStream o = new ByteArrayOutputStream(data.length);
+        o.write('\r');
+        o.write('\n');
+        o.write('-');
+        o.write('-');
+        o.write(multipart_delimiter1.getBytes());
+        o.write('\r');
+        o.write('\n');
+        o.write(("Content-Disposition: form-data; name=\"_FILES\"; filename=\""+filename+"\"").getBytes());
+        o.write('\r');
+        o.write('\n');
+        o.write("Content-Transfer-Encoding: binary".getBytes());
+        o.write('\r');
+        o.write('\n');
+        o.write('\r');
+        o.write('\n');
+        o.write(data);
+        o.write('\r');
+        o.write('\n');
+        o.write('-');
+        o.write('-');
+        o.write(multipart_delimiter1.getBytes());
+        o.write('-');
+        o.write('-');
+        //System.out.println("data formatted");
+        return o.toByteArray();
+    }
+    public class UploadFileRoute extends ByteRoute
+    {
+        String folderID;
+        public UploadFileRoute(String folderID,byte[] post_data)
+        {
+            super("",METHOD_POST,post_data);
+            this.folderID = folderID;
+        }
+
+        @Override
+        public String getFullURL()
+        {
+            return HTTPS + server + API + "file/" + folderID;
+        }
+        @Override
+        public byte[] get() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            throw new InvalidMethodException();
+        }
+
+        @Override
+        public byte[] post() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            
+            HttpsURLConnection con = (HttpsURLConnection) new URL(getFullURL()).openConnection();
+            con.setRequestMethod("POST");
+            con.setInstanceFollowRedirects(false);
+            con.setConnectTimeout(5000);
+            con.setReadTimeout(5000);
+            con.setDoOutput(true);
+            con.setRequestProperty("Content-Type","multipart/form-data; boundary="+multipart_delimiter1);
+            con.setRequestProperty("Content-Length",String.valueOf(post_data.length));
+            con.connect();
+            OutputStream w = con.getOutputStream();
+            w.write(post_data);
+            
+            w.close();
+            handleResponseCode(con.getResponseCode());
+            return readConnection(con);
+        }
+
+        @Override
+        public byte[] put() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            throw new InvalidMethodException();
+        }
+
+        @Override
+        public byte[] delete() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            throw new InvalidMethodException();
+        }
+
+        @Override
+        public byte[] head() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
+        {
+            throw new InvalidMethodException();
+        }
+    }
+
+
+    
+    
     
     
     
