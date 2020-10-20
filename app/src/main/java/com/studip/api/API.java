@@ -357,6 +357,7 @@ public class API
         @Override
         public String call() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
         {
+            //System.out.println("route called!");
             switch (method)
             {
                 case METHOD_GET:
@@ -565,7 +566,14 @@ public class API
         @Override
         public String head() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
         {
-            throw new InvalidMethodException();
+            HttpsURLConnection con = (HttpsURLConnection) new URL(getFullURL()).openConnection();
+            con.setInstanceFollowRedirects(false);
+            con.setConnectTimeout(5000);
+            con.setReadTimeout(5000);
+            con.setRequestMethod("HEAD");
+            con.connect();
+            handleResponseCode(con.getResponseCode());
+            return readConnection(con);
         }
     }
     public class UserRoute extends BasicRoute

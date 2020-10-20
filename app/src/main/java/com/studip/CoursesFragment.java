@@ -55,18 +55,25 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         if (Data.courses == null)
         {
             h = HandlerCompat.createAsync(Looper.getMainLooper());
+            
             // TODO add null checks, as the user data might be deformed or null, in case of a network disconnection
-            Data.courses = new CourseList(Data.user.getData().user_id,h);
+            Data.courses = new CourseList(Data.user.user_id,h);
         }
         Data.courses.addRefreshListener(this);
-        if (savedInstanceState != null)
+        if (Data.courselist == null)
         {
-            try
+            if (savedInstanceState != null)
             {
-                event_adapter.courselist = Courses.ArrayFromList(Data.courses.getData());
-                event_adapter.notifyDataSetChanged();
+                try
+                {
+                    Data.courselist = Courses.ArrayFromList(Data.courses.getData());
+                    event_adapter.notifyDataSetChanged();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
-            catch (Exception e) {e.printStackTrace();}
         }
         l.setAdapter(event_adapter);
         
@@ -78,9 +85,12 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState == null)
+        if (Data.courselist == null)
         {
-            Data.courses.refresh();
+            if (savedInstanceState == null)
+            {
+                Data.courses.refresh();
+            }
         }
     }
 
@@ -164,7 +174,8 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
     {
         try
         {
-            event_adapter.courselist = Courses.ArrayFromList(Data.courses.getData());
+            System.out.println("refreshed");
+            Data.courselist = Courses.ArrayFromList(Data.courses.getData());
             event_adapter.notifyDataSetChanged();
             StudipCourse[] courses = Courses.ArrayFromList(Data.courses.getData());
             Data.courses_events_pending = new EventList[Data.courses.getData().pagination.total];
@@ -257,7 +268,6 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
      
     private class EventAdapter extends ArrayAdapter
     {
-        StudipCourse[] courselist;
         public EventAdapter(@NonNull Context context, int resource)
         {
             super(context, resource);
@@ -275,16 +285,16 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 v = getLayoutInflater().inflate(R.layout.courses_entry,parent,false);
             }
             TextView t = v.findViewById(R.id.course_name);
-            t.setText(courselist[position].title);
+            t.setText(Data.courselist[position].title);
             ImageView img;
             img = v.findViewById(R.id.course_forum);
-            if (courselist[position].modules == null || courselist[position].modules.forum == null)
+            if (Data.courselist[position].modules == null || Data.courselist[position].modules.forum == null)
             {
                 img.setVisibility(View.INVISIBLE);
             }
             else
             {
-                if (courselist[position].modules.forum != null)
+                if (Data.courselist[position].modules.forum != null)
                     img.setVisibility(View.VISIBLE);
             }
             img = v.findViewById(R.id.course_news);
@@ -311,19 +321,19 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
             {
                 img.setVisibility(View.INVISIBLE);
             }
-            v.findViewById(R.id.course_members).setOnClickListener(new OnMembersClicked(courselist[position].course_id));
-            v.findViewById(R.id.course_files).setOnClickListener(new OnFilesClicked(courselist[position].course_id));
+            v.findViewById(R.id.course_members).setOnClickListener(new OnMembersClicked(Data.courselist[position].course_id));
+            v.findViewById(R.id.course_files).setOnClickListener(new OnFilesClicked(Data.courselist[position].course_id));
             return v;
         }
         
         @Override
         public int getCount()
         {
-            if (courselist == null)
+            if (Data.courselist == null)
             {
                 return 0;
             }
-            return courselist.length;
+            return Data.courselist.length;
         }
     }
     

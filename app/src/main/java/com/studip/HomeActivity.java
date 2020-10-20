@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -85,11 +86,14 @@ public class HomeActivity extends AppCompatActivity
             Data.gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.STATIC).create();
             // include transient fields, we just don't want java serialization to try to serialize them
         }
-        if (Data.user == null)
-        {
-            Data.user = new User(HandlerCompat.createAsync(Looper.getMainLooper()));
-            Data.user.refresh();
-        }
+
+        Intent intent = new Intent(this,CacheService.class);
+        intent.putExtra(CacheService.RESTORE_KEY,CacheService.RESTORE);
+        startService(intent);
+
+
+
+        Data.user_provider = new User(HandlerCompat.createAsync(Looper.getMainLooper()));
         setContentView(R.layout.activity_home);
         
         
@@ -100,8 +104,41 @@ public class HomeActivity extends AppCompatActivity
         
          
 
-        
-        
+        Handler h = HandlerCompat.createAsync(Looper.getMainLooper());
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                while (! Thread.interrupted())
+                {
+                    if (Data.data_restored)
+                    {
+                        h.post(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                if (Data.user == null)
+                                {
+                                    Data.user = Data.user_provider.getData();
+                                }
+                                pager.getAdapter().notifyDataSetChanged();
+                            }
+                        });
+                    }
+                    
+                    try
+                    {
+                        Thread.sleep(10);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
         
         
         
@@ -113,11 +150,12 @@ public class HomeActivity extends AppCompatActivity
     
 
 
-
     @Override
     protected void onStop()
     {
         super.onStop();
+        Intent intent = new Intent(this,CacheService.class);
+        startService(intent);
     }
 
     @Override
@@ -131,6 +169,10 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
+        if (! Data.data_restored)
+        {
+            return true;
+        }
         switch (item.getItemId()) {
             case R.id.menu_home:
                 pager.setCurrentItem(0);
@@ -183,6 +225,10 @@ public class HomeActivity extends AppCompatActivity
         @Override
         public int getItemCount()
         {
+            if (! Data.data_restored)
+            {
+                return 0;
+            }
             return 4;
         }
     }

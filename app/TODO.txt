@@ -18,6 +18,12 @@ TODO:
     
     plugins:
         plugins don't seem to have a REST api defined, probably because there wasn't an app for so long
+        
+        make issues on github for the plugins to define REST-APIs:
+        https://github.com/virtUOS/courseware/issues
+        https://github.com/virtUOS/studip-meeting/issues
+        https://github.com/elan-ev/studip-opencast-plugin/issues
+        
         courseware:
             to get the courseware html for a course: /plugins.php/courseware/courseware?cid=
             cid is the course-id

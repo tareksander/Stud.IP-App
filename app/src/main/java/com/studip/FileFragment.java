@@ -84,7 +84,8 @@ public class FileFragment extends Fragment implements Runnable, SwipeRefreshLayo
         
         if (Data.folder_provider == null)
         {
-            Data.folder_provider = new Folder(HandlerCompat.createAsync(Looper.getMainLooper()), Folder.TYPE_USER_TOP_FOLDER,Data.user.getData().user_id);
+            // TODO defer until the data has been restored
+            Data.folder_provider = new Folder(HandlerCompat.createAsync(Looper.getMainLooper()), Folder.TYPE_USER_TOP_FOLDER,Data.user.user_id);
         }
         Data.folder_provider.addRefreshListener(this);
         if (savedInstanceState == null)
@@ -337,7 +338,7 @@ public class FileFragment extends Fragment implements Runnable, SwipeRefreshLayo
         {
             SwipeRefreshLayout ref = getView().findViewById(R.id.file_refresh);
             ref.setRefreshing(true);
-            Data.folder_provider.reinit(Folder.TYPE_USER_TOP_FOLDER,Data.user.getData().user_id);
+            Data.folder_provider.reinit(Folder.TYPE_USER_TOP_FOLDER,Data.user.user_id);
             Data.folder_provider.refresh();
             return false;
         }

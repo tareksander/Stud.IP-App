@@ -34,8 +34,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         try
         {
             ListView l = v.findViewById(R.id.home_list);
-
-            StudipUser u = Data.user.getData();
+            StudipUser u = Data.user;
             if (u != null && u.name != null && u.name.given != null)
             {
                 String welcome_message = getString(R.string.welcome)+" "+u.name.given+"!";
@@ -44,8 +43,8 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             }
             else
             {
-                Data.user.addRefreshListener(this);
-                Data.user.refresh();
+                Data.user_provider.addRefreshListener(this);
+                Data.user_provider.refresh();
                 ad = new HomeAdapter(getActivity(),ArrayAdapter.NO_SELECTION,new String[0]);
                 l.setAdapter(ad);
             }
@@ -60,8 +59,8 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void run()
     {
-        Data.user.removeRefreshListener(this);
-        StudipUser u = Data.user.getData();
+        Data.user_provider.removeRefreshListener(this);
+        StudipUser u = Data.user_provider.getData();
         String welcome_message = getString(R.string.welcome)+" "+u.name.given+"!";
         ad.s = new String[] {welcome_message};
         ad.notifyDataSetChanged();
