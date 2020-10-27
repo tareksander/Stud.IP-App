@@ -1,15 +1,23 @@
 TODO:
     rework the api to also get session cookies on login, to use in VideoViews and WebViews
-    login: index.php
-    form variables: loginname, password
-    https://en.wikipedia.org/wiki/POST_(HTTP)
-    https://www.edureka.co/community/5406/how-to-send-http-post-requests-on-java
-    POST, set the media type, connect,
-    get the output stream and write the encoded data, 
-    gwt the cookie from the response header
-    how do you know if the login succeeded?
-    just try another request to a protected ressource?
 
+
+TODO finish the option to only save a session cookie, so the password doesn't have to be stored and make it the default method
+
+
+
+    TODO publish on f-droid:
+        https://www.f-droid.org/en/docs/Inclusion_How-To
+        Wait for publishing in the submission queue or make a merge request?
+        https://www.f-droid.org/en/docs/Submitting_to_F-Droid_Quick_Start_Guide
+        and
+        https://www.f-droid.org/en/docs/Build_Server_Setup/#optionally-using-qemukvmlibvirt-instead-of-virtualbox
+        to use qemu
+    
+    TODO app links: most Stud.IP servers have a hostname of studip.*
+    
+    
+    
 
     general:
         To make a new icon from a svg, convert it to a png with GIMP and then use it in android studio

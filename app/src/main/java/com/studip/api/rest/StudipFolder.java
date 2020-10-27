@@ -1,5 +1,7 @@
 package com.studip.api.rest;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+
 public class StudipFolder
 {
     public String id;
@@ -9,7 +11,7 @@ public class StudipFolder
     public String range_type;
     public String folder_type;
     public String name;
-    public transient JsonArray data_content;
+    public transient JsonElement data_content;
     public String description;
     public int mkdate;
     public int chdate;
@@ -26,7 +28,7 @@ public class StudipFolder
         public String range_type;
         public String folder_type;
         public String name;
-        public transient JsonArray data_content;
+        public transient JsonElement data_content;
         public String description;
         public int mkdate;
         public int chdate;

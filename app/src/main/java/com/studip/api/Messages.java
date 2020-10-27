@@ -27,7 +27,7 @@ public class Messages extends ManagedObject<StudipListObject>
     {
         if (ref == null)
         {
-            ref = Data.api.submitWithCallback(Data.api.new CallbackRoute(Data.api.new UserRoute("inbox",Data.user.user_id),this));
+            ref = Data.api.submitWithCallback(Data.api.new CallbackRoute(Data.api.new UserRoute("inbox?limit="+limit,Data.user.user_id),this));
         }
     }
 }

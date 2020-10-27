@@ -43,8 +43,8 @@ public class Downloads
                 if (c.getString(nameindex).equals(name))
                 {
                     int fileid = c.getInt(id);
+                    //System.out.println("file found!: "+ c.getString(nameindex));
                     c.close();
-                    //System.out.println("file found!");
                     return res.openOutputStream(ContentUris.withAppendedId(MediaStore.Downloads.EXTERNAL_CONTENT_URI,fileid));
                 }
                 c.moveToNext();
@@ -52,7 +52,7 @@ public class Downloads
             c.close();
             
             ContentValues vals = new ContentValues();
-            vals.put(MediaStore.Downloads.RELATIVE_PATH,Environment.DIRECTORY_DOWNLOADS);
+            //vals.put(MediaStore.Downloads.RELATIVE_PATH,Environment.DIRECTORY_DOWNLOADS);
             vals.put(MediaStore.Downloads.DISPLAY_NAME,name);
             
             Uri uri = res.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI,vals);

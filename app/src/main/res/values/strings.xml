@@ -23,6 +23,19 @@
     <string name="dir">Verzeichnis</string>
     <string name="file">Datei</string>
     <string name="delete_msg">Wirklich löschen?</string>
+    <string name="message_subject">Betreff</string>
+    <string name="message_sender">Absender</string>
+    <string name="message_time">Zeit</string>
+    <string name="message_new">Nachricht Schreiben</string>
+    <string name="message_delete_title">Nachricht Löschen</string>
+    <string name="message_delete_msg">Diese Nachricht wirklich löschen:</string>
+    <string name="message_search">Suchen</string>
+    <string name="message_send">Senden</string>
+    <string name="message_no_addressee">kein Addressat</string>
+    <string name="message_no_subject">kein Betreff</string>
+    <string name="message_no_content">kein Inhalt</string>
+    
+    
     
     <string name="settings">Einstellungen</string>
     <string name="settings_main">Einstellungen:</string>

@@ -248,7 +248,8 @@ public class FileFragment extends Fragment implements Runnable, SwipeRefreshLayo
             SwipeRefreshLayout ref = getView().findViewById(R.id.file_refresh);
             ref.setRefreshing(false);
             //System.out.println((char)  result[1]);
-            //System.out.println("download finished");
+            //System.out.println("download finished")
+            //System.out.println(result.length);
             if (result != null)
             {
                 try
@@ -257,7 +258,12 @@ public class FileFragment extends Fragment implements Runnable, SwipeRefreshLayo
                     out.write(result);
                     out.flush();
                     out.close();
+                    //System.out.println("file written");
                 } catch (Exception ignored) {ignored.printStackTrace();}
+            }
+            if (error != null)
+            {
+                error.printStackTrace();
             }
         }
 

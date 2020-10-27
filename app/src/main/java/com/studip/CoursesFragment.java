@@ -45,8 +45,11 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         SwipeRefreshLayout r = v.findViewById(R.id.event_refresh);
         r.setOnRefreshListener(this);
         
-        
-        
+        // TODO
+        /*
+        to search for courses:
+        dispatch.php/globalsearch/find?search=
+         */
         
         
         ListView l = v.findViewById(R.id.event_list);
@@ -174,14 +177,14 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
     {
         try
         {
-            System.out.println("refreshed");
+            //System.out.println("refreshed");
             Data.courselist = Courses.ArrayFromList(Data.courses.getData());
             event_adapter.notifyDataSetChanged();
             StudipCourse[] courses = Courses.ArrayFromList(Data.courses.getData());
             Data.courses_events_pending = new EventList[Data.courses.getData().pagination.total];
             if (Data.courses_hasevents != null)
             {
-                Data.courses_hasevents = Arrays.copyOf(Data.courses_hasevents,courses.length);
+                Data.courses_hasevents = Arrays.copyOf(Data.courses_hasevents, courses.length);
             }
             else
             {
@@ -287,15 +290,17 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
             TextView t = v.findViewById(R.id.course_name);
             t.setText(Data.courselist[position].title);
             ImageView img;
-            img = v.findViewById(R.id.course_forum);
-            if (Data.courselist[position].modules == null || Data.courselist[position].modules.forum == null)
+            if (Data.courselist[position].modules_object != null)
             {
-                img.setVisibility(View.INVISIBLE);
-            }
-            else
-            {
-                if (Data.courselist[position].modules.forum != null)
+                img = v.findViewById(R.id.course_forum);
+                if (Data.courselist[position].modules_object.forum == null)
+                {
+                    img.setVisibility(View.INVISIBLE);
+                }
+                else
+                {
                     img.setVisibility(View.VISIBLE);
+                }
             }
             img = v.findViewById(R.id.course_news);
             if (true)

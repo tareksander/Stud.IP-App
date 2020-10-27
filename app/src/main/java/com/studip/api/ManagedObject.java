@@ -34,7 +34,7 @@ public abstract class ManagedObject<T> extends RouteCallback
                 obj = (T) Data.gson.fromJson(json,c);
             } catch (Exception e)
             {
-                //e.printStackTrace();
+                e.printStackTrace();
                 refresh();
                 return;
             }

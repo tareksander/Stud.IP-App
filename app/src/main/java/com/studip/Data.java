@@ -6,6 +6,7 @@ import com.studip.api.CourseList;
 import com.studip.api.EventList;
 import com.studip.api.Folder;
 import com.studip.api.Messages;
+import com.studip.api.NewsList;
 import com.studip.api.User;
 import com.studip.api.rest.StudipCourse;
 import com.studip.api.rest.StudipFolder;
@@ -33,6 +34,11 @@ public class Data
     
     // Data used by specific Fragments:
     // TODO reset all values to null on logout, as they are all user-specific
+    // TODO clear the cache file on logout
+    
+    
+    // HomeFragment:
+    public static NewsList global_news;
     
     // CoursesFragment:
     public static CoursesFragment coursesfragment;
@@ -52,6 +58,7 @@ public class Data
     // MessagesFragment:
     public static MessagesFragment messagesfragment;
     public static volatile StudipMessage[] messages;
+    public static volatile StudipUser[] senders;
     public static Messages messages_provider;
     
     

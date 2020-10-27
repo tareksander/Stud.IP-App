@@ -1,5 +1,8 @@
 package com.studip.api.rest;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.annotations.Expose;
+
 import java.io.Serializable;
 public class StudipCourse implements Serializable
 {
@@ -27,7 +30,9 @@ public class StudipCourse implements Serializable
     }
     public String start_semester;
     public String end_semester;
-    public Modules modules;
+    public transient JsonElement modules; // if empty, it's an empty array, but if there are elements, it's an object !?!
+    @Expose(serialize = false, deserialize = false) // this shouldn't get serialized by Gson, modules already is
+    public transient Modules modules_object;
     public static class Modules  implements Serializable
     {
         public String forum;

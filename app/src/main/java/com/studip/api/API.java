@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -35,18 +36,21 @@ import javax.net.ssl.HttpsURLConnection;
 public class API
 {
     private final String server; // hostname
-    private final int EXECUTOR_THREADS_NUM = 8;
+    private final int EXECUTOR_THREADS_NUM = 10;
     private ExecutorService exec = Executors.newFixedThreadPool(EXECUTOR_THREADS_NUM);
     private ServerAuthenticator auth;
     private final String user_id_monitor = "";
     private volatile String user_id_cached;
 
     private static final String HTTPS = "https://";
-    private static final String API = "/api.php/";
+    public static final String API = "/api.php/";
     
     public static final String CREDENTIALS_SERVER = "credentials_server";
     public static final String CREDENTIALS_USERNAME = "credentials_username";
     public static final String CREDENTIALS_PASSWORD = "credentials_password";
+    
+    private CookieStore cookies;
+    
     
     
     private static final String route_discovery = "discovery";
@@ -57,7 +61,7 @@ public class API
     public static final int METHOD_DELETE = 4;
     public static final int METHOD_HEAD = 5;
     
-    public static String multipart_delimiter1 = "aqb2ig8al79fdj0dsj39fm39smb7y35d52xv24bx24dg26bds712ns843bdvaa1a87hnd923n9d2hfzg3r6t2f7623gf632gf67327f67w3tgr";
+    private final static String multipart_delimiter1 = "aqb2ig8al79fdj0dsj39fm39smb7y35d52xv24bx24dg26bds712ns843bdvaa1a87hnd923n9d2hfzg3r6t2f7623gf632gf67327f67w3tgr";
     
     public API(String server)
     {
@@ -221,6 +225,8 @@ public class API
 
     public boolean login(String username,char[] password) throws Exception
     {
+        CookieHandler.setDefault(new CookieManager(null,CookiePolicy.ACCEPT_ALL));
+        cookies = ((CookieManager) CookieHandler.getDefault()).getCookieStore();
         try
         {
             auth = new ServerAuthenticator(username,password);
@@ -271,7 +277,14 @@ public class API
         }
         else
         {
-            return false;
+            if (cookies.getCookies().size() == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
     
@@ -332,6 +345,8 @@ public class API
         final String route;
         final String post_data;
         private final int method;
+        private int recursive_call = 0;
+        private final int recursive_call_limit = 20;
         public Route(String route,int method,String post_data)
         {
             this.route = route;
@@ -358,18 +373,34 @@ public class API
         public String call() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
         {
             //System.out.println("route called!");
-            switch (method)
+            try
             {
-                case METHOD_GET:
-                    return get();
-                case METHOD_POST:
-                    return post();
-                case METHOD_PUT:
-                    return put();
-                case METHOD_DELETE:
-                    return delete();
-                case METHOD_HEAD:
-                    return head();
+                switch (method)
+                {
+                    case METHOD_GET:
+                        return get();
+                    case METHOD_POST:
+                        return post();
+                    case METHOD_PUT:
+                        return put();
+                    case METHOD_DELETE:
+                        return delete();
+                    case METHOD_HEAD:
+                        return head();
+                }
+            } catch (ConnectException e) // it seems the server refuses connections if they happen too fast, so try again later
+            {
+                if (recursive_call >= recursive_call_limit)
+                {
+                    throw e;
+                }
+                recursive_call++;
+                try
+                {
+                    Thread.sleep((int)Math.ceil(Math.random()*20));
+                }
+                catch (InterruptedException ignored) {}
+                return call();
             }
             throw new InvalidMethodException();
         }
@@ -414,6 +445,8 @@ public class API
         final String route;
         final byte[] post_data;
         private final int method;
+        private int recursive_call = 0;
+        private final int recursive_call_limit = 20;
         public ByteRoute(String route,int method,byte[] post_data)
         {
             this.route = route;
@@ -439,20 +472,38 @@ public class API
         @Override
         public byte[] call() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
         {
-            switch (method)
+            try
             {
-                case METHOD_GET:
-                    return get();
-                case METHOD_POST:
-                    return post();
-                case METHOD_PUT:
-                    return put();
-                case METHOD_DELETE:
-                    return delete();
-                case METHOD_HEAD:
-                    return head();
+                switch (method)
+                {
+                    case METHOD_GET:
+                        return get();
+                    case METHOD_POST:
+                        return post();
+                    case METHOD_PUT:
+                        return put();
+                    case METHOD_DELETE:
+                        return delete();
+                    case METHOD_HEAD:
+                        return head();
+                    default:
+                        throw new InvalidMethodException();
+                }
             }
-            throw new InvalidMethodException();
+            catch (ConnectException e) // it seems the server refuses connections if they happen too fast, so try again later
+            {
+                if (recursive_call >= recursive_call_limit)
+                {
+                    throw e;
+                }
+                recursive_call++;
+                try
+                {
+                    Thread.sleep((int) Math.ceil(Math.random() * 20));
+                }
+                catch (InterruptedException ignored) {}
+                return call();
+            }
         }
         public byte[] readConnection(HttpsURLConnection con) throws IOException
         {
@@ -508,6 +559,7 @@ public class API
         @Override
         public String get() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException
         {
+            //System.out.println(getFullURL());
             HttpsURLConnection con = (HttpsURLConnection) new URL(getFullURL()).openConnection();
             con.setInstanceFollowRedirects(false);
             con.setConnectTimeout(5000);
@@ -576,6 +628,42 @@ public class API
             return readConnection(con);
         }
     }
+    public class BlankRoute extends BasicRoute
+    {
+        String full_route;
+        public BlankRoute(String full_route)
+        {
+            super("");
+            this.full_route = full_route;
+        }
+        @Override
+        public String getFullURL()
+        {
+            //System.out.println("full URL: "+HTTPS + server + full_route);
+            return HTTPS + server + full_route;
+        }
+    }
+    public class DispatchRoute extends BasicRoute
+    {
+        // Routes that aren't in the api, but are used by the site's javascript
+        public DispatchRoute(String route, int method, String post_data)
+        {
+            super(route, method, post_data);
+        }
+        public DispatchRoute(String route, int method)
+        {
+            super(route, method);
+        }
+        public DispatchRoute(String route)
+        {
+            super(route);
+        }
+        @Override
+        public String getFullURL()
+        {
+            return HTTPS + server + "/dispatch.php/" + route;
+        }
+    }
     public class UserRoute extends BasicRoute
     {
         final String userID;
@@ -602,7 +690,32 @@ public class API
             }
         }
     }
-
+    public class MessageRoute extends BasicRoute
+    {
+        String messageID;
+        public MessageRoute(String route, String messageID)
+        {
+            super(route);
+            this.messageID = messageID;
+        }
+        public MessageRoute(String route, int method, String messageID)
+        {
+            super(route, method);
+            this.messageID = messageID;
+        }
+        @Override
+        public String getFullURL()
+        {
+            if (route.equals(""))
+            {
+                return HTTPS + server + API + "message/" + messageID;
+            }
+            else
+            {
+                return HTTPS + server + API + "message/" + messageID + "/" + route;
+            }
+        }
+    }
     public class CourseRoute extends BasicRoute
     {
         final String courseID;
@@ -826,7 +939,18 @@ public class API
             throw new InvalidMethodException();
         }
     }
-
+    public class SendMessageRoute extends BasicRoute
+    {
+        public SendMessageRoute(String post_data)
+        {
+            super(null,METHOD_POST, post_data);
+        }
+        @Override
+        public String getFullURL()
+        {
+            return HTTPS + server + API + "messages";
+        }
+    }
 
     
     
