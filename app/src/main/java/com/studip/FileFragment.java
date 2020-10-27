@@ -33,7 +33,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.studip.api.API;
 import com.studip.api.ByteRouteCallback;
 import com.studip.api.Folder;
+import com.studip.api.ManagedObjectListener;
 import com.studip.api.RouteCallback;
+import com.studip.api.rest.StudipFolder;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -54,12 +56,13 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class FileFragment extends Fragment implements Runnable, SwipeRefreshLayout.OnRefreshListener
+public class FileFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 {
     
     private ParentLongClicked parent_long_clicked_listener;
     FileAdapter file_adapter;
     
+    private Callback listener = new Callback();
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -87,7 +90,7 @@ public class FileFragment extends Fragment implements Runnable, SwipeRefreshLayo
             // TODO defer until the data has been restored
             Data.folder_provider = new Folder(HandlerCompat.createAsync(Looper.getMainLooper()), Folder.TYPE_USER_TOP_FOLDER,Data.user.user_id);
         }
-        Data.folder_provider.addRefreshListener(this);
+        Data.folder_provider.addRefreshListener(listener);
         if (savedInstanceState == null)
         {
             Data.folder_provider.refresh();
@@ -107,22 +110,28 @@ public class FileFragment extends Fragment implements Runnable, SwipeRefreshLayo
         ListView l = getView().findViewById(R.id.file_list);
         l.setAdapter(file_adapter);
     }
-
-
-    @Override
-    public void run()
+    
+    
+    private class Callback extends ManagedObjectListener<StudipFolder>
     {
-        Data.current_folder = Data.folder_provider.getData();
-        file_adapter.notifyDataSetChanged();
-        SwipeRefreshLayout ref = getView().findViewById(R.id.file_refresh);
-        ref.setRefreshing(false);
+
+        @Override
+        public void callback(StudipFolder obj, Exception error)
+        {
+            Data.current_folder = Data.folder_provider.getData();
+            file_adapter.notifyDataSetChanged();
+            SwipeRefreshLayout ref = getView().findViewById(R.id.file_refresh);
+            ref.setRefreshing(false);
+        }
     }
+    
+    
 
     @Override
     public void onDestroy()
     {
         super.onDestroy();
-        Data.folder_provider.removeRefreshListener(this);
+        Data.folder_provider.removeRefreshListener(listener);
     }
 
     @Override

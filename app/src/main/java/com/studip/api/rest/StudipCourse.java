@@ -40,4 +40,7 @@ public class StudipCourse implements Serializable
         public String wiki;
     }
     public int group;
+    
+    
+    
 }

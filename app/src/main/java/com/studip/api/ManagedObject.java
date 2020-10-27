@@ -6,7 +6,7 @@ import java.util.concurrent.Future;
 public abstract class ManagedObject<T> extends RouteCallback
 {
     Future ref;
-    private ArrayList<Runnable> listeners = new ArrayList<>();
+    private ArrayList<ManagedObjectListener<T>> listeners = new ArrayList<>();
     T obj;
     private final Class<T> c;
     private final Handler h;
@@ -15,11 +15,11 @@ public abstract class ManagedObject<T> extends RouteCallback
         this.c = c;
         this.h = h;
     }
-    public void addRefreshListener(Runnable listener)
+    public void addRefreshListener(ManagedObjectListener<T> listener)
     {
         listeners.add(listener);
     }
-    public void removeRefreshListener(Runnable listener)
+    public void removeRefreshListener(ManagedObjectListener<T> listener)
     {
         listeners.remove(listener);
     }
@@ -35,13 +35,20 @@ public abstract class ManagedObject<T> extends RouteCallback
             } catch (Exception e)
             {
                 e.printStackTrace();
-                refresh();
+                for (ManagedObjectListener<T> listener : listeners)
+                {
+                    listener.setResult(null);
+                    listener.setError(e);
+                    h.post(listener);
+                }
                 return;
             }
             //System.out.println("route finished, calling listeners");
             ref = null;
-            for (Runnable listener : listeners)
+            for (ManagedObjectListener<T> listener : listeners)
             {
+                listener.setResult(obj);
+                listener.setError(null);
                 h.post(listener);
             }
             return;

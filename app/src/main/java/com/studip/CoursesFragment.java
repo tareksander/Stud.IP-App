@@ -19,22 +19,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.gson.JsonObject;
 import com.studip.api.CourseList;
 import com.studip.api.Courses;
 import com.studip.api.EventList;
 import com.studip.api.Folder;
-import com.studip.api.RouteCallback;
+import com.studip.api.ManagedObjectListener;
+import com.studip.api.News;
+import com.studip.api.NewsList;
 import com.studip.api.rest.StudipCourse;
 import com.studip.api.rest.StudipListArray;
 import com.studip.api.rest.StudipListObject;
 
 import java.util.Arrays;
 
-public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, Runnable
+public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 {
-    EventAdapter event_adapter;
+    CourseAdapter event_adapter;
     Handler h;
+    private Callback listener = new Callback();
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -53,7 +55,7 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         
         
         ListView l = v.findViewById(R.id.event_list);
-        event_adapter = new EventAdapter(getActivity(), ArrayAdapter.NO_SELECTION);
+        event_adapter = new CourseAdapter(getActivity(), ArrayAdapter.NO_SELECTION);
         Data.coursesfragment = this;
         if (Data.courses == null)
         {
@@ -62,7 +64,7 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
             // TODO add null checks, as the user data might be deformed or null, in case of a network disconnection
             Data.courses = new CourseList(Data.user.user_id,h);
         }
-        Data.courses.addRefreshListener(this);
+        Data.courses.addRefreshListener(listener);
         if (Data.courselist == null)
         {
             if (savedInstanceState != null)
@@ -82,7 +84,41 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         
         return v;
     }
-    
+
+    private class Callback extends ManagedObjectListener<StudipListObject>
+    {
+        @Override
+        public void callback(StudipListObject obj, Exception error)
+        {
+            try
+            {
+                //System.out.println("refreshed");
+                Data.courselist = Courses.ArrayFromList(Data.courses.getData());
+                event_adapter.notifyDataSetChanged();
+                StudipCourse[] courses = Courses.ArrayFromList(Data.courses.getData());
+                Data.courses_events_pending = new EventList[Data.courses.getData().pagination.total];
+                if (Data.courses_hasevents != null)
+                {
+                    Data.courses_hasevents = Arrays.copyOf(Data.courses_hasevents, courses.length);
+                }
+                else
+                {
+                    Data.courses_hasevents = new boolean[courses.length];
+                }
+                for (int i = 0;i<Data.courses_events_pending.length;i++)
+                {
+                    //System.out.println(Data.api.submit(Data.api.new CourseRoute("events",courses[i].course_id)).get());
+                    Data.courses_events_pending[i] = new EventList(h,courses[i].course_id);
+                    Data.courses_events_pending[i].addRefreshListener(new HasEvents(i));
+                    Data.courses_events_pending[i].refresh();
+                }
+            }
+            catch (Exception e) {e.printStackTrace();}
+            //System.out.println("main refresh done");
+            //SwipeRefreshLayout r = getView().findViewById(R.id.event_refresh);
+            //r.setRefreshing(false);
+        }
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
@@ -101,7 +137,7 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public void onDestroy()
     {
         super.onDestroy();
-        Data.courses.removeRefreshListener(this);
+        Data.courses.removeRefreshListener(listener);
     }
 
     private class OnMembersClicked implements View.OnClickListener
@@ -171,49 +207,61 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         }
     }
     
-    
-    @Override
-    public void run()
+    public class OnNewsClicked extends ManagedObjectListener<StudipListObject> implements View.OnClickListener, Runnable
     {
-        try
+        private AlertDialog d;
+        private NewsAdapter ad;
+        private NewsList news;
+        private String courseID;
+        public OnNewsClicked(String courseID)
         {
-            //System.out.println("refreshed");
-            Data.courselist = Courses.ArrayFromList(Data.courses.getData());
-            event_adapter.notifyDataSetChanged();
-            StudipCourse[] courses = Courses.ArrayFromList(Data.courses.getData());
-            Data.courses_events_pending = new EventList[Data.courses.getData().pagination.total];
-            if (Data.courses_hasevents != null)
+            this.courseID = courseID;
+        }
+        @Override
+        public void onClick(View v)
+        {
+            View layout = getLayoutInflater().inflate(R.layout.course_news_dialog,null);
+            d = new AlertDialog.Builder(getActivity()).setView(layout).create();
+            ad = new NewsAdapter(getActivity(),ArrayAdapter.NO_SELECTION);
+            ListView newslist = layout.findViewById(R.id.course_news_list);
+            newslist.setAdapter(ad);
+            news = new NewsList(h,courseID);
+            news.addRefreshListener(this);
+            news.refresh();
+            d.show();
+        }
+
+        @Override
+        public void callback(StudipListObject obj, Exception error)
+        {
+            try
             {
-                Data.courses_hasevents = Arrays.copyOf(Data.courses_hasevents, courses.length);
-            }
-            else
+                ad.news = News.ArrayFromList(news.getData());
+                if (ad.news.length == 0)
+                {
+                    d.dismiss();
+                }
+                ad.notifyDataSetChanged();
+            } catch (Exception e)
             {
-                Data.courses_hasevents = new boolean[courses.length];
-            }
-            for (int i = 0;i<Data.courses_events_pending.length;i++)
-            {
-                //System.out.println(Data.api.submit(Data.api.new CourseRoute("events",courses[i].course_id)).get());
-                Data.courses_events_pending[i] = new EventList(h,courses[i].course_id);
-                Data.courses_events_pending[i].addRefreshListener(new HasEvents(i));
-                Data.courses_events_pending[i].refresh();
+                d.dismiss();
             }
         }
-        catch (Exception e) {e.printStackTrace();}
-        //System.out.println("main refresh done");
-        //SwipeRefreshLayout r = getView().findViewById(R.id.event_refresh);
-        //r.setRefreshing(false);
     }
     
     
-    public class HasEvents implements Runnable
+    
+    
+    public class HasEvents extends ManagedObjectListener<StudipListArray>
     {
         int index;
         public HasEvents(int index)
         {
             this.index = index;
         }
+
         @Override
-        public void run()
+        public void callback(StudipListArray obj, Exception error)
         {
             //System.out.println("finished event route");
             try
@@ -226,7 +274,7 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         Data.courses_hasevents[index] = true;
                         Data.coursesfragment.event_adapter.notifyDataSetChanged();
                     }
-                    else 
+                    else
                     {
                         Data.courses_hasevents[index] = false;
                         Data.coursesfragment.event_adapter.notifyDataSetChanged();
@@ -256,7 +304,7 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         return;
                 }
                 //System.out.println("all pending requests done");
-                
+
                 View v = getView(); // getView returns null if the fragment is recreated when changing orientation and pending requests are running
                 if (v != null)
                 {
@@ -269,9 +317,9 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
     
      
-    private class EventAdapter extends ArrayAdapter
+    private class CourseAdapter extends ArrayAdapter
     {
-        public EventAdapter(@NonNull Context context, int resource)
+        public CourseAdapter(@NonNull Context context, int resource)
         {
             super(context, resource);
         }
@@ -303,9 +351,13 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 }
             }
             img = v.findViewById(R.id.course_news);
-            if (true)
+            if (false)
             {
                 img.setVisibility(View.INVISIBLE);
+            }
+            else
+            {
+                img.setVisibility(View.VISIBLE);
             }
             img = v.findViewById(R.id.course_schedule);
             if (Data.courses_hasevents == null || (! Data.courses_hasevents[position]))
@@ -321,13 +373,22 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
             {
                 img.setVisibility(View.INVISIBLE);
             }
+            else
+            {
+                img.setVisibility(View.VISIBLE);
+            }
             img = v.findViewById(R.id.course_meetings);
             if (true)
             {
                 img.setVisibility(View.INVISIBLE);
             }
+            else
+            {
+                img.setVisibility(View.VISIBLE);
+            }
             v.findViewById(R.id.course_members).setOnClickListener(new OnMembersClicked(Data.courselist[position].course_id));
             v.findViewById(R.id.course_files).setOnClickListener(new OnFilesClicked(Data.courselist[position].course_id));
+            v.findViewById(R.id.course_news).setOnClickListener(new OnNewsClicked(Data.courselist[position].course_id));
             return v;
         }
         

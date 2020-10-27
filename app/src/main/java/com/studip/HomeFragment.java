@@ -1,7 +1,6 @@
 package com.studip;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,20 +17,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.gson.JsonObject;
+import com.studip.api.ManagedObjectListener;
 import com.studip.api.News;
 import com.studip.api.NewsList;
-import com.studip.api.ResponseParser;
+import com.studip.api.rest.StudipListObject;
 import com.studip.api.rest.StudipNews;
 import com.studip.api.rest.StudipUser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, Runnable
+public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 {
-    private HomeAdapter ad;
+    private NewsAdapter ad;
     Handler h;
+    private Callback listener = new Callback();
+    private UserCallback user_listener = new UserCallback();
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -44,10 +45,10 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         ListView l = v.findViewById(R.id.home_list);
         if (Data.user == null)
         {
-            Data.user_provider.addRefreshListener(this);
+            Data.user_provider.addRefreshListener(user_listener);
             Data.user_provider.refresh();
         }
-        ad = new HomeAdapter(getActivity(),ArrayAdapter.NO_SELECTION);
+        ad = new NewsAdapter(getActivity(),ArrayAdapter.NO_SELECTION);
         l.setAdapter(ad);
         try
         {
@@ -69,31 +70,52 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         if (Data.global_news == null)
         {
             Data.global_news = new NewsList(h,null);
-            Data.global_news.addRefreshListener(this::OnNewsRefresh);
+            Data.global_news.addRefreshListener(listener);
             Data.global_news.refresh();
         }
         else
         {
-            
+            Data.global_news.addRefreshListener(listener);
         }
-        Data.global_news.addRefreshListener(this::OnNewsRefresh);
+        
         
         
         return v;
     }
     
-    
-    
-    public void OnNewsRefresh()
+    private class Callback extends ManagedObjectListener<StudipListObject>
     {
-        try
+        @Override
+        public void callback(StudipListObject obj, Exception error)
         {
-            StudipNews[] news = News.ArrayFromList(Data.global_news.getData());
-            ad.news = news;
-            ad.notifyDataSetChanged();
-        } catch (Exception e)
+            try
+            {
+                StudipNews[] news = News.ArrayFromList(Data.global_news.getData());
+                ad.news = news;
+                ad.notifyDataSetChanged();
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            ListView l = getView().findViewById(R.id.home_list);
+            SwipeRefreshLayout r = getView().findViewById(R.id.home_refresh);
+            r.setRefreshing(false);
+        }
+    }
+    
+    private class UserCallback extends ManagedObjectListener<StudipUser>
+    {
+        @Override
+        public void callback(StudipUser obj, Exception error)
         {
-            e.printStackTrace();
+            Data.user_provider.removeRefreshListener(this);
+            StudipUser u = Data.user;
+            if (u != null && u.name != null && u.name.given != null)
+            {
+                String welcome_message = getString(R.string.welcome)+" "+u.name.given+"!";
+                TextView welcome = getView().findViewById(R.id.welcome_message);
+                welcome.setText(welcome_message);
+            }
         }
     }
 
@@ -102,69 +124,17 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     public void onDestroy()
     {
         super.onDestroy();
-        Data.global_news.removeRefreshListener(this::OnNewsRefresh);
-    }
-
-    @Override
-    public void run()
-    {
-        Data.user_provider.removeRefreshListener(this);
-        StudipUser u = Data.user;
-        if (u != null && u.name != null && u.name.given != null)
-        {
-            String welcome_message = getString(R.string.welcome)+" "+u.name.given+"!";
-            TextView welcome = getView().findViewById(R.id.welcome_message);
-            welcome.setText(welcome_message);
-        }
+        Data.global_news.removeRefreshListener(listener);
     }
     
-    private class HomeAdapter extends ArrayAdapter
-    {
-        StudipNews[] news;
-        public HomeAdapter(@NonNull Context context, int resource)
-        {
-            super(context, resource);
-        }
-        
-        @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)
-        {
-            View v;
-            if (convertView != null)
-            {
-                v = convertView;
-            }
-            else
-            {
-                v = getLayoutInflater().inflate(R.layout.course_news_entry,parent,false);
-            }
-            TextView title = v.findViewById(R.id.news_title);
-            TextView content = v.findViewById(R.id.news_content);
-            title.setText(news[position].topic);
-            Document d = Jsoup.parse(news[position].body_html);
-            content.setText(d.wholeText());
-            return v;
-        }
-
-        @Override
-        public int getCount()
-        {
-            if (news == null)
-            {
-                return 0;
-            }
-            return news.length;
-        }
-    }
+    
+    
     
     
     
     @Override
     public void onRefresh()
     {
-        
-        ListView l = getView().findViewById(R.id.home_list);
-        SwipeRefreshLayout r = getView().findViewById(R.id.home_refresh);
-        r.setRefreshing(false);
+        Data.global_news.refresh();
     }
 }

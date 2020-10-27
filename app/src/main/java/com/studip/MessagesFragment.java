@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
 import com.studip.api.API;
+import com.studip.api.ManagedObjectListener;
 import com.studip.api.Messages;
 import com.studip.api.RouteCallback;
 import com.studip.api.rest.StudipListObject;
@@ -54,13 +55,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class MessagesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, Runnable
+public class MessagesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 {
     MessagesAdapter adapter;
     Handler h;
     
     
     volatile boolean can_send = false; // gets set when the messages/write request completed
+    
+    private Callback listener = new Callback();
     
     View dialog_layout;
     AlertDialog message_write_dialog;
@@ -78,7 +81,7 @@ public class MessagesFragment extends Fragment implements SwipeRefreshLayout.OnR
         if (Data.messages_provider == null)
         {
             Data.messages_provider = new Messages(h);
-            Data.messages_provider.addRefreshListener(this);
+            Data.messages_provider.addRefreshListener(listener);
         }
         
         
@@ -160,7 +163,7 @@ public class MessagesFragment extends Fragment implements SwipeRefreshLayout.OnR
         {
             message_write_dialog.dismiss();
         }
-        Data.messages_provider.removeRefreshListener(this);
+        Data.messages_provider.removeRefreshListener(listener);
     }
 
 
@@ -170,40 +173,44 @@ public class MessagesFragment extends Fragment implements SwipeRefreshLayout.OnR
         Data.messages_provider.refresh();
     }
     
-
-
-    @Override
-    public void run()
+    private class Callback extends ManagedObjectListener<StudipListObject>
     {
-        SwipeRefreshLayout ref = getView().findViewById(R.id.messages_refresh);
-        StudipListObject l  = Data.messages_provider.getData();
-        Iterator<Map.Entry<String, JsonElement>> it = l.collection.entrySet().iterator();
-        Data.messages = new StudipMessage[l.collection.size()];
-        Data.senders = new StudipUser[Data.messages.length];
-        //System.out.println(l.pagination.total);
-        int index = 0;
-        while (it.hasNext())
+
+        @Override
+        public void callback(StudipListObject obj, Exception error)
         {
-            JsonElement e = it.next().getValue();
-            try
+            SwipeRefreshLayout ref = getView().findViewById(R.id.messages_refresh);
+            StudipListObject l  = Data.messages_provider.getData();
+            Iterator<Map.Entry<String, JsonElement>> it = l.collection.entrySet().iterator();
+            Data.messages = new StudipMessage[l.collection.size()];
+            Data.senders = new StudipUser[Data.messages.length];
+            //System.out.println(l.pagination.total);
+            int index = 0;
+            while (it.hasNext())
             {
-                Data.messages[index] = Data.gson.fromJson(e,StudipMessage.class);
+                JsonElement e = it.next().getValue();
+                try
+                {
+                    Data.messages[index] = Data.gson.fromJson(e,StudipMessage.class);
+                }
+                catch (JsonSyntaxException ignored)
+                {
+                    Data.messages = null;
+                    ref.setRefreshing(false);
+                    return;
+                };
+                index++;
             }
-            catch (JsonSyntaxException ignored)
+            adapter.notifyDataSetChanged();
+            for (int i = 0;i<Data.messages.length;i++)
             {
-                Data.messages = null;
-                ref.setRefreshing(false);
-                return;
-            };
-            index++;
-        }
-        adapter.notifyDataSetChanged();
-        for (int i = 0;i<Data.messages.length;i++)
-        {
-            //System.out.println(Data.messages[i].sender);
-            Data.api.submitWithCallback(Data.api.new CallbackRoute(Data.api.new BlankRoute(Data.messages[i].sender),new GetSubjectData(i)));
+                //System.out.println(Data.messages[i].sender);
+                Data.api.submitWithCallback(Data.api.new CallbackRoute(Data.api.new BlankRoute(Data.messages[i].sender),new GetSubjectData(i)));
+            }
         }
     }
+
+    
     
     private class GetSubjectData extends RouteCallback
     {
