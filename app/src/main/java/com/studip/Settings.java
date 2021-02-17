@@ -13,9 +13,9 @@ public class Settings
     public static final int AUTHENTICATION_OAUTH = 3;
     
     
-    public static final int authentification_method_default = AUTHENTICATION_BASIC;
-    private static final String authentification_method_key = "authentification_method";
-    public volatile int authentification_method;
+    public static final int authentication_method_default = AUTHENTICATION_COOKIE;
+    private static final String authentication_method_key = "authentification_method";
+    public volatile int authentication_method;
     
     private static final String theme_key = "theme";
     public volatile int theme;
@@ -35,14 +35,14 @@ public class Settings
         
         if (prefs instanceof EncryptedSharedPreferences)
         {
-            s.authentification_method = prefs.getInt(authentification_method_key,authentification_method_default);
+            s.authentication_method = prefs.getInt(authentication_method_key,authentication_method_default);
             s.theme = prefs.getInt(theme_key,AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
             s.notification_period = prefs.getInt(notification_period_key,30);
             s.notification_service_enabled = prefs.getBoolean(notification_service_enabled_key,false);
         }
         else
         {
-            s.authentification_method = authentification_method_default;
+            s.authentication_method = authentication_method_default;
             s.theme = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
             s.notification_period = 30;
             s.notification_service_enabled = false;
@@ -56,7 +56,7 @@ public class Settings
         if (prefs instanceof  EncryptedSharedPreferences)
         {
             SharedPreferences.Editor e = prefs.edit();
-            e.putInt(authentification_method_key,authentification_method);
+            e.putInt(authentication_method_key,authentication_method);
             e.putInt(theme_key,theme);
             e.putInt(notification_period_key,notification_period);
             e.putBoolean(notification_service_enabled_key,notification_service_enabled);

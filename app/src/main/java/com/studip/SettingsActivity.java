@@ -3,6 +3,7 @@ package com.studip;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.TooltipCompat;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;
 
@@ -16,13 +17,16 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Switch;
 
 import com.studip.api.API;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
@@ -59,7 +63,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         }
         setContentView(R.layout.activity_settings);
         RadioGroup auth_group = findViewById(R.id.auth_group);
-        switch (Data.settings.authentification_method)
+        switch (Data.settings.authentication_method)
         {
             default:
             case Settings.AUTHENTICATION_BASIC:
@@ -72,6 +76,17 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
                 auth_group.check(R.id.auth_oauth);
                 break;
         }
+        // TODO manually display dialogs, as the tooltips cut off the text
+        RadioButton auth = findViewById(R.id.auth_basic);
+        TooltipCompat.setTooltipText(auth,getResources().getText(R.string.auth_basic_desc));
+        auth = findViewById(R.id.auth_cookie);
+        TooltipCompat.setTooltipText(auth,getResources().getText(R.string.auth_cookie_desc));
+        auth = findViewById(R.id.auth_oauth);
+        TooltipCompat.setTooltipText(auth,getResources().getText(R.string.auth_oauth_desc));
+        
+        
+        
+        
         RadioGroup theme_group = findViewById(R.id.theme_group);
         switch (Data.settings.theme)
         {
@@ -89,8 +104,14 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         SwitchCompat sw = findViewById(R.id.notification_service_enabled);
         sw.setChecked(Data.settings.notification_service_enabled);
         Spinner s = findViewById(R.id.notification_service_period);
-        
-        ArrayAdapter<Integer> a = new ArrayAdapter<Integer>(this,android.R.layout.simple_spinner_item,Arrays.stream( getResources().getIntArray(R.array.service_periods)).boxed().toArray(Integer[]::new));
+
+        List<Integer> list = new ArrayList<>();
+        for (int i : getResources().getIntArray(R.array.service_periods))
+        {
+            Integer integer = i;
+            list.add(integer);
+        }
+        ArrayAdapter<Integer> a = new ArrayAdapter<Integer>(this,android.R.layout.simple_spinner_item, list.toArray(new Integer[0]));
         s.setAdapter(a);
         s.setSelection(a.getPosition(Data.settings.notification_period));
         if (! Data.settings.notification_service_enabled)
@@ -137,17 +158,17 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     {
         if (v.equals(findViewById(R.id.auth_basic)))
         {
-            Data.settings.authentification_method = Settings.AUTHENTICATION_BASIC;
+            Data.settings.authentication_method = Settings.AUTHENTICATION_BASIC;
             return;
         }
         if (v.equals(findViewById(R.id.auth_cookie)))
         {
-            Data.settings.authentification_method = Settings.AUTHENTICATION_COOKIE;
+            Data.settings.authentication_method = Settings.AUTHENTICATION_COOKIE;
             return;
         }
         if (v.equals(findViewById(R.id.auth_oauth)))
         {
-            Data.settings.authentification_method = Settings.AUTHENTICATION_OAUTH;
+            Data.settings.authentication_method = Settings.AUTHENTICATION_OAUTH;
         }
     }
     

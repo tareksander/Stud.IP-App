@@ -15,7 +15,7 @@
     <string name="menu_messages">Nachrichten</string>
     <string name="welcome">Willkommen</string>
     <string name="members_dialog_title">Teilnehmer</string>
-    <string name="cache_service">Speichert Datenvon Stud.IP zwischen, um Netzwerkbandbreite zu sparen</string>
+    <string name="cache_service">Speichert Daten von Stud.IP zwischen, um Netzwerkbandbreite zu sparen</string>
     <string name="mkdir">neues Verzeichnis</string>
     <string name="upload">Datei hochladen</string>
     <string name="select_file">Datei auswählen</string>
@@ -34,6 +34,13 @@
     <string name="message_no_addressee">kein Addressat</string>
     <string name="message_no_subject">kein Betreff</string>
     <string name="message_no_content">kein Inhalt</string>
+    <string name="hint_addressee">Addressat</string>
+    <string name="hint_subject">Betreff</string>
+    <string name="hint_title">Titel</string>
+    <string name="hint_content">Inhalt</string>
+    <string name="forum_create">Beitrag erstellen</string>
+    
+    
     
     
     
@@ -53,12 +60,17 @@
     <string name="settings_experimental">Hier können experimentelle Features aktiviert werden:</string>
     <string name="auth_setting">Authentifizierungsmethode</string>
     <string name="auth_basic">HTTP Basic Authentication</string>
+    <string name="auth_basic_desc">Mit HTTP Basic Authentication wird bei jeder Anfrage der Benutzername und das Passwort mitgesendet.\nDamit niemand das Passwort auf dem Weg herausfinden kann,
+    werden unverschlüsselte Anfragen nicht gesendet. Der Benutzername und das Passwort müssen aber auf dem Gerät gespeichert bleiben. Sie werden verschlüsselt in einer Datei gespeichert, auf die nur die App zugriff hat.
+    Aber wenn das Betriebssystem selbst angegriffen wurde (oder das Gerät gerooted ist), könnte ein anderes Programm sich den Schlüssel für die Datei vom Betriebssytsem nehmen und die Daten auslesen.
+    Für normalen Gebrauch sollte es aber sicher genug sein.</string>
     <string name="auth_cookie">Session Cookie</string>
+    <string name="auth_cookie_desc">Noch nicht implementiert. Dies ist die Methode, die auch ein Browser verwendet. Mit dem Benutzernamen und Passwort wird ein Session Cookie vom Server angefragt, dannach wird das Password gelöscht.
+    Es wird nur der Cookie auf dem Gerät gespeichert, mit der Gleichen Sicherheit wie das Passwort bei Basic Authentication. Wenn der Cookie von anderen Programmen genommen wird, könnten sich diese als Sie ausgeben, aber nicht ihr Passwort ändern.</string>
     <string name="auth_oauth">OAuth 2</string>
+    <string name="auth_oauth_desc">Noch nicht implementiert. Die sicherste Methode: Sie funktioniert ähnlich wie cookie authentication, aber anstatt das die App den Benutzernamen und das Passwort abfragt, werden sie zu der Seite ihrer Institution weitergeleitet und müssen sich bei ihr anmelden.
+    Die App bekommt dann nur am Ende das Authenticaton Token, das im prinzip wie der Cookie bei cookie authentication funktioniert</string>
     <string name="settings_developer">Entwicklereinstellungen:\nDiese Einstellungen können die App instabil machen oder die Sicherheit herabsetzen. Benutzen auf eigene Gefahr.</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="empty"> </string>
 
 
 </resources>

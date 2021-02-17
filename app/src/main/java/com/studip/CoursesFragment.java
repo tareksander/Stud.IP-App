@@ -1,35 +1,52 @@
 package com.studip;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.util.Linkify;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.os.HandlerCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.studip.api.API;
 import com.studip.api.CourseList;
 import com.studip.api.Courses;
 import com.studip.api.EventList;
 import com.studip.api.Folder;
+import com.studip.api.Forum;
 import com.studip.api.ManagedObjectListener;
 import com.studip.api.News;
 import com.studip.api.NewsList;
 import com.studip.api.rest.StudipCourse;
+import com.studip.api.rest.StudipForumCategory;
+import com.studip.api.rest.StudipForumEntry;
 import com.studip.api.rest.StudipListArray;
 import com.studip.api.rest.StudipListObject;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 
 public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener
@@ -56,7 +73,9 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         
         ListView l = v.findViewById(R.id.event_list);
         event_adapter = new CourseAdapter(getActivity(), ArrayAdapter.NO_SELECTION);
+        CoursesFragment old = Data.coursesfragment;
         Data.coursesfragment = this;
+        
         if (Data.courses == null)
         {
             h = HandlerCompat.createAsync(Looper.getMainLooper());
@@ -81,6 +100,7 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         }
         l.setAdapter(event_adapter);
+        
         
         return v;
     }
@@ -139,10 +159,265 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         super.onDestroy();
         Data.courses.removeRefreshListener(listener);
     }
+    
+    private class OnForumClicked extends Forum.ForumCallback implements View.OnClickListener
+    {
+        private final String courseID;
+        public AlertDialog dialog;
+        private Forum f;
+        private ForumAdapter ad;
+        private StudipForumEntry entry = null;
+        private EditText subject;
+        private EditText content;
+        public OnForumClicked(String courseID)
+        {
+            this.courseID = courseID;
+        }
+        @Override
+        public void onClick(View v)
+        {
+            f = new Forum(courseID,this,h);
+            View layout = getLayoutInflater().inflate(R.layout.dialog_forum,null,false);
+            dialog = new AlertDialog.Builder(getActivity()).setView(layout).create();
+            ad = new ForumAdapter(getActivity(),ArrayAdapter.NO_SELECTION);
+            Button submit = layout.findViewById(R.id.forum_submit);
+            submit.setOnClickListener(this::submitEntry);
+            subject = layout.findViewById(R.id.forum_subject);
+            content = layout.findViewById(R.id.forum_content);
+            ListView l = layout.findViewById(R.id.forum_list);
+            l.setAdapter(ad);
+            f.refresh();
+            dialog.setOnKeyListener((dialog, keyCode, event) ->
+            {
+                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
+                {
+                    //System.out.println("back pressed. depth: "+f.getDepth());
+                    if (f.getDepth() <= 1)
+                    {
+                        dialog.dismiss();
+                        return true;
+                    }
+                    f.goUp();
+                    f.refresh();
+                    return true;
+                }
+                return false;
+            });
+            
+            
+            dialog.show();
+        }
+        void submitEntry(View v) {
+            if (entry != null)
+            {
+                String post_data = null;
+                try
+                {
+                    if ("1".equals(entry.depth))
+                    {
+                        System.out.println("URL: "+"/forum_entry/"+entry.topic_id);
+                        post_data = "subject="+ URLEncoder.encode(subject.getText().toString(),"UTF-8")+"&content="+URLEncoder.encode(content.getText().toString(),"UTF-8");
+                        System.out.println("Data: "+post_data);
+                        Data.api.submit(Data.api.new BasicRoute("/forum_entry/"+entry.topic_id, API.METHOD_POST,post_data)).get();
+                        f.refresh();
+                    }
+                    if ("2".equals(entry.depth)) {
+                        System.out.println("URL: "+"/forum_entry/"+entry.topic_id);
+                        post_data = "content="+URLEncoder.encode(content.getText().toString(),"UTF-8");
+                        System.out.println("Data: "+post_data);
+                        Data.api.submit(Data.api.new BasicRoute("/forum_entry/"+entry.topic_id, API.METHOD_POST,post_data)).get();
+                        f.refresh();
+                    }
+                }  catch (Exception e)
+                {
+                    e.printStackTrace();
+                    dialog.dismiss();
+                }
+            }
+        }
+        private class ForumAdapter extends ArrayAdapter
+        {
+            Object o;
+            public ForumAdapter(@NonNull Context context, int resource)
+            {
+                super(context, resource);
+            }
+            @SuppressLint("SetTextI18n")
+            @NonNull
+            @Override
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)
+            {
+                TextView v;
+                final int finalP = position;
+                if (convertView == null)
+                {
+                    v = new TextView(getContext());
+                    v.setAutoLinkMask(Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
+                }
+                else
+                {
+                    v = (TextView) convertView;
+                    v.setOnClickListener(null);
+                }
+                if (o != null)
+                {
+                    if (o instanceof StudipForumCategory[])
+                    {
+                        //System.out.println("category");
+                        StudipForumCategory[] c = (StudipForumCategory[]) o;
+                        v.setText(c[position].entry_name);
+                        v.setOnClickListener(v1 ->
+                        {
+                            f.goDownCategory(c[finalP].category_id);
+                            f.refresh();
+                        });
+                    }
+                    if (o instanceof StudipForumEntry[])
+                    {
+                        //System.out.println("areas");
+                        StudipForumEntry[] e = (StudipForumEntry[]) o;
+                        v.setText(e[position].subject);
+                        v.setOnClickListener(v1 ->
+                        {
+                            f.goDownEntry(e[finalP].topic_id);
+                            f.refresh();
+                        });
+                    }
+                    if (o instanceof  StudipForumEntry)
+                    {
+                        //System.out.println("entry");
+                        StudipForumEntry e = (StudipForumEntry) o;
+                        StudipForumEntry[] children = e.children;
+                        //System.out.println(e.depth);
+                        if ("1".equals(e.depth))
+                        {
+                            final int p2 = children.length-1-position;
+                            Document d = Jsoup.parse(children[children.length-1-position].subject); // the newest element is at the bottom, but we don't want that for the post list
+                            v.setText(d.wholeText());
+                            v.setOnClickListener(v12 ->
+                            {
+                                f.goDownEntry(e.children[p2].topic_id);
+                                f.refresh();
+                            });
+                            return v;
+                        }
+                        if ("2".equals(e.depth))
+                        {
+                            //System.out.println("depth 2");
+                            if (position == 0)
+                            {
+                                Document d = Jsoup.parse(e.subject);
+                                Document c = Jsoup.parse(e.content);
+                                v.setText(d.wholeText()+"\n\n"+c.wholeText());
+                            }
+                            else
+                            {
+                                position--;
+                                Document c = Jsoup.parse(children[position].content);
+                                v.setText(c.wholeText());
+                            }
+                            return v;
+                        }
+                        Document d = Jsoup.parse(e.content);
+                        v.setText(d.wholeText());
+                        return  v;
+                    }
+                }
+                return v;
+            }
 
+            @Override
+            public int getCount()
+            {
+                if (o == null)
+                {
+                    return 0;
+                }
+                if (o instanceof StudipForumEntry)
+                {
+                    StudipForumEntry e = (StudipForumEntry) o;
+                    if (e.children == null)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        if ("1".equals(e.depth))
+                        {
+                            return e.children.length;
+                        }
+                        else
+                        {
+                            return e.children.length + 1; // we also need to display the entry itself
+                        }
+                    }
+                }
+                if (o instanceof StudipForumEntry[])
+                {
+                    return ((StudipForumEntry[])o).length;
+                }
+                if (o instanceof StudipForumCategory[])
+                {
+                    return ((StudipForumCategory[])o).length;
+                }
+                return 0;
+            }
+        }
+        @Override
+        public void forumRefreshed(Object o)
+        {
+            //System.out.println("forum refreshed");
+            if (o instanceof Exception)
+            {
+                Exception e = (Exception) o;
+                e.printStackTrace();
+                return;
+            }
+            View subject = dialog.findViewById(R.id.forum_subject);
+            View content = dialog.findViewById(R.id.forum_content);
+            View submit = dialog.findViewById(R.id.forum_submit);
+            if (o instanceof StudipForumEntry)
+            {
+                //System.out.println("entry");
+                StudipForumEntry e = (StudipForumEntry) o;
+                entry = e;
+                if ("1".equals(e.depth))
+                {
+                    subject.setVisibility(View.VISIBLE);
+                    content.setVisibility(View.VISIBLE);
+                    submit.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    if ("2".equals(e.depth))
+                    {
+                        subject.setVisibility(View.GONE);
+                        content.setVisibility(View.VISIBLE);
+                        submit.setVisibility(View.VISIBLE);
+                    }
+                    else
+                    {
+                        subject.setVisibility(View.GONE);
+                        content.setVisibility(View.GONE);
+                        submit.setVisibility(View.GONE);
+                    }
+                }
+            }
+            else
+            {
+                subject.setVisibility(View.GONE);
+                content.setVisibility(View.GONE);
+                submit.setVisibility(View.GONE);
+            }
+            ad.o = o;
+            ad.notifyDataSetChanged();
+        }
+    }
+    
+    
     private class OnMembersClicked implements View.OnClickListener
     {
-        String courseID;
+        private final String courseID;
         public OnMembersClicked(String courseID)
         {
             this.courseID = courseID;
@@ -182,7 +457,7 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     public class OnFilesClicked implements View.OnClickListener
     {
-        String courseID;
+        private final String courseID;
         public OnFilesClicked(String courseID)
         {
             this.courseID = courseID;
@@ -212,7 +487,7 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
         private AlertDialog d;
         private NewsAdapter ad;
         private NewsList news;
-        private String courseID;
+        private final String courseID;
         public OnNewsClicked(String courseID)
         {
             this.courseID = courseID;
@@ -305,10 +580,10 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 }
                 //System.out.println("all pending requests done");
 
-                View v = getView(); // getView returns null if the fragment is recreated when changing orientation and pending requests are running
+                View v = Data.coursesfragment.getView();
                 if (v != null)
                 {
-                    SwipeRefreshLayout r = getView().findViewById(R.id.event_refresh);
+                    SwipeRefreshLayout r = v.findViewById(R.id.event_refresh);
                     r.setRefreshing(false);
                     Data.coursesfragment.event_adapter.notifyDataSetChanged();
                 }
@@ -389,6 +664,7 @@ public class CoursesFragment extends Fragment implements SwipeRefreshLayout.OnRe
             v.findViewById(R.id.course_members).setOnClickListener(new OnMembersClicked(Data.courselist[position].course_id));
             v.findViewById(R.id.course_files).setOnClickListener(new OnFilesClicked(Data.courselist[position].course_id));
             v.findViewById(R.id.course_news).setOnClickListener(new OnNewsClicked(Data.courselist[position].course_id));
+            v.findViewById(R.id.course_forum).setOnClickListener(new OnForumClicked(Data.courselist[position].course_id));
             return v;
         }
         

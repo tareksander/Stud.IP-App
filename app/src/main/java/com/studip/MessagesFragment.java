@@ -81,9 +81,8 @@ public class MessagesFragment extends Fragment implements SwipeRefreshLayout.OnR
         if (Data.messages_provider == null)
         {
             Data.messages_provider = new Messages(h);
-            Data.messages_provider.addRefreshListener(listener);
         }
-        
+        Data.messages_provider.addRefreshListener(listener);
         
         // TODO test sending a message to more than one person
         
@@ -242,8 +241,12 @@ public class MessagesFragment extends Fragment implements SwipeRefreshLayout.OnR
                         }
                         if (!is_null)
                         {
-                            SwipeRefreshLayout ref = getView().findViewById(R.id.messages_refresh);
-                            ref.setRefreshing(false);
+                            View v = getView();
+                            if (v != null)
+                            {
+                                SwipeRefreshLayout ref = v.findViewById(R.id.messages_refresh);
+                                ref.setRefreshing(false);
+                            }
                         }
                         adapter.notifyDataSetChanged();
                     }
@@ -380,9 +383,9 @@ public class MessagesFragment extends Fragment implements SwipeRefreshLayout.OnR
             catch (ExecutionException e)
             {
                 e.printStackTrace();
+                Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_SHORT).show();
             }
             catch (InterruptedException ignored) {}
-
         } catch (UnsupportedEncodingException ignored) {}
     }
     private class AddresseeListAdapter extends ArrayAdapter

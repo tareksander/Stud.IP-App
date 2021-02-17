@@ -79,10 +79,20 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         }
         
         
-        
         return v;
     }
-    
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null)
+        {
+            // simulate a refresh
+            listener.callback(Data.global_news.getData(),null);
+        }
+    }
+
     private class Callback extends ManagedObjectListener<StudipListObject>
     {
         @Override

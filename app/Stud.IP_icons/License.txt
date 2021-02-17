@@ -1,6 +1,0 @@
-The files in this folder are licensed under the GNU GPLv2.
-They are from the Stud.IP repository.
-The respective .xml files in the drawable folders are converted from these.
-
-https://sourceforge.net/projects/studip
-https://github.com/studip/studip

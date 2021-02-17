@@ -30,6 +30,7 @@ import androidx.security.crypto.EncryptedSharedPreferences;
 
 import com.studip.Data;
 import com.studip.R;
+import com.studip.Settings;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -232,6 +233,12 @@ public class API
             auth = new ServerAuthenticator(username,password);
             Authenticator.setDefault(auth);
             exec.submit(new BasicRoute(route_discovery)).get();
+            // if using cookie authentication, delete the password authenticator
+            if (Data.settings.authentication_method == Settings.AUTHENTICATION_COOKIE) {
+                auth = null;
+                Authenticator.setDefault(new DenyAuthenticator());
+                System.out.println("using cookie auth");
+            }
         } catch (Exception e)
         {
             auth = null;
@@ -277,7 +284,7 @@ public class API
         }
         else
         {
-            if (cookies.getCookies().size() == 0)
+            if (cookies == null || cookies.getCookies().size() == 0)
             {
                 return false;
             }
@@ -417,21 +424,21 @@ public class API
             con.disconnect();
             return builder.toString();
         }
-        public void handleResponseCode(int code) throws AuthorisationException, RouteInactiveException, InvalidMethodException, IOException
+        public void handleResponseCode(HttpsURLConnection con) throws AuthorisationException, RouteInactiveException, InvalidMethodException, IOException
         {
-            switch (code)
+            switch (con.getResponseCode())
             {
                 case 201:
                 case 200:
                     return;
                 case 401:
-                    throw new AuthorisationException();
+                    throw new AuthorisationException(con.getResponseMessage());
                 case 403:
-                    throw new RouteInactiveException();
+                    throw new RouteInactiveException(con.getResponseMessage());
                 case 404:
-                    throw new InvalidMethodException();
+                    throw new InvalidMethodException(con.getResponseMessage());
                 default:
-                    throw new IOException("unexpected status code: "+code);
+                    throw new IOException("unexpected status code: "+con.getResponseCode()+"  Message: "+con.getResponseMessage());
             }
         }
         public abstract String get() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
@@ -519,21 +526,21 @@ public class API
             con.disconnect();
             return b.array();
         }
-        public void handleResponseCode(int code) throws AuthorisationException, RouteInactiveException, InvalidMethodException, IOException
+        public void handleResponseCode(HttpsURLConnection con) throws AuthorisationException, RouteInactiveException, InvalidMethodException, IOException
         {
-            switch (code)
+            switch (con.getResponseCode())
             {
                 case 201:
                 case 200:
                     return;
                 case 401:
-                    throw new AuthorisationException();
+                    throw new AuthorisationException(con.getResponseMessage());
                 case 403:
-                    throw new RouteInactiveException();
+                    throw new RouteInactiveException(con.getResponseMessage());
                 case 404:
-                    throw new InvalidMethodException();
+                    throw new InvalidMethodException(con.getResponseMessage());
                 default:
-                    throw new IOException("unexpected status code: "+code);
+                    throw new IOException("unexpected status code: "+con.getResponseCode()+"  Message: "+con.getResponseMessage());
             }
         }
         public abstract byte[] get() throws IOException, InvalidMethodException, AuthorisationException, RouteInactiveException;
@@ -565,7 +572,7 @@ public class API
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
             con.connect();
-            handleResponseCode(con.getResponseCode());
+            handleResponseCode(con);
             return readConnection(con);
         }
         @Override
@@ -582,7 +589,7 @@ public class API
             BufferedWriter w = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
             w.write(post_data);
             w.close();
-            handleResponseCode(con.getResponseCode());
+            handleResponseCode(con);
             return readConnection(con);
         }
         @Override
@@ -599,7 +606,7 @@ public class API
             BufferedWriter w = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
             w.write(post_data);
             w.close();
-            handleResponseCode(con.getResponseCode());
+            handleResponseCode(con);
             return readConnection(con);
         }
         @Override
@@ -611,7 +618,7 @@ public class API
             con.setReadTimeout(5000);
             con.setRequestMethod("DELETE");
             con.connect();
-            handleResponseCode(con.getResponseCode());
+            handleResponseCode(con);
             return readConnection(con);
         }
 
@@ -624,7 +631,7 @@ public class API
             con.setReadTimeout(5000);
             con.setRequestMethod("HEAD");
             con.connect();
-            handleResponseCode(con.getResponseCode());
+            handleResponseCode(con);
             return readConnection(con);
         }
     }
@@ -823,7 +830,7 @@ public class API
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
             con.connect();
-            handleResponseCode(con.getResponseCode());
+            handleResponseCode(con);
             return readConnection(con);
         }
 
@@ -917,7 +924,7 @@ public class API
             w.write(post_data);
             
             w.close();
-            handleResponseCode(con.getResponseCode());
+            handleResponseCode(con);
             return readConnection(con);
         }
 
@@ -951,7 +958,6 @@ public class API
             return HTTPS + server + API + "messages";
         }
     }
-
     
     
     

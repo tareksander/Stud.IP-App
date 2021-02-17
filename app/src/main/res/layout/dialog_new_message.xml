@@ -30,6 +30,7 @@
                     android:id="@+id/message_addressee"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:hint="@string/hint_addressee"
                     android:singleLine="true"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/addressee_add"
@@ -59,6 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:hint="@string/hint_subject"
                 android:inputType="textPersonName"
                 android:singleLine="true" />
 
@@ -68,6 +70,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:gravity="start|top"
+                android:hint="@string/hint_content"
                 android:inputType="textMultiLine" />
 
             <Button
