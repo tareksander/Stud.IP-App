@@ -86,10 +86,7 @@ public class HomeActivity extends AppCompatActivity
             Data.gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.STATIC).create();
             // include transient fields, we just don't want java serialization to try to serialize them
         }
-
-        Intent intent = new Intent(this,CacheService.class);
-        intent.putExtra(CacheService.RESTORE_KEY,CacheService.RESTORE);
-        startService(intent);
+        
 
 
 
@@ -154,8 +151,6 @@ public class HomeActivity extends AppCompatActivity
     protected void onStop()
     {
         super.onStop();
-        Intent intent = new Intent(this,CacheService.class);
-        startService(intent);
     }
 
     @Override

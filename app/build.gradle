@@ -8,7 +8,7 @@ android {
         }
     }
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.studip"
@@ -28,6 +28,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    buildFeatures {
+        viewBinding true
+        dataBinding true
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -35,6 +40,22 @@ android {
 }
 
 dependencies {
+
+    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    
+    // ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel:2.3.0"
+    // LiveData
+    implementation "androidx.lifecycle:lifecycle-livedata:2.3.0"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.3.0"
+    
+    implementation "androidx.work:work-runtime:2.5.0"
+
+    implementation "androidx.paging:paging-runtime:2.1.2"
+
+    implementation "androidx.room:room-runtime:2.2.6"
+    annotationProcessor "androidx.room:room-compiler:2.2.6"
+    
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'

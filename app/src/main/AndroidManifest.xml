@@ -21,11 +21,6 @@
         android:theme="@style/AppTheme">
         
         <meta-data android:name="android.webkit.WebView.MetricsOptOut" android:value="true" />
-        <service
-            android:name=".CacheService"
-            android:description="@string/cache_service"
-            android:enabled="true"
-            android:exported="false" />
 
         <activity android:name=".SettingsActivity" />
         <activity android:name=".HomeActivity" />
