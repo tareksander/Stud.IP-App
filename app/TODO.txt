@@ -2,19 +2,70 @@ TODO:
     rework the api to also get session cookies on login, to use in VideoViews and WebViews
     finish the option to only save a session cookie, so the password doesn't have to be stored and make it the default method
     let logout send a logout request to the server with the cookie
-    make the cache service a bound service that provides an abstraction over the API class and manages caching the content in a database using Room
-        https://developer.android.com/training/data-storage/room
     add a method to try to force loading content from the server, for swipe-to-refresh
+    add a settings button to delete all the cached data, in case the caching somehow breaks
     make another service/Job to periodically update the database or parts of it, depending on the battery state, airplane mode, data saving setting, and settings:
+    store the Work-tag if the work is started and don't re-start it if it is still registered
     https://developer.android.com/topic/libraries/architecture/workmanager
+    https://developer.android.com/reference/android/app/AlarmManager
+    
+TODO: caching
+    cache the Data using Room
+    put the database in the cache directory, so the OS can remove it if there isn't enough storage
+    
+    https://developer.android.com/training/data-storage/room
+    https://medium.com/androiddevelopers/7-pro-tips-for-room-fbadea4bfbd1#5e38
+    https://developer.android.com/jetpack/guide
+    
+    
+    use paging for large lists:
+    https://developer.android.com/topic/libraries/architecture/paging.html
+    
+    messages: avoid reloading ALL messages, load one at a time and stop when the first cached message is encountered
+    
+    after logging in, check for available API-routes and tell the user if features aren't available because the provider disabled the API route
+    add a settings button to re-perform the check, so the user doesn't have to log out if an API-route is enabled
+    
+    rework the communication with the API with a library:
+    https://developer.android.com/training/volley
+    https://github.com/square/retrofit
+    https://stackoverflow.com/questions/23879567/how-to-prevent-retrofit-from-clearing-my-cookies
+    https://medium.com/@dileepsattawan/how-to-handle-cookies-with-retrofit-in-android-8b1812178949
+    https://stackoverflow.com/questions/38418809/add-cookies-to-retrofit-2-request/44694428
+    
+
+split up the dialog into DialogFragments, this preserves them during a configuration change and they can be split up into their own files:
+https://developer.android.com/guide/fragments/dialogs
+
+battery saving:
+https://developer.android.com/training/efficient-downloads/regular_updates
+https://developer.android.com/topic/performance/power
+
+use DownloadManager for downloads and add the session cookie to authenticate it:
+https://developer.android.com/reference/android/app/DownloadManager.Request
 
 
 TODO Use a ViewModel to fix the configuration change bugs once and for all
+
+IMPORTANT: If LiveData changes while an activity is in the stopped state and then returns to resumed, does it get the update?
+https://developer.android.com/topic/libraries/architecture/livedata
+Always up to date data
+    If a lifecycle becomes inactive, it receives the latest data upon becoming active again.
+
+https://developer.android.com/jetpack/guide#fetching_data
+https://developer.android.com/topic/libraries/architecture/viewmodel
 https://developer.android.com/reference/androidx/lifecycle/ViewModel
 https://developer.android.com/topic/libraries/architecture/livedata
 
 
-https://developer.android.com/guide/components/activities/recents
+add app widgets for: messages, forums, course news, global news, calendar
+https://developer.android.com/guide/topics/appwidgets
+https://developer.android.com/guide/topics/appwidgets#preview
+https://developer.android.com/guide/topics/appwidgets#fresh
+https://developer.android.com/guide/topics/graphics/drawables#nine-patch
+
+
+
 
     TODO publish on f-droid:
         https://f-droid.org/de/docs/Repository_Style_Guide
@@ -26,6 +77,7 @@ https://developer.android.com/guide/components/activities/recents
         to use qemu
     
     TODO app links: most Stud.IP servers have a hostname of studip.*
+    Tools->App Links Assistant
          dynamically add a broadcast receiver which listens for the specific hostname the user is currently logged in as
          https://developer.android.com/reference/android/content/Context#registerReceiver(android.content.BroadcastReceiver,%20android.content.IntentFilter,%20java.lang.String,%20android.os.Handler)
          
