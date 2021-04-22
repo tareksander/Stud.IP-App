@@ -1,0 +1,11 @@
+An unofficial app for Stud.IP systems.
+The API of the system has to be enabled to use this app.
+
+In development and currently undergoing a rewrite.
+Before the rewrite the app could show courses, show forums, download and upload your own files and course files,
+read and write messages and show course and global announcements.
+But there were some bugs that were hard to fix without a rewrite, and it was hard to continue developing it.
+
+At the moment it can only show global news, but the old features should be back in relatively short time.
+
+
