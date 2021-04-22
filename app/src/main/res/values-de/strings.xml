@@ -1,0 +1,82 @@
+<resources>
+    <string name="url_field">Server</string>
+    <string name="continue_msg">weiter</string>
+    <string name="username_field">Benutzername</string>
+    <string name="password_field">Passwort</string>
+    <string name="login_error_title">Fehler</string>
+    <string name="login_error_message">Es ist entweder der Hostname, der Benutzername oder das Passwort falsch. Wenn sie sich sicher sind, dass alles richtig ist, hat ihr Stud.IP Admin das API nicht freigeschaltet.</string>
+    <string name="restore_error_message">Es ist ein Fehler beim Wiederherstellen der Verbindung aufgetreten. Überprüfen sie ihre Netzwerkverbindung oder versuchen sie, sich erneut anzumelden.</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_event">Veranstaltungen</string>
+    <string name="menu_files">Dateien</string>
+    <string name="menu_messages">Nachrichten</string>
+    <string name="welcome">Willkommen %1$s !</string>
+    <string name="members_dialog_title">Teilnehmer</string>
+    <string name="mkdir">neues Verzeichnis</string>
+    <string name="upload">Datei hochladen</string>
+    <string name="select_file">Datei auswählen</string>
+    <string name="delete">Löschen</string>
+    <string name="dir">Verzeichnis</string>
+    <string name="file">Datei</string>
+    <string name="delete_msg">Wirklich löschen?</string>
+    <string name="message_subject">Betreff</string>
+    <string name="message_sender">Absender</string>
+    <string name="message_time">Zeit</string>
+    <string name="message_new">Nachricht Schreiben</string>
+    <string name="message_delete_title">Nachricht Löschen</string>
+    <string name="message_delete_msg">Diese Nachricht wirklich löschen:</string>
+    <string name="message_search">Suchen</string>
+    <string name="message_send">Senden</string>
+    <string name="message_no_addressee">kein Addressat</string>
+    <string name="message_no_subject">kein Betreff</string>
+    <string name="message_no_content">kein Inhalt</string>
+    <string name="hint_addressee">Addressat</string>
+    <string name="hint_subject">Betreff</string>
+    <string name="hint_title">Titel</string>
+    <string name="hint_content">Inhalt</string>
+    <string name="forum_create">Beitrag erstellen</string>
+
+
+    <string name="autologout_msg">Ihre Sitzung ist abgelaufen, fahren sie ohne Verbindung fort oder melden sie sich erneut an.</string>
+    <string name="autologout_relogin">neu anmelden</string>
+    <string name="con_lost_msg">Es kann keine Verbindung zum Stud.IP-Server hergestellt werden. Fahren sie ohne Verbindung fort oder überprüfen sie ihre Internetverbindung.</string>
+    <string name="con_lost_title">Verbindung unterbrochen</string>
+
+    <string name="crash_msg">Leider ist die App abgestürtzt. Bitte melden sie den Fehler und wie er passiert ist.</string>
+    <string name="crash_clipboard">Crash-Log in die Zwischenablage kopieren</string>
+    <string name="crash_mail">Crash-Log an unofficial_studip_app_bugs@web.de schicken</string>
+    <string name="crash_github">Github-Issue öffnen</string>
+    <string name="crash_restart">App neu starten</string>
+
+    <string name="settings">Einstellungen</string>
+    <string name="settings_main">Einstellungen:</string>
+    <string name="clear_credentials">Anmeldedaten löschen</string>
+    <string name="clear_credentials_dialog">Anmeldedaten wirklich löschen?</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="settings_theme">Theme:</string>
+    <string name="settings_theme_dark">Dunkel</string>
+    <string name="settings_theme_light">Hell</string>
+    <string name="settings_theme_auto">Automatisch</string>
+    <string name="settings_notification_service">Service für Hintergrundbenachrichtigungen</string>
+    <string name="settings_notification_service2">Läuft alle</string>
+    <string name="settings_notification_service3">Minuten</string>
+    <string name="settings_experimental">Hier können experimentelle Features aktiviert werden:</string>
+    <string name="auth_setting">Authentifizierungsmethode</string>
+    <string name="auth_basic">HTTP Basic Authentication</string>
+    <string name="auth_basic_desc">Mit HTTP Basic Authentication wird bei jeder Anfrage der Benutzername und das Passwort mitgesendet.\nDamit niemand das Passwort auf dem Weg herausfinden kann,
+    werden unverschlüsselte Anfragen nicht gesendet. Der Benutzername und das Passwort müssen aber auf dem Gerät gespeichert bleiben. Sie werden verschlüsselt in einer Datei gespeichert, auf die nur die App zugriff hat.
+    Aber wenn das Betriebssystem selbst angegriffen wurde (oder das Gerät gerooted ist), könnte ein anderes Programm sich den Schlüssel für die Datei vom Betriebssytsem nehmen und die Daten auslesen.
+    Für normalen Gebrauch sollte es aber sicher genug sein. Der Vorteil gegenüber des Session Cookies ist, dass man unbegrenzte Zeit angemeldet bleibt (solange sich das Passwort nicht ändert)</string>
+    <string name="auth_cookie">Session Cookie</string>
+    <string name="auth_cookie_desc">Dies ist die Methode, die auch ein Browser verwendet. Mit dem Benutzernamen und Passwort wird ein Session Cookie vom Server angefragt, dannach wird das Password gelöscht.
+    Es wird nur der Cookie auf dem Gerät gespeichert, mit der Gleichen Sicherheit wie das Passwort bei Basic Authentication. Wenn der Cookie von anderen Programmen genommen wird, könnten sich diese als Sie ausgeben, aber nicht ihr Passwort ändern.
+    Der Nachteil ist, dass die Sitzung irgendwann abläuft und man sich wieder anmelden muss.</string>
+    <string name="auth_oauth">OAuth 2</string>
+    <string name="auth_oauth_desc">Noch nicht implementiert. Die sicherste Methode: Sie funktioniert ähnlich wie der Session Cookies, aber anstatt das die App den Benutzernamen und das Passwort abfragt, werden sie zu der Seite ihrer Institution weitergeleitet und müssen sich bei ihr anmelden.
+    Die App bekommt dann nur am Ende das Authenticaton Token, das im prinzip wie der Session Cookie funktioniert</string>
+    <string name="settings_developer">Entwicklereinstellungen:\nDiese Einstellungen können die App instabil machen oder die Sicherheit herabsetzen. Benutzen auf eigene Gefahr.</string>
+
+
+
+</resources>

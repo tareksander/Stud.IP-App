@@ -13,6 +13,10 @@ TODO: caching
     cache the Data using Room
     put the database in the cache directory, so the OS can remove it if there isn't enough storage
     
+    Do the StudipFolders have to be in Room? Just seeing them would not be helpful when working offline.
+    
+    
+    
     https://developer.android.com/training/data-storage/room
     https://medium.com/androiddevelopers/7-pro-tips-for-room-fbadea4bfbd1#5e38
     https://developer.android.com/jetpack/guide
@@ -33,6 +37,12 @@ TODO: caching
     https://medium.com/@dileepsattawan/how-to-handle-cookies-with-retrofit-in-android-8b1812178949
     https://stackoverflow.com/questions/38418809/add-cookies-to-retrofit-2-request/44694428
     
+    instead of playing the videos in the app itself, make a content provider and share a URI to access the video to a video player app
+    
+    use DownloadManager for downloads and add the session cookie to authenticate it:
+    https://developer.android.com/reference/android/app/DownloadManager.Request
+    
+    
 
 split up the dialog into DialogFragments, this preserves them during a configuration change and they can be split up into their own files:
 https://developer.android.com/guide/fragments/dialogs
@@ -41,9 +51,13 @@ battery saving:
 https://developer.android.com/training/efficient-downloads/regular_updates
 https://developer.android.com/topic/performance/power
 
-use DownloadManager for downloads and add the session cookie to authenticate it:
-https://developer.android.com/reference/android/app/DownloadManager.Request
 
+
+
+Add the ability to transfer app data to another phone via bluetooth.
+A one-time-password is generated and the user has to enter it on the app of the other phone.
+A key is derived from this password and all data encrypted with it.
+https://developer.android.com/guide/topics/connectivity/bluetooth
 
 TODO Use a ViewModel to fix the configuration change bugs once and for all
 
