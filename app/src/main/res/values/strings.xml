@@ -1,76 +1,78 @@
 <resources>
-    <string name="app_name">Stud.IP</string>
-    <string name="url_field">Server</string>
-    <string name="url_button">weiter</string>
-    <string name="login_button">weiter</string>
-    <string name="username_field">Benutzername</string>
-    <string name="password_field">Passwort</string>
-    <string name="login_error_title">Fehler</string>
-    <string name="login_error_message">Es ist entweder der Hostname, der Benutzername oder das Passwort falsch. Wenn sie sich sicher sind, dass alles richtig ist, hat ihr Stud.ip Admin das API nicht freigeschaltet.</string>
-    <string name="restore_error_message">Es ist ein Fehler beim Wiederherstellen der Verbindung aufgetreten. Überprüfen sie ihre Netzwerkverbindung oder versuchen sie, sich erneut anzumelden.</string>
-    <string name="url_uos">studip.uni-osnabrueck.de</string>
+    <string name="app_name" translatable="false">Stud.IP</string>
+    <string name="url_field">server</string>
+    <string name="continue_msg">continue</string>
+    <string name="username_field">username</string>
+    <string name="password_field">password</string>
+    <string name="login_error_title">Error</string>
+    <string name="login_error_message">Either the hostname, username or password is wrong. If you are sure everything is right, your Stud.IP-admin hasn\'t enabled the API.</string>
+    <string name="restore_error_message">An error has occurred while trying to reconnect. Check you network connectivity or try to log in again.</string>
+    <string name="url_uos" translatable="false">studip.uni-osnabrueck.de</string>
     <string name="menu_home">Home</string>
-    <string name="menu_event">Veranstaltungen</string>
-    <string name="menu_files">Dateien</string>
-    <string name="menu_messages">Nachrichten</string>
-    <string name="welcome">Willkommen</string>
-    <string name="members_dialog_title">Teilnehmer</string>
-    <string name="cache_service">Speichert Daten von Stud.IP zwischen, um Netzwerkbandbreite zu sparen</string>
-    <string name="mkdir">neues Verzeichnis</string>
-    <string name="upload">Datei hochladen</string>
-    <string name="select_file">Datei auswählen</string>
-    <string name="delete">Löschen</string>
-    <string name="dir">Verzeichnis</string>
-    <string name="file">Datei</string>
-    <string name="delete_msg">Wirklich löschen?</string>
-    <string name="message_subject">Betreff</string>
-    <string name="message_sender">Absender</string>
-    <string name="message_time">Zeit</string>
-    <string name="message_new">Nachricht Schreiben</string>
-    <string name="message_delete_title">Nachricht Löschen</string>
-    <string name="message_delete_msg">Diese Nachricht wirklich löschen:</string>
-    <string name="message_search">Suchen</string>
-    <string name="message_send">Senden</string>
-    <string name="message_no_addressee">kein Addressat</string>
-    <string name="message_no_subject">kein Betreff</string>
-    <string name="message_no_content">kein Inhalt</string>
-    <string name="hint_addressee">Addressat</string>
-    <string name="hint_subject">Betreff</string>
-    <string name="hint_title">Titel</string>
-    <string name="hint_content">Inhalt</string>
-    <string name="forum_create">Beitrag erstellen</string>
+    <string name="menu_event">Courses</string>
+    <string name="menu_files">Files</string>
+    <string name="menu_messages">Messages</string>
+    <string name="welcome">Welcome %1$s !</string>
+    <string name="members_dialog_title">Participants</string>
+    <string name="mkdir">new directory</string>
+    <string name="upload">upload file</string>
+    <string name="select_file">select file</string>
+    <string name="delete">delete</string>
+    <string name="dir">Directory</string>
+    <string name="file">file</string>
+    <string name="delete_msg">really delete?</string>
+    <string name="message_subject">Subject</string>
+    <string name="message_sender">Sender</string>
+    <string name="message_time">time</string>
+    <string name="message_new">write message</string>
+    <string name="message_delete_title">delete message</string>
+    <string name="message_delete_msg">Really delete this message?</string>
+    <string name="message_search">Error</string>
+    <string name="message_send">send</string>
+    <string name="message_no_addressee">no addressee</string>
+    <string name="message_no_subject">no subject</string>
+    <string name="message_no_content">no content</string>
+    <string name="hint_addressee">Addressee</string>
+    <string name="hint_subject">Subject</string>
+    <string name="hint_title">Title</string>
+    <string name="hint_content">Content</string>
+    <string name="forum_create">create Topic</string>
+
     
+    <string name="autologout_msg">Your session has expired. Continue without a connection or log in again.</string>
+    <string name="autologout_relogin">log in again</string>
+    <string name="con_lost_msg">A connection to you Stud.IP server cannot be established. Continue without a connection or check your network connectivity.</string>
+    <string name="con_lost_title">Connection lost</string>
     
-    
-    
-    
-    <string name="settings">Einstellungen</string>
-    <string name="settings_main">Einstellungen:</string>
-    <string name="clear_credentials">Anmeldedaten löschen</string>
-    <string name="clear_credentials_dialog">Anmeldedaten wirklich löschen?</string>
+    <string name="crash_msg">Unfortunately the app crashed. Please report the error and how it happened.</string>
+    <string name="crash_clipboard">copy Crash-Log to clipboard</string>
+    <string name="crash_mail">send Crash-Log to unofficial_studip_app_bugs@web.de</string>
+    <string name="crash_github">open issue on Github</string>
+    <string name="crash_restart">restart app</string>
+
+    <string name="settings">Settings</string>
+    <string name="settings_main">Settings:</string>
+    <string name="clear_credentials">delete login data</string>
+    <string name="clear_credentials_dialog">really delete login data?</string>
     <string name="ok">OK</string>
-    <string name="cancel">Abbrechen</string>
+    <string name="cancel">Cancel</string>
     <string name="settings_theme">Theme:</string>
-    <string name="settings_theme_dark">Dunkel</string>
-    <string name="settings_theme_light">Hell</string>
-    <string name="settings_theme_auto">Automatisch</string>
-    <string name="settings_notification_service">Service für Hintergrundbenachrichtigungen</string>
-    <string name="settings_notification_service2">Läuft alle</string>
-    <string name="settings_notification_service3">Minuten</string>
-    <string name="settings_experimental">Hier können experimentelle Features aktiviert werden:</string>
-    <string name="auth_setting">Authentifizierungsmethode</string>
+    <string name="settings_theme_dark">dark</string>
+    <string name="settings_theme_light">light</string>
+    <string name="settings_theme_auto">auto</string>
+    <string name="settings_notification_service">Service for background notifications.</string>
+    <string name="settings_notification_service2">runy every</string>
+    <string name="settings_notification_service3">minutes</string>
+    <string name="settings_experimental">Experimental features can be activated here:</string>
+    <string name="auth_setting">Authentication method</string>
     <string name="auth_basic">HTTP Basic Authentication</string>
-    <string name="auth_basic_desc">Mit HTTP Basic Authentication wird bei jeder Anfrage der Benutzername und das Passwort mitgesendet.\nDamit niemand das Passwort auf dem Weg herausfinden kann,
-    werden unverschlüsselte Anfragen nicht gesendet. Der Benutzername und das Passwort müssen aber auf dem Gerät gespeichert bleiben. Sie werden verschlüsselt in einer Datei gespeichert, auf die nur die App zugriff hat.
-    Aber wenn das Betriebssystem selbst angegriffen wurde (oder das Gerät gerooted ist), könnte ein anderes Programm sich den Schlüssel für die Datei vom Betriebssytsem nehmen und die Daten auslesen.
-    Für normalen Gebrauch sollte es aber sicher genug sein.</string>
-    <string name="auth_cookie">Session Cookie</string>
-    <string name="auth_cookie_desc">Noch nicht implementiert. Dies ist die Methode, die auch ein Browser verwendet. Mit dem Benutzernamen und Passwort wird ein Session Cookie vom Server angefragt, dannach wird das Password gelöscht.
-    Es wird nur der Cookie auf dem Gerät gespeichert, mit der Gleichen Sicherheit wie das Passwort bei Basic Authentication. Wenn der Cookie von anderen Programmen genommen wird, könnten sich diese als Sie ausgeben, aber nicht ihr Passwort ändern.</string>
+    <string name="auth_basic_desc">With HTTP Basic Authentication the username and password is send with every request.\nTo secure your password, unencrypted connections are refused.\nThe username and password have to be saved on the device. They are encrypted in a file, which only the app can access, but if the operating system itself is hacked (or you rooted your device), another app could get the key from the operating system and decrypt the username and password.\nBut for normal use it should be safe enough.\nThe advantage over a session cookie is that a session cookie eventually expires and you have to log in again. Because with HTTP Basic Authentication the username and password are stored on the device, you only have to log in once (as log as you don\'t change the password).</string>
+    <string name="auth_cookie">session cookie</string>
+    <string name="auth_cookie_desc">This is the method browsers use. Username and password are used to fetch a session cookie, after that the password is deleted.\nOnly the cookie is saved on the device, with the same security as the password with HTTP Basic Authentication. If the cookie is leaked, someone can impersonate you for as long as the cookie lasts, but they cannot change your password.\nThe downside is that the cookie eventually expires and you have to log in again.</string>
     <string name="auth_oauth">OAuth 2</string>
-    <string name="auth_oauth_desc">Noch nicht implementiert. Die sicherste Methode: Sie funktioniert ähnlich wie cookie authentication, aber anstatt das die App den Benutzernamen und das Passwort abfragt, werden sie zu der Seite ihrer Institution weitergeleitet und müssen sich bei ihr anmelden.
-    Die App bekommt dann nur am Ende das Authenticaton Token, das im prinzip wie der Cookie bei cookie authentication funktioniert</string>
-    <string name="settings_developer">Entwicklereinstellungen:\nDiese Einstellungen können die App instabil machen oder die Sicherheit herabsetzen. Benutzen auf eigene Gefahr.</string>
+    <string name="auth_oauth_desc">Not implemented yet. The safest method: It works like a session cookie, but instead of entering the username and password in the app, you are redirected to the Stud.IP-Server and have to log in there.\nThe app only gets the authentication token afterwards, which works like a session cookie.</string>
+    <string name="settings_developer">Developer settings:\nThese settings could make the app unstable or lower the security. Use at your own risk.</string>
+    
 
 
 </resources>

@@ -47,13 +47,13 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <com.studip.NoscrollListView
+            <org.studip.unofficial_app.ui.NoscrollListView
                 android:id="@+id/message_addressee_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="true">
 
-            </com.studip.NoscrollListView>
+            </org.studip.unofficial_app.ui.NoscrollListView>
 
             <EditText
                 android:id="@+id/message_subject_edit"

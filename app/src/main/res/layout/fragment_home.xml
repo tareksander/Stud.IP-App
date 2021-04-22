@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-
+<layout>
+    <data>
+        <variable
+            name="m"
+            type="org.studip.unofficial_app.model.viewmodels.HomeViewModel" />
+        <variable
+            name="c"
+            type="android.content.Context" />
+        <variable name="adapter" type="org.studip.unofficial_app.ui.NewsAdapter"/>
+    </data>
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -11,7 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@{String.format(@string/welcome,m.getUser(c).name.given)}"/>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/home_refresh"
@@ -21,17 +31,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/welcome_message"
-        tools:context=".HomeFragment">
+        tools:context=".HomeFragment"
+        app:onRefreshListener="@{() -> m.news.refresh(c)}">
 
         <ListView
             android:id="@+id/home_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="vertical">
+            android:scrollbars="vertical"
+            app:adapter="@{adapter}">
 
         </ListView>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
+</layout>
