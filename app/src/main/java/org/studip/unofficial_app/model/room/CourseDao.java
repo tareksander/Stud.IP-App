@@ -21,7 +21,7 @@ public interface CourseDao extends BasicDao<StudipCourse>
     StudipForumCategory[] getCategories(String id);
     
     
-    @Query("SELECT * FROM courses WHERE (SELECT `begin` FROM semesters WHERE id) >= (SELECT `begin` FROM semesters WHERE id = :id) AND (SELECT `end` FROM semesters) <= (SELECT `end` FROM semesters WHERE id = :id)")
+    @Query("SELECT * FROM courses WHERE (SELECT `begin` FROM semesters WHERE id = SUBSTR(start_semester,19)) <= (SELECT `begin` FROM semesters WHERE id = :id) AND (SELECT `end` FROM semesters WHERE id = SUBSTR(end_semester,19)) >= (SELECT `end` FROM semesters WHERE id = :id)")
     StudipCourse[] getSemester(String id);
     
     
@@ -30,6 +30,10 @@ public interface CourseDao extends BasicDao<StudipCourse>
     
     // WARNING: observable queries fire if any of the mentioned tables are changed, not only the object you look at
 
+
+    @Query("SELECT * FROM courses WHERE (SELECT `begin` FROM semesters WHERE id = SUBSTR(start_semester,19)) <= (SELECT `begin` FROM semesters WHERE id = :id) AND (SELECT `end` FROM semesters WHERE id = SUBSTR(end_semester,19)) >= (SELECT `end` FROM semesters WHERE id = :id)")
+    LiveData<StudipCourse[]> observeSemester(String id);
+    
     @Query("SELECT * FROM news WHERE course_id = :id")
     LiveData<StudipNews[]> observeNews(String id);
 

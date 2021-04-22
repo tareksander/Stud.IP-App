@@ -18,6 +18,7 @@ import org.studip.unofficial_app.api.routes.File;
 import org.studip.unofficial_app.api.routes.Folder;
 import org.studip.unofficial_app.api.routes.Forum;
 import org.studip.unofficial_app.api.routes.Message;
+import org.studip.unofficial_app.api.routes.Semester;
 import org.studip.unofficial_app.api.routes.Studip;
 import org.studip.unofficial_app.api.routes.TestRoutes;
 import org.studip.unofficial_app.api.routes.User;
@@ -78,6 +79,7 @@ public class API
     public final Message message;
     public final Studip studip;
     public final User user;
+    public final Semester semester;
     
     private final TestRoutes tests;
     
@@ -159,6 +161,7 @@ public class API
         studip = retrofit.create(Studip.class);
         user = retrofit.create(User.class);
         tests = retrofit.create(TestRoutes.class);
+        semester = retrofit.create(Semester.class);
     }
     
     
@@ -211,7 +214,8 @@ public class API
             {
                 int code = response.code();
                 if (code == 200 && response.body() != null) {
-                    boolean same = userID != null && userID.equals(response.body().user_id);
+                    //System.out.println("id: "+userID);
+                    boolean same = userID == null || userID.equals(response.body().user_id);
                     userID = response.body().user_id;
                     user.updateInsertAsync(response.body()).timeout(10,TimeUnit.SECONDS).subscribeOn(Schedulers.io()).subscribe(() -> {
                         d.postValue(code);

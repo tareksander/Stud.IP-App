@@ -38,12 +38,12 @@
     <string name="hint_content">Content</string>
     <string name="forum_create">create Topic</string>
 
-    
+
     <string name="autologout_msg">Your session has expired. Continue without a connection or log in again.</string>
     <string name="autologout_relogin">log in again</string>
     <string name="con_lost_msg">A connection to you Stud.IP server cannot be established. Continue without a connection or check your network connectivity.</string>
     <string name="con_lost_title">Connection lost</string>
-    
+
     <string name="crash_msg">Unfortunately the app crashed. Please report the error and how it happened.</string>
     <string name="crash_clipboard">copy Crash-Log to clipboard</string>
     <string name="crash_mail">send Crash-Log to unofficial_studip_app_bugs@web.de</string>
@@ -72,7 +72,9 @@
     <string name="auth_oauth">OAuth 2</string>
     <string name="auth_oauth_desc">Not implemented yet. The safest method: It works like a session cookie, but instead of entering the username and password in the app, you are redirected to the Stud.IP-Server and have to log in there.\nThe app only gets the authentication token afterwards, which works like a session cookie.</string>
     <string name="settings_developer">Developer settings:\nThese settings could make the app unstable or lower the security. Use at your own risk.</string>
-    
+    <string name="semester_select">select semester</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

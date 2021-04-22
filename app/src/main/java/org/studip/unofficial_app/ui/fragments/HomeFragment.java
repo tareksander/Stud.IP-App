@@ -30,23 +30,13 @@ import java.util.List;
 public class HomeFragment extends Fragment
 {
     private HomeViewModel m;
-    private HomeActivityViewModel homem;
     private FragmentHomeBinding binding;
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        
-        
-        
-    }
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
         m = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
-        homem = new ViewModelProvider(requireActivity()).get(HomeActivityViewModel.class);;
         binding = FragmentHomeBinding.inflate(inflater);
         binding.setLifecycleOwner(this);
         binding.setC(requireContext());
@@ -61,27 +51,7 @@ public class HomeFragment extends Fragment
             }
             binding.getAdapter().setNews(studipNews.toArray(new StudipNews[0]));
         });
-        m.news.getStatus().observe(getViewLifecycleOwner(), status -> {
-            if (homem.connectionLostDialogShown.getValue() != null && ! homem.connectionLostDialogShown.getValue()) {
-                if (status != -1)
-                {
-                    //System.out.println(status);
-                    if (status == 401)
-                    {
-                        homem.connectionLostDialogShown.setValue(true);
-                        HomeActivity.showConnectionLostDialog(requireActivity(), true);
-                    }
-                    else
-                    {
-                        if (status != 200)
-                        {
-                            homem.connectionLostDialogShown.setValue(true);
-                            HomeActivity.showConnectionLostDialog(requireActivity(), false);
-                        }
-                    }
-                }
-            }
-        });
+        m.news.getStatus().observe(getViewLifecycleOwner(), status -> HomeActivity.onStatusReturn(requireActivity(),status));
         
         return binding.getRoot();
     }

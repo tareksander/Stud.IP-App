@@ -199,9 +199,11 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         }
         
         WorkManager.getInstance(this).cancelUniqueWork(NotificationWorker.WORKER_ID);
-        
+        //System.out.println("logout");
         settings.logout = true;
         settings.safe(SettingsProvider.getSettingsPreferences(this));
+        Intent i = new Intent(this,HomeActivity.class);
+        startActivity(i);
         System.exit(0);
     }
     

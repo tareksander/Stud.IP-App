@@ -45,4 +45,11 @@ public class StudipSemester
     {
         return Objects.hash(id, title, description, begin, end, seminars_begin, seminars_end);
     }
+
+    @NonNull
+    @Override
+    public String toString()
+    {
+        return title;
+    }
 }
