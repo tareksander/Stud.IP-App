@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         'default' {
-        storeFile file('/home/tarekmain/android keystores/studip.jks')
         }
     }
     compileSdkVersion 30
