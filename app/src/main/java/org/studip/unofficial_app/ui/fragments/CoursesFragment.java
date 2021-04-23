@@ -12,7 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
 import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.R;
@@ -24,14 +26,15 @@ import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.room.DB;
 import org.studip.unofficial_app.model.viewmodels.CoursesViewModel;
 import org.studip.unofficial_app.ui.HomeActivity;
+import org.studip.unofficial_app.ui.fragments.dialog.CourseNewsDialogFragment;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
-public class CoursesFragment extends Fragment
+public class CoursesFragment extends SwipeRefreshFragment
 {
-    
+    private final Fragment f = this;
     private CoursesViewModel m;
     private FragmentCoursesBinding binding;
     @Override
@@ -41,14 +44,15 @@ public class CoursesFragment extends Fragment
         binding = FragmentCoursesBinding.inflate(inflater);
         m = new ViewModelProvider(requireActivity()).get(CoursesViewModel.class);
         
+        setSwipeRefreshLayout(binding.coursesRefresh);
         
         SemesterAdapter semad = new SemesterAdapter(requireActivity(),R.layout.list_textview);
         binding.semesterSelect.setAdapter(semad);
         
         CoursesAdapter coursead = new CoursesAdapter(requireActivity(),ArrayAdapter.NO_SELECTION);
         binding.coursesList.setAdapter(coursead);
-        
-        String semid;
+
+        final String[] semid = {null};
 
         binding.coursesRefresh.setOnRefreshListener(() -> {
             m.semester.refresh(requireActivity());
@@ -65,63 +69,66 @@ public class CoursesFragment extends Fragment
                 m.semester.refresh(requireActivity());
             }
             Arrays.sort(sems, (o1, o2) -> -Long.compare(o1.begin, o2.begin));
+            StudipSemester selected = (StudipSemester) binding.semesterSelect.getSelectedItem();
             semad.clear();
             semad.addAll(sems);
-            long unixtime = System.currentTimeMillis()/1000;
-            for (int i = 0;i<sems.length;i++) {
+            long unixtime = System.currentTimeMillis() / 1000;
+            for (int i = 0; i < sems.length; i++)
+            {
                 StudipSemester s = sems[i];
-                if (unixtime >= s.begin && unixtime <= s.end) {
-                    binding.semesterSelect.setSelection(i);
-                    break;
+                if (semid[0] == null)
+                {
+                    if (unixtime >= s.begin && unixtime <= s.end)
+                    {
+                        //System.out.println("no semester selected");
+                        binding.semesterSelect.setSelection(i);
+                        break;
+                    }
+                } else {
+                    if (s.id.equals(semid[0])) {
+                        //System.out.println("current semester selected");
+                        binding.semesterSelect.setSelection(i);
+                        break;
+                    }
                 }
             }
         });
         
         DB db = DBProvider.getDB(requireActivity());
         
-        LiveData<StudipCourse[]> dball = db.courseDao().observeAll();
         final LiveData<StudipCourse[]>[] dbsem = new LiveData[]{null};
-
-        dball.observe(getViewLifecycleOwner(),(c) -> {
-            if (c.length == 0 && m.courses.getStatus().getValue() == -1) {
-                //System.out.println("refresh");
+        final LiveData<StudipCourse[]> courses_saved = db.courseDao().observeAll();
+        courses_saved.observe(getViewLifecycleOwner(), (c) -> {
+            if (c.length == 0) {
+                //System.out.println("no courses");
                 m.courses.refresh(requireActivity());
             }
-            coursead.clear();
-            coursead.addAll(c);
+            courses_saved.removeObservers(getViewLifecycleOwner());
         });
+        
         
         binding.semesterSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
-                if (dbsem[0] != null) {
+                semid[0] = semad.getItem(position).id;
+                if (dbsem[0] != null)
+                {
                     dbsem[0].removeObservers(getViewLifecycleOwner());
                 }
                 // /api.php/semester/
-                //System.out.println("selected semester"+semad.getItem(position).title+"  "+semad.getItem(position).id);
-                dball.removeObservers(getViewLifecycleOwner());
+                //System.out.println("selected semester" + semad.getItem(position).title + "  " + semad.getItem(position).id);
                 dbsem[0] = db.courseDao().observeSemester(semad.getItem(position).id);
-                dbsem[0].observe(getViewLifecycleOwner(),(c) -> {
+                dbsem[0].observe(getViewLifecycleOwner(), (c) ->
+                {
                     //System.out.println("updated semester courses");
                     coursead.clear();
                     coursead.addAll(c);
                 });
             }
-
             @Override
-            public void onNothingSelected(AdapterView<?> parent)
-            {
-                //System.out.println("nothing selected");
-                dball.observe(getViewLifecycleOwner(),(c) -> {
-                    if (c.length == 0 && m.courses.getStatus().getValue() == -1) {
-                        m.courses.refresh(requireActivity());
-                    }
-                    coursead.clear();
-                    coursead.addAll(c);
-                });
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
         
         
@@ -129,7 +136,6 @@ public class CoursesFragment extends Fragment
     }
     
     private class SemesterAdapter extends ArrayAdapter<StudipSemester> {
-
         public SemesterAdapter(@NonNull Context context, int resource)
         {
             super(context, resource);
@@ -163,7 +169,14 @@ public class CoursesFragment extends Fragment
                     b.courseFiles.setVisibility(View.VISIBLE);
                 }
             }
-            
+            b.courseNews.setOnClickListener(v1 ->
+            {
+                Bundle args = new Bundle();
+                args.putString("cid",c.course_id);
+                CourseNewsDialogFragment news = new CourseNewsDialogFragment();
+                news.setArguments(args);
+                news.show(getParentFragmentManager(),"course_news");
+            });
             return v;
         }
     }

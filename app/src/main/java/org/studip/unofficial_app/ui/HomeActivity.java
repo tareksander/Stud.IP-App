@@ -37,6 +37,8 @@ import org.studip.unofficial_app.ui.fragments.CoursesFragment;
 import org.studip.unofficial_app.ui.fragments.CoursesNavHostFragment;
 import org.studip.unofficial_app.ui.fragments.HomeFragment;
 
+import java.util.function.ObjIntConsumer;
+
 public class HomeActivity extends AppCompatActivity
 {
     private ActivityHomeBinding binding;
@@ -170,6 +172,9 @@ public class HomeActivity extends AppCompatActivity
         }
     }
     
+    public void navigateTo(int position) {
+        binding.pager.setCurrentItem(position);
+    }
     
     private static class HomeFragmentsAdapter extends FragmentStateAdapter {
 
@@ -184,7 +189,7 @@ public class HomeActivity extends AppCompatActivity
         {
             switch (position) {
                 case 1:
-                    return new CoursesNavHostFragment();
+                    return new CoursesFragment();
                 case 0:
                 default:
                     return new HomeFragment();

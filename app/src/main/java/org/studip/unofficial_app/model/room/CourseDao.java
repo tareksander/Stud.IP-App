@@ -5,6 +5,9 @@ import androidx.room.Query;
 import org.studip.unofficial_app.api.rest.StudipCourse;
 import org.studip.unofficial_app.api.rest.StudipForumCategory;
 import org.studip.unofficial_app.api.rest.StudipNews;
+
+import java.util.List;
+
 @Dao
 public interface CourseDao extends BasicDao<StudipCourse>
 {
@@ -35,7 +38,7 @@ public interface CourseDao extends BasicDao<StudipCourse>
     LiveData<StudipCourse[]> observeSemester(String id);
     
     @Query("SELECT * FROM news WHERE course_id = :id")
-    LiveData<StudipNews[]> observeNews(String id);
+    LiveData<List<StudipNews>> observeNews(String id);
 
     @Query("SELECT * FROM courses WHERE course_id = :id")
     LiveData<StudipCourse> observe(String id);

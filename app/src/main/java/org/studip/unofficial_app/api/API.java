@@ -213,6 +213,7 @@ public class API
             public void onResponse(@NotNull Call<StudipUser> call, @NotNull Response<StudipUser> response)
             {
                 int code = response.code();
+                //System.out.println("code: "+code);
                 if (code == 200 && response.body() != null) {
                     //System.out.println("id: "+userID);
                     boolean same = userID == null || userID.equals(response.body().user_id);

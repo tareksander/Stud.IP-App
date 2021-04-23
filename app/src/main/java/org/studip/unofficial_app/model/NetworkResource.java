@@ -15,12 +15,18 @@ public abstract class NetworkResource<T,R>
     
     protected final MutableLiveData<Integer> status = new MutableLiveData<>(-1);
     protected final MutableLiveData<Boolean> refreshing = new MutableLiveData<>(false);
-    private final LiveData<T> res;
+    private LiveData<T> res = null;
+    
+    private Context app;
     public NetworkResource(Context c) {
-        res = Transformations.distinctUntilChanged(getDBData(c));
+        app = c.getApplicationContext();
     }
     
     public LiveData<T> get() {
+        if (res == null) {
+            res = Transformations.distinctUntilChanged(getDBData(app));
+            app = null;
+        }
         return res;
     }
     
@@ -50,12 +56,15 @@ public abstract class NetworkResource<T,R>
                             refreshing.postValue(false);
                         }).start();
                     } else {
+                        System.out.println("no response");
                         refreshing.setValue(false);
                     }
                 }
                 @Override
                 public void onFailure(@NotNull Call<R> call, @NotNull Throwable t)
                 {
+                    System.out.println("newtwork call failed");
+                    t.printStackTrace();
                     refreshing.setValue(false);
                 }
             });

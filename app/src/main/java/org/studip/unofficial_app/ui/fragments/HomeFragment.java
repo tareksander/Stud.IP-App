@@ -21,13 +21,14 @@ import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.databinding.FragmentHomeBinding;
 import org.studip.unofficial_app.model.viewmodels.HomeActivityViewModel;
 import org.studip.unofficial_app.model.viewmodels.HomeViewModel;
+import org.studip.unofficial_app.model.viewmodels.StringViewModelFactory;
 import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.NewsAdapter;
 
 import java.util.List;
 
 
-public class HomeFragment extends Fragment
+public class HomeFragment extends SwipeRefreshFragment
 {
     private HomeViewModel m;
     private FragmentHomeBinding binding;
@@ -43,6 +44,8 @@ public class HomeFragment extends Fragment
         binding.setAdapter(new NewsAdapter(requireContext(), ArrayAdapter.NO_SELECTION));
         binding.setM(m);
         
+        setSwipeRefreshLayout(binding.homeRefresh);
+        
         m.news.isRefreshing().observe(getViewLifecycleOwner(), binding.homeRefresh::setRefreshing);
         m.news.get().observe(getViewLifecycleOwner(), studipNews ->
         {
@@ -55,8 +58,6 @@ public class HomeFragment extends Fragment
         
         return binding.getRoot();
     }
-    
-    
     
     
 }

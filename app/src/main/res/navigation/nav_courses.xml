@@ -6,5 +6,13 @@
     <fragment
         android:id="@+id/coursesFragment"
         android:name="org.studip.unofficial_app.ui.fragments.CoursesFragment"
-        android:label="CoursesFragment" />
+        android:label="CoursesFragment" >
+        <action
+            android:id="@+id/action_coursesFragment_to_courseNewsDialogFragment"
+            app:destination="@id/courseNewsDialogFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/courseNewsDialogFragment"
+        android:name="org.studip.unofficial_app.ui.fragments.dialog.CourseNewsDialogFragment"
+        android:label="CourseNewsDialogFragment" />
 </navigation>
