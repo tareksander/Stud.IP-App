@@ -17,7 +17,7 @@ public class HomeViewModel extends AndroidViewModel
     public HomeViewModel(Application c)
     {
         super(c);
-        news = new NewsResource(c);
+        news = new NewsResource(c,null);
     }
 
 

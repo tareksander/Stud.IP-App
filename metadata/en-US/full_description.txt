@@ -1,4 +1,3 @@
-An unofficial app for Stud.IP systems.
 The API of the system has to be enabled to use this app.
 
 In development and currently undergoing a rewrite.

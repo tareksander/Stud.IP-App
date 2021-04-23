@@ -81,7 +81,7 @@ public class CrashActivity extends AppCompatActivity
     }
 
     public void onRestart(View v) {
-        Intent i = new Intent(getApplicationContext(), ServerSelectActivity.class);
+        Intent i = new Intent(getApplicationContext(), HomeActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
         System.exit(0);

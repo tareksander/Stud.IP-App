@@ -1,4 +1,3 @@
-Eine inoffizielle App für Stud.IP-Systeme.
 Zum Benutzen muss das API des Systems angeschaltet sein.
 
 Ist noch in der Entwicklung und gerade in einem rewrite.

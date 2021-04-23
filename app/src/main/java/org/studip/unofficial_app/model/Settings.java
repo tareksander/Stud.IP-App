@@ -73,13 +73,8 @@ public class Settings
             e.putInt(theme_key,theme);
             e.putInt(notification_period_key,notification_period);
             e.putBoolean(notification_service_enabled_key,notification_service_enabled);
-            
-            if (logout) {
-                e.commit();
-            } else
-            {
-                e.apply();
-            }
+
+            e.commit();
         }
         else
         {

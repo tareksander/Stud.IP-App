@@ -24,4 +24,5 @@ public abstract class DB extends RoomDatabase
     public abstract ForumEntryDao forumEntryDao();
     public abstract NewsDao newsDao();
     public abstract UserDao userDao();
+    public abstract SemesterDao semesterDao();
 }

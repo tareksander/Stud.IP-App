@@ -75,6 +75,7 @@ public class StudipCourse implements Serializable
     @Ignore
     public transient JsonElement modules; // if empty, it's an empty array, but if there are elements, it's an object !?!
     @Expose(serialize = false, deserialize = false) // this shouldn't get serialized by Gson, modules already is
+    @Embedded
     public transient Modules modules_object;
     public static class Modules  implements Serializable
     {

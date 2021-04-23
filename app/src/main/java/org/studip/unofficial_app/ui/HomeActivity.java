@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -31,7 +32,12 @@ import org.studip.unofficial_app.model.NotificationWorker;
 import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.model.room.DB;
+import org.studip.unofficial_app.model.viewmodels.HomeActivityViewModel;
+import org.studip.unofficial_app.ui.fragments.CoursesFragment;
+import org.studip.unofficial_app.ui.fragments.CoursesNavHostFragment;
 import org.studip.unofficial_app.ui.fragments.HomeFragment;
+
+import java.util.function.ObjIntConsumer;
 
 public class HomeActivity extends AppCompatActivity
 {
@@ -110,6 +116,30 @@ public class HomeActivity extends AppCompatActivity
 
         setContentView(binding.getRoot());
     }
+    
+    public static void onStatusReturn(FragmentActivity a,int status) {
+        HomeActivityViewModel homem = new ViewModelProvider(a).get(HomeActivityViewModel.class);
+        if (homem.connectionLostDialogShown.getValue() != null && ! homem.connectionLostDialogShown.getValue()) {
+            if (status != -1)
+            {
+                //System.out.println(status);
+                if (status == 401)
+                {
+                    homem.connectionLostDialogShown.setValue(true);
+                    HomeActivity.showConnectionLostDialog(a, true);
+                }
+                else
+                {
+                    if (status != 200)
+                    {
+                        homem.connectionLostDialogShown.setValue(true);
+                        HomeActivity.showConnectionLostDialog(a, false);
+                    }
+                }
+            }
+        }
+    }
+    
     public static void showConnectionLostDialog(FragmentActivity a, boolean autologout) {
         Bundle b = new Bundle();
         b.putBoolean("autologout",autologout);
@@ -142,6 +172,9 @@ public class HomeActivity extends AppCompatActivity
         }
     }
     
+    public void navigateTo(int position) {
+        binding.pager.setCurrentItem(position);
+    }
     
     private static class HomeFragmentsAdapter extends FragmentStateAdapter {
 
@@ -155,6 +188,8 @@ public class HomeActivity extends AppCompatActivity
         public Fragment createFragment(int position)
         {
             switch (position) {
+                case 1:
+                    return new CoursesFragment();
                 case 0:
                 default:
                     return new HomeFragment();

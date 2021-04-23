@@ -15,6 +15,9 @@ public interface BasicDao<T>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void updateInsert(T c);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void updateInsertMultiple(T... c);
     
     @Update
     void update(T c);
