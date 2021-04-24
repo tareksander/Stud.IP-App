@@ -1,16 +1,20 @@
 package org.studip.unofficial_app.api;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Environment;
+import android.webkit.MimeTypeMap;
+import android.webkit.URLUtil;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.security.crypto.EncryptedSharedPreferences;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.api.routes.Course;
 import org.studip.unofficial_app.api.routes.Discovery;
@@ -28,29 +32,20 @@ import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.model.room.UserDao;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.Authenticator;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.Credentials;
 import okhttp3.HttpUrl;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.ResponseBody;
-import okhttp3.Route;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -59,6 +54,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class API
 {
+    private static final AtomicInteger DOWNLOAD_ID = new AtomicInteger(0);
+    
+    private static final String NOTIFICATION_TAG_DOWNLOAD = "download";
+    
     public final Retrofit retrofit;
     private final ConcurrentHashMap<String, List<Cookie>> cookies = new ConcurrentHashMap<>();
     
@@ -69,6 +68,8 @@ public class API
     private static final String USERNAME_KEY = "username";
     private static final String PASSWORD_KEY = "password";
     private static final String AUTH_METHOD_KEY = "method";
+    
+    private static final String HTTPS = "https://";
     
     
     public final Discovery discovery;
@@ -85,7 +86,6 @@ public class API
     
     private final String hostname;
     
-    // TODO reimplement HTTP Basic Auth
     
     private int auth_method = 0;
     
@@ -96,7 +96,7 @@ public class API
     public API(String hostname) {
         this.hostname = hostname;
         retrofit = new Retrofit.Builder()
-                .baseUrl("https://"+hostname+"/")
+                .baseUrl(HTTPS+hostname+"/")
                 .addConverterFactory(GsonConverterFactory.create(GsonProvider.getGson()))
                 .client(new OkHttpClient.Builder().cookieJar(new CookieJar()
                 {
@@ -164,6 +164,109 @@ public class API
         semester = retrofit.create(Semester.class);
     }
     
+    public void downloadFile(@NonNull Context con, @NonNull String fid, String filename) {
+        /*
+        NotificationCompat.Builder b = new NotificationCompat.Builder(con, Notifications.CHANNEL_DOWNLOADS);
+        b.setSmallIcon(android.R.drawable.stat_sys_download);
+        b.setContentTitle(filename);
+        b.setCategory(NotificationCompat.CATEGORY_PROGRESS);
+        b.setPriority(NotificationCompat.PRIORITY_LOW);
+        b.setProgress(100,0,false);
+        b.setGroup(NOTIFICATION_TAG_DOWNLOAD);
+        
+        Context c = con.getApplicationContext();
+
+        NotificationManagerCompat n = NotificationManagerCompat.from(con);
+        int id = DOWNLOAD_ID.getAndAdd(1);
+        n.notify(NOTIFICATION_TAG_DOWNLOAD,id,b.build());
+
+        
+        file.download(fid).enqueue(new Callback<ResponseBody>()
+        {
+            @Override
+            public void onResponse(@NotNull Call<ResponseBody> call, @NotNull Response<ResponseBody> response)
+            {
+                    try (ResponseBody r = response.body();
+                         OutputStream out = Downloads.openInDownloads(c, filename))
+                    {
+                        if (r != null)
+                        {
+                            out.write(r.bytes());
+                        }
+                    }
+                    catch (IOException ignored) {}
+                    n.cancel(NOTIFICATION_TAG_DOWNLOAD,id);
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<ResponseBody> call, @NotNull Throwable t)
+            {
+                n.cancel(NOTIFICATION_TAG_DOWNLOAD,id);
+            }
+        });
+        */
+        DownloadManager m = (DownloadManager) con.getSystemService(Context.DOWNLOAD_SERVICE);
+        String uri = HTTPS+hostname+"/api.php/file/"+fid+"/download";
+        if (URLUtil.isHttpsUrl(uri))
+        {
+            DownloadManager.Request r = new DownloadManager.Request(Uri.parse(uri));
+            String extension = MimeTypeMap.getFileExtensionFromUrl(filename);
+            if (extension != null)
+            {
+                r.setMimeType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
+            }
+            r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+            r.setVisibleInDownloadsUi(true);
+            r.allowScanningByMediaScanner();
+
+            r.setTitle(filename);
+            r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            
+            java.io.File f = new java.io.File("/"+Environment.DIRECTORY_DOWNLOADS+"/"+filename);
+            //System.out.println(f.toString());
+            if (f.exists()) {
+                // TODO show a dialog to ask if the file should be deleted
+                //f.delete();
+            }
+            
+            
+            boolean authed = false;
+
+            if (auth_method == Settings.AUTHENTICATION_BASIC)
+            {
+                r.addRequestHeader("Authorization", Credentials.basic(username, password));
+                authed = true;
+                //System.out.println("authed basic");
+            }
+            else
+            {
+                String auth = null;
+                List<Cookie> l = cookies.get(hostname);
+                if (l != null) {
+                    for (Cookie c : l) {
+                        if (c.name().equals(AUTH_COOKIE_NAME)) {
+                            auth = c.name()+"="+c.value();
+                            break;
+                        }
+                    }
+                }
+                if (auth != null)
+                {
+                    r.addRequestHeader("Cookie",auth);
+                    authed = true;
+                    //System.out.println("authed cookie");
+                }
+            }
+
+
+            if (authed)
+            {
+                m.enqueue(r);
+            }
+        } else {
+            throw new RuntimeException("download would not be secure");
+        }
+    }
     
     public String getHostname() {
         return hostname;

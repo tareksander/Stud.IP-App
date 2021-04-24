@@ -16,14 +16,14 @@ import retrofit2.http.Path;
 public interface Message
 {
     @DELETE("api.php/message/{mid}")
-    Call<ResponseBody> delete(@Path("mid") String id);
+    Call<Void> delete(@Path("mid") String id);
 
     @GET("api.php/message/{mid}")
-    Call<ResponseBody> get(@Path("mid") String id);
+    Call<Void> get(@Path("mid") String id);
     
     @FormUrlEncoded
     @PUT("api.php/message/{mid}")
-    Call<ResponseBody> update(@Path("mid") String id, @Field("unread") boolean unread);
+    Call<Void> update(@Path("mid") String id, @Field("unread") boolean unread);
     
     @GET("api.php/message/{mid}/file_folder")
     Call<StudipFolder> getFolder(@Path("mid") String id);

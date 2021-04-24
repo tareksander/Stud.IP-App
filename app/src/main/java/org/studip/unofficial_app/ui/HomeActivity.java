@@ -2,11 +2,8 @@ package org.studip.unofficial_app.ui;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.FragmentManager;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,7 +17,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 
 import org.studip.unofficial_app.R;
@@ -29,15 +25,14 @@ import org.studip.unofficial_app.databinding.ActivityHomeBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.NotificationWorker;
+import org.studip.unofficial_app.model.Notifications;
 import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.model.room.DB;
 import org.studip.unofficial_app.model.viewmodels.HomeActivityViewModel;
 import org.studip.unofficial_app.ui.fragments.CoursesFragment;
-import org.studip.unofficial_app.ui.fragments.CoursesNavHostFragment;
+import org.studip.unofficial_app.ui.fragments.FileFragment;
 import org.studip.unofficial_app.ui.fragments.HomeFragment;
-
-import java.util.function.ObjIntConsumer;
 
 public class HomeActivity extends AppCompatActivity
 {
@@ -47,7 +42,8 @@ public class HomeActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
-        
+
+        Notifications.initChannels(this);
 
         Settings s = SettingsProvider.getSettings(this);
         AppCompatDelegate.setDefaultNightMode(SettingsProvider.getSettings(this).theme);
@@ -188,6 +184,8 @@ public class HomeActivity extends AppCompatActivity
         public Fragment createFragment(int position)
         {
             switch (position) {
+                case 2:
+                    return new FileFragment();
                 case 1:
                     return new CoursesFragment();
                 case 0:

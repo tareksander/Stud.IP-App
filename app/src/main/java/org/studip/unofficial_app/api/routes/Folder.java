@@ -15,7 +15,7 @@ import retrofit2.http.Query;
 public interface Folder
 {
     @DELETE("api.php/folder/{fid}")
-    Call<ResponseBody> delete(@Path("fid") String folderID);
+    Call<Void> delete(@Path("fid") String folderID);
 
     @GET("api.php/folder/{fid}")
     Call<StudipFolder> get(@Path("fid") String folderID);

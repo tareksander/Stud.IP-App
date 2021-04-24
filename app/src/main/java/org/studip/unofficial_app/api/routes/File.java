@@ -26,7 +26,7 @@ public interface File
     // new MultipartBody.Builder().addFormDataPart("name","_FILES").addFormDataPart("filename",filename).addPart(RequestBody.create(file)).build();
     @Multipart
     @POST("api.php/file/{fid}/update")
-    Call<ResponseBody> update(@Path("fid") String fileID, @Body MultipartBody body);
+    Call<Void> update(@Path("fid") String fileID, @Body MultipartBody body);
 
     // new MultipartBody.Builder().addFormDataPart("name","_FILES").addFormDataPart("filename",filename).addPart(RequestBody.create(file)).build();
     @Multipart

@@ -74,7 +74,7 @@
     <string name="settings_developer">Developer settings:\nThese settings could make the app unstable or lower the security. Use at your own risk.</string>
     <string name="semester_select">select semester</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="my_documents">Your files</string>
 
 
 </resources>
