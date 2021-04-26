@@ -5,4 +5,4 @@ Vor dem rewrite konnte die App Kurse abrufen, Foren anzeigen,
 eigene Dateien und Dateien von Kursen downloaden und uploaden, Nachrichten lesen und schreiben, Ankündigungen des Systems und von Kursen anzeigen.
 Allerdings gab es auch einige Fehler, die ohne einen rewrite schwer zu beheben sind und es war nicht einfach daran weiterzuarbeiten.
 
-Im Moment können nur globale Ankündigungen gelesen werden, aber die alten Features sollten relativ schnell wiederhergestellt werden.
+Im Moment können noch keine Nachrichten abgerufen oder geschrieben werden.

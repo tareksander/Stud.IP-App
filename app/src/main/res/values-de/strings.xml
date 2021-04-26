@@ -12,7 +12,7 @@
     <string name="menu_messages">Nachrichten</string>
     <string name="welcome">Willkommen %1$s !</string>
     <string name="members_dialog_title">Teilnehmer</string>
-    <string name="mkdir">neues Verzeichnis</string>
+    <string name="mkdir">Neues Verzeichnis</string>
     <string name="upload">Datei hochladen</string>
     <string name="select_file">Datei auswählen</string>
     <string name="delete">Löschen</string>
@@ -77,6 +77,7 @@
     Die App bekommt dann nur am Ende das Authenticaton Token, das im prinzip wie der Session Cookie funktioniert</string>
     <string name="settings_developer">Entwicklereinstellungen:\nDiese Einstellungen können die App instabil machen oder die Sicherheit herabsetzen. Benutzen auf eigene Gefahr.</string>
     <string name="semester_select">Semester auswählen</string>
+    <string name="my_documents">Deine Dateien</string>
 
 
 </resources>

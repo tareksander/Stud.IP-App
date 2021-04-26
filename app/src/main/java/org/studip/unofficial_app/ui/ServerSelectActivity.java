@@ -3,6 +3,7 @@ package org.studip.unofficial_app.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -41,9 +42,12 @@ public class ServerSelectActivity extends AppCompatActivity
         //System.out.println("ServerSelect");
         
         binding = ActivityServerSelectBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
         
+        
+        binding.serverUrlsList.setOnItemClickListener((parent, view, position, id) -> onSubmitURL(view));
+        
+        
+        setContentView(binding.getRoot());
     }
     
 
@@ -77,10 +81,10 @@ public class ServerSelectActivity extends AppCompatActivity
         }
         else
         {
-            if (v instanceof Button)
+            if (v instanceof TextView)
             {
-                Button b = (Button) v;
-                APIProvider.newAPI(b.getText().toString());
+                TextView t = (TextView) v;
+                APIProvider.newAPI(t.getText().toString());
                 toLoginActivity();
             }
         }

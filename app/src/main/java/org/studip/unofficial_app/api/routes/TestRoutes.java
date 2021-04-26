@@ -11,7 +11,7 @@ public interface TestRoutes
      */
     
     @GET("https://www.google.com/")
-    Call<ResponseBody> tryGoogle();
+    Call<Void> tryGoogle();
     
     
     

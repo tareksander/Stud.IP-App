@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="studip_server_urls">
+        <item>studip.uni-osnabrueck.de</item>
+        <item>digicampus.uni-augsburg.de</item>
+        <item>studip.tu-braunschweig.de</item>
+        <item>elearning.uni-bremen.de</item>
+        <item>studip.tu-clausthal.de</item>
+        <item>elearning.fh-flensburg.de/studip</item>
+        <item>studip.kh-freiburg.de</item>
+        <item>studip.uni-giessen.de</item>
+        <item>studip.hawk.de</item>
+        <item>studip.uni-goettingen.de</item>
+        <item>e-learning.tuhh.de/studip</item>
+        <item>studip.uni-halle.de</item>
+        <item>studip.ph-heidelberg.de</item>
+        <item>studip.hs-gm.de</item>
+        <item>studip.hs-harz.de/studip</item>
+        <item>studip.hs-rm.de</item>
+        <item>neo.hfwu.de</item>
+        <item>studip.ostfalia.de</item>
+        <item>studip.uni-passau.de/studip</item>
+        <item>studip.uni-rostock.de</item>
+        <item>studip.hs-schmalkalden.de</item>
+        <item>lms.ph-gmuend.de</item>
+        <item>studip.hochschule-trier.de</item>
+        <item>studip.uni-trier.de</item>
+        <item>e-learning.tuhh.de/studip</item>
+        <item>www.studip.uni-vechta.de</item>
+        <item>ammerland.elan-ev.de</item>
+        <item>lingen.elan-ev.de</item>
+        <item>norden.elan-ev.de</item>
+        <item>papenburg.elan-ev.de</item>
+        <item>studip.hs-wismar.de</item>
+        <item>studip.ehs-dresden.de</item>
+    </string-array>
+</resources>

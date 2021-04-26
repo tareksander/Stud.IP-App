@@ -19,13 +19,6 @@ import org.studip.unofficial_app.ui.NewsAdapter;
 
 public class CourseNewsDialogFragment extends DialogFragment
 {
-    
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-    }
 
     @NonNull
     @Override
@@ -43,7 +36,6 @@ public class CourseNewsDialogFragment extends DialogFragment
             final NewsAdapter ad = new NewsAdapter(requireContext(), ArrayAdapter.NO_SELECTION);
             binding.courseNewsList.setAdapter(ad);
             m.news.get().observe(this, (news) -> {
-                //System.out.println("course news 2");
                 //System.out.println(news);
                 if (news.size() == 0 && m.news.getStatus().getValue() == 200) {
                     dismiss();

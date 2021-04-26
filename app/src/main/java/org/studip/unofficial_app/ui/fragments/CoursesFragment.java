@@ -25,6 +25,7 @@ import org.studip.unofficial_app.databinding.FragmentCoursesBinding;
 import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.room.DB;
 import org.studip.unofficial_app.model.viewmodels.CoursesViewModel;
+import org.studip.unofficial_app.model.viewmodels.HomeActivityViewModel;
 import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.fragments.dialog.CourseNewsDialogFragment;
 
@@ -36,6 +37,7 @@ public class CoursesFragment extends SwipeRefreshFragment
 {
     private final Fragment f = this;
     private CoursesViewModel m;
+    private HomeActivityViewModel h;
     private FragmentCoursesBinding binding;
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
@@ -43,6 +45,7 @@ public class CoursesFragment extends SwipeRefreshFragment
     {
         binding = FragmentCoursesBinding.inflate(inflater);
         m = new ViewModelProvider(requireActivity()).get(CoursesViewModel.class);
+        h = new ViewModelProvider(requireActivity()).get(HomeActivityViewModel.class);
         
         setSwipeRefreshLayout(binding.coursesRefresh);
         
@@ -169,6 +172,11 @@ public class CoursesFragment extends SwipeRefreshFragment
                     b.courseFiles.setVisibility(View.VISIBLE);
                 }
             }
+            b.courseFiles.setOnClickListener(v1 -> {
+                h.filesCourse.setValue(c);
+                HomeActivity a = (HomeActivity) requireActivity();
+                a.navigateTo(2);
+            });
             b.courseNews.setOnClickListener(v1 ->
             {
                 Bundle args = new Bundle();

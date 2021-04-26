@@ -13,7 +13,19 @@ TODO: caching
     cache the Data using Room
     put the database in the cache directory, so the OS can remove it if there isn't enough storage
     
-    Do the StudipFolders have to be in Room? Just seeing them would not be helpful when working offline.
+    
+    
+    
+    
+TODO: help screen, or wiki on github, or detailed description on f-droid
+    
+    
+    
+    For the notification service:
+    Notifications work over this api with the session cookie: /dispatch.php/jsupdater/get
+    caution: just returns an empty list if the session isn't valid
+    test whether it works with basic auth
+    
     
     
     
@@ -31,7 +43,6 @@ TODO: caching
     add a settings button to re-perform the check, so the user doesn't have to log out if an API-route is enabled
     
     rework the communication with the API with a library:
-    https://developer.android.com/training/volley
     https://github.com/square/retrofit
     https://stackoverflow.com/questions/23879567/how-to-prevent-retrofit-from-clearing-my-cookies
     https://medium.com/@dileepsattawan/how-to-handle-cookies-with-retrofit-in-android-8b1812178949
