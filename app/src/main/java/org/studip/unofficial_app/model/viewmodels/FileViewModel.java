@@ -73,7 +73,7 @@ public class FileViewModel extends ViewModel
                     } else {
                         System.out.println("no response");
                     }
-                    refreshing.postValue(false);
+                    refreshing.setValue(false);
                 }
                 @Override
                 public void onFailure(@NotNull Call<StudipFolder> call, @NotNull Throwable t)

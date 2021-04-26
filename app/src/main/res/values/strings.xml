@@ -7,14 +7,13 @@
     <string name="login_error_title">Error</string>
     <string name="login_error_message">Either the hostname, username or password is wrong. If you are sure everything is right, your Stud.IP-admin hasn\'t enabled the API.</string>
     <string name="restore_error_message">An error has occurred while trying to reconnect. Check you network connectivity or try to log in again.</string>
-    <string name="url_uos" translatable="false">studip.uni-osnabrueck.de</string>
     <string name="menu_home">Home</string>
     <string name="menu_event">Courses</string>
     <string name="menu_files">Files</string>
     <string name="menu_messages">Messages</string>
     <string name="welcome">Welcome %1$s !</string>
     <string name="members_dialog_title">Participants</string>
-    <string name="mkdir">new directory</string>
+    <string name="mkdir">New directory</string>
     <string name="upload">upload file</string>
     <string name="select_file">select file</string>
     <string name="delete">delete</string>

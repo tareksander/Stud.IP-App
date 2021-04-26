@@ -6,15 +6,25 @@ import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 public interface File
 {
     
+    
+    
+    
     // TODO api.php/file/{fid}  GET + DELETE + PUT
+    
+    @DELETE("api.php/file/{fid}")
+    Call<Void> delete(@Path("fid") String fileID);
+    
+    
     
     
     // TODO api.php/file/{fid}/copy/{folder}  POST
@@ -23,15 +33,15 @@ public interface File
     Call<ResponseBody> download(@Path("fid") String fileID);
 
     
-    // new MultipartBody.Builder().addFormDataPart("name","_FILES").addFormDataPart("filename",filename).addPart(RequestBody.create(file)).build();
+    // MultipartBody.Part.createFormData("filename",getFileName(file,requireActivity()), RequestBody.create(data));
     @Multipart
     @POST("api.php/file/{fid}/update")
-    Call<Void> update(@Path("fid") String fileID, @Body MultipartBody body);
+    Call<Void> update(@Path("fid") String fileID, @Part MultipartBody.Part body);
 
-    // new MultipartBody.Builder().addFormDataPart("name","_FILES").addFormDataPart("filename",filename).addPart(RequestBody.create(file)).build();
+    // MultipartBody.Part.createFormData("filename",getFileName(file,requireActivity()), RequestBody.create(data));
     @Multipart
     @POST("api.php/file/{fid}")
-    Call<StudipFolder.FileRef> upload(@Path("fid") String folderID, @Body MultipartBody body);
+    Call<StudipFolder.FileRef> upload(@Path("fid") String folderID, @Part MultipartBody.Part body);
     
     
     

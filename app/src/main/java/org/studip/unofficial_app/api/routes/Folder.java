@@ -9,6 +9,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -35,7 +36,7 @@ public interface Folder
 
     
     @FormUrlEncoded
-    @GET("api.php/folder/{fid}/new_folder")
+    @POST("api.php/folder/{fid}/new_folder")
     Call<StudipFolder> createFolder(@Path("fid") String folderID, @Field("name") String name, @Field("description") String description);
     
 }

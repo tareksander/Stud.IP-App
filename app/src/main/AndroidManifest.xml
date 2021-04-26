@@ -35,5 +35,12 @@
         </activity>
         <activity android:name=".ui.ServerSelectActivity" />
     </application>
-
+    
+    <queries>
+        <intent>
+            <action android:name="ACTION_ACTION_OPEN_DOCUMENT"/>
+            <data android:mimeType="*/*"/>
+        </intent>
+    </queries>
+    
 </manifest>

@@ -16,6 +16,19 @@ TODO: caching
     
     
     
+    
+TODO: help screen, or wiki on github, or detailed description on f-droid
+    
+    
+    
+    For the notification service:
+    Notifications work over this api with the session cookie: /dispatch.php/jsupdater/get
+    caution: just returns an empty list if the session isn't valid
+    test whether it works with basic auth
+    
+    
+    
+    
     https://developer.android.com/training/data-storage/room
     https://medium.com/androiddevelopers/7-pro-tips-for-room-fbadea4bfbd1#5e38
     https://developer.android.com/jetpack/guide

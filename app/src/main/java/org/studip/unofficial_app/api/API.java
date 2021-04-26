@@ -54,9 +54,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class API
 {
-    private static final AtomicInteger DOWNLOAD_ID = new AtomicInteger(0);
-    
-    private static final String NOTIFICATION_TAG_DOWNLOAD = "download";
     
     public final Retrofit retrofit;
     private final ConcurrentHashMap<String, List<Cookie>> cookies = new ConcurrentHashMap<>();
@@ -165,46 +162,6 @@ public class API
     }
     
     public void downloadFile(@NonNull Context con, @NonNull String fid, String filename) {
-        /*
-        NotificationCompat.Builder b = new NotificationCompat.Builder(con, Notifications.CHANNEL_DOWNLOADS);
-        b.setSmallIcon(android.R.drawable.stat_sys_download);
-        b.setContentTitle(filename);
-        b.setCategory(NotificationCompat.CATEGORY_PROGRESS);
-        b.setPriority(NotificationCompat.PRIORITY_LOW);
-        b.setProgress(100,0,false);
-        b.setGroup(NOTIFICATION_TAG_DOWNLOAD);
-        
-        Context c = con.getApplicationContext();
-
-        NotificationManagerCompat n = NotificationManagerCompat.from(con);
-        int id = DOWNLOAD_ID.getAndAdd(1);
-        n.notify(NOTIFICATION_TAG_DOWNLOAD,id,b.build());
-
-        
-        file.download(fid).enqueue(new Callback<ResponseBody>()
-        {
-            @Override
-            public void onResponse(@NotNull Call<ResponseBody> call, @NotNull Response<ResponseBody> response)
-            {
-                    try (ResponseBody r = response.body();
-                         OutputStream out = Downloads.openInDownloads(c, filename))
-                    {
-                        if (r != null)
-                        {
-                            out.write(r.bytes());
-                        }
-                    }
-                    catch (IOException ignored) {}
-                    n.cancel(NOTIFICATION_TAG_DOWNLOAD,id);
-            }
-
-            @Override
-            public void onFailure(@NotNull Call<ResponseBody> call, @NotNull Throwable t)
-            {
-                n.cancel(NOTIFICATION_TAG_DOWNLOAD,id);
-            }
-        });
-        */
         DownloadManager m = (DownloadManager) con.getSystemService(Context.DOWNLOAD_SERVICE);
         String uri = HTTPS+hostname+"/api.php/file/"+fid+"/download";
         if (URLUtil.isHttpsUrl(uri))

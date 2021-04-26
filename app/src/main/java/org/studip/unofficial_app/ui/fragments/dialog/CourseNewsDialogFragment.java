@@ -19,13 +19,6 @@ import org.studip.unofficial_app.ui.NewsAdapter;
 
 public class CourseNewsDialogFragment extends DialogFragment
 {
-    
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-    }
 
     @NonNull
     @Override
