@@ -7,18 +7,19 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Observer;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import org.studip.unofficial_app.api.rest.StudipCollection;
 import org.studip.unofficial_app.api.rest.StudipCourse;
+import org.studip.unofficial_app.model.room.DB;
 
 import java.util.Map;
 import java.util.Objects;
 
 import retrofit2.Call;
 
-public class CoursesResource extends NetworkResource<StudipCourse[], StudipCollection<StudipCourse>> {
+public class CoursesResource extends NetworkResource<StudipCourse[]> {
 
-    private String semester = null;
     public CoursesResource(Context c)
     {
         super(c);
@@ -41,24 +42,23 @@ public class CoursesResource extends NetworkResource<StudipCourse[], StudipColle
     }
 
     @Override
-    protected void updateDB(Context c, StudipCollection<StudipCourse> res)
+    protected void updateDB(Context c, Object o)
     {
+        StudipCollection<StudipCourse> res = (StudipCollection<StudipCourse>) o;
+        DB db = DBProvider.getDB(c);
         for (Map.Entry<String,StudipCourse> entry : res.collection.entrySet()) {
             StudipCourse course = entry.getValue();
             Gson gson = GsonProvider.getGson();
+            // only store the ids, that makes it easier to formulate DB queries
+            course.start_semester = lastPathSegment(course.start_semester);
+            course.end_semester = lastPathSegment(course.end_semester);
             if (! course.modules.isJsonArray()) {
-                course.modules_object = gson.fromJson(course.modules,StudipCourse.Modules.class);
+                try
+                {
+                    course.modules_object = gson.fromJson(course.modules, StudipCourse.Modules.class);
+                } catch (JsonSyntaxException ignored) {}
             }
-            /*
-            System.out.println(course.title);
-            if (course.modules_object != null)
-            {
-                System.out.println(course.modules_object.documents);
-                System.out.println(course.modules_object.forum);
-                System.out.println(course.modules_object.wiki);
-            }
-            */
-            DBProvider.getDB(c).courseDao().updateInsert(course);
+            db.courseDao().updateInsert(course);
         }
     }
 }

@@ -78,6 +78,7 @@
     <string name="settings_developer">Entwicklereinstellungen:\nDiese Einstellungen können die App instabil machen oder die Sicherheit herabsetzen. Benutzen auf eigene Gefahr.</string>
     <string name="semester_select">Semester auswählen</string>
     <string name="my_documents">Deine Dateien</string>
+    <string name="not_logged_in">nicht eingeloggt</string>
 
 
 </resources>

@@ -74,6 +74,7 @@
     <string name="semester_select">select semester</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="my_documents">Your files</string>
+    <string name="not_logged_in">not logged in</string>
 
 
 </resources>

@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import retrofit2.Call;
 
-public class SemesterResource extends NetworkResource<StudipSemester[], StudipCollection<StudipSemester>>{
+public class SemesterResource extends NetworkResource<StudipSemester[]>{
 
 
     public SemesterResource(Context c)
@@ -31,8 +31,9 @@ public class SemesterResource extends NetworkResource<StudipSemester[], StudipCo
     }
 
     @Override
-    protected void updateDB(Context c, StudipCollection<StudipSemester> res)
+    protected void updateDB(Context c, Object o)
     {
+        StudipCollection<StudipSemester> res = (StudipCollection<StudipSemester>) o;
         DBProvider.getDB(c).semesterDao().updateInsertMultiple(res.collection.values().toArray(new StudipSemester[0]));
     }
 }

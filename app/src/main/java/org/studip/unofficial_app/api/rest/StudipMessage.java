@@ -5,10 +5,11 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity(tableName = "messages")
-public class StudipMessage
+public class StudipMessage implements Serializable
 {
     @NonNull
     @PrimaryKey
@@ -19,12 +20,15 @@ public class StudipMessage
     public String mkdate;
     public String priority;
     public String message_html;
-    // public X tags; I don't know what type the dags array is, probably String[]
+    // public X tags; I don't know what type the tags array is, probably String[]
     public String sender;
-    @Ignore
     public String[] recipients;
+    
+    // get the attachments with /api.php/file/attachments[x]
+    public String[] attachments;
     public boolean unread;
-
+    
+    
     @Override
     public boolean equals(Object o)
     {

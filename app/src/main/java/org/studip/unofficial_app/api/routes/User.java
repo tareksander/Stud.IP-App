@@ -3,6 +3,7 @@ package org.studip.unofficial_app.api.routes;
 import org.studip.unofficial_app.api.rest.StudipCollection;
 import org.studip.unofficial_app.api.rest.StudipCourse;
 import org.studip.unofficial_app.api.rest.StudipFolder;
+import org.studip.unofficial_app.api.rest.StudipMessage;
 import org.studip.unofficial_app.api.rest.StudipScheduleEntry;
 import org.studip.unofficial_app.api.rest.StudipUser;
 
@@ -29,7 +30,7 @@ public interface User
     Call<StudipUser> user(@Path("uid") String user);
 
     @GET("api.php/user/{uid}/{box}")
-    Call<StudipUser> userBox(@Path("uid") String user, @Path("box") String mailbox);
+    Call<StudipCollection<StudipMessage>> userBox(@Path("uid") String user, @Path("box") String mailbox, @Query("offset") int offset, @Query("limit") int limit);
     
     
     // TODO user/{uid}/activitystream

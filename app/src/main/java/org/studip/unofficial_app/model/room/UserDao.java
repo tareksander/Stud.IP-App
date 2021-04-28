@@ -22,7 +22,10 @@ public interface UserDao extends BasicDao<StudipUser>
 
     @Query("SELECT * FROM users WHERE user_id = :id")
     Single<StudipUser> getSingle(String id);
-    
+
+
+    @Query("SELECT * FROM users WHERE user_id = :id")
+    LiveData<StudipUser> observe(String id);
     
     
 }

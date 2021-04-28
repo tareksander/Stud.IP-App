@@ -173,7 +173,7 @@ public class CoursesFragment extends SwipeRefreshFragment
                 }
             }
             b.courseFiles.setOnClickListener(v1 -> {
-                h.filesCourse.setValue(c);
+                h.setFilesCourse(c);
                 HomeActivity a = (HomeActivity) requireActivity();
                 a.navigateTo(2);
             });

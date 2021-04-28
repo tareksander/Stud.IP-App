@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
-public class NewsResource extends NetworkResource<List<StudipNews>, StudipCollection<StudipNews>>
+public class NewsResource extends NetworkResource<List<StudipNews>>
 {
     private final String cid;
     public NewsResource(Context c, String cid)
@@ -42,8 +42,9 @@ public class NewsResource extends NetworkResource<List<StudipNews>, StudipCollec
     }
 
     @Override
-    protected void updateDB(Context c, StudipCollection<StudipNews> res)
+    protected void updateDB(Context c, Object o)
     {
+        StudipCollection<StudipNews> res = (StudipCollection<StudipNews>) o;
         //System.out.println("new news got");
         if (cid != null) {
             for (StudipNews n : res.collection.values()) {
