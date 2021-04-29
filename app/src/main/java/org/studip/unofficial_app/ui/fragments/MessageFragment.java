@@ -26,6 +26,7 @@ import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.viewmodels.MessagesViewModel;
 import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.fragments.dialog.MessageDialogFragment;
+import org.studip.unofficial_app.ui.fragments.dialog.MessageWriteDialogFragment;
 
 import java.util.Calendar;
 import java.util.Objects;
@@ -59,13 +60,14 @@ public class MessageFragment extends SwipeRefreshFragment
         binding.messagesList.setAdapter(ad);
         
         m.mes.get().observe(getViewLifecycleOwner(), (messages) -> {
-            System.out.println("messages");
+            //System.out.println("messages");
             if (messages.length == 0 && m.mes.getStatus().getValue() == -1) {
                 //System.out.println("refreshing");
                 binding.messagesRefresh.setRefreshing(true);
                 m.mes.refresh(requireActivity());
                 return;
             }
+            binding.messagesList.setAdapter(ad);
             ad.clear();
             ad.addAll(messages);
             //System.out.println(messages.length);
@@ -85,6 +87,9 @@ public class MessageFragment extends SwipeRefreshFragment
             ad.submitList(l);
         });
         */
+        
+        binding.messageWrite.setOnClickListener((v) -> new MessageWriteDialogFragment().show(getParentFragmentManager(),"message_write"));
+        
         
         
         binding.messagesRefresh.setOnRefreshListener(() -> m.mes.refresh(requireActivity()));

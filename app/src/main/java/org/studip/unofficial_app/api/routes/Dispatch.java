@@ -21,7 +21,7 @@ public interface Dispatch
     
     // call before trying to search for addressees 
     @GET("dispatch.php/messages/write")
-    Call<StudipNotifications> startMessage();
+    Call<Void> startMessage();
     
     
     @GET("dispatch.php/multipersonsearch/ajax_search/add_adressees")

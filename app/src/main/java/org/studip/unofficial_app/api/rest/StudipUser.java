@@ -110,4 +110,11 @@ public class StudipUser  implements Serializable
     {
         return Objects.hash(user_id, username, name, perms, email, avatar_small, avatar_medium, avatar_normal, avatar_original, phone, homepage, privadr);
     }
+
+    @NonNull
+    @Override
+    public String toString()
+    {
+        return name.formatted+" ( "+username+" )";
+    }
 }

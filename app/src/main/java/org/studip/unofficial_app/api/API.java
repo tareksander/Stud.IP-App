@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.api.routes.Course;
 import org.studip.unofficial_app.api.routes.Discovery;
+import org.studip.unofficial_app.api.routes.Dispatch;
 import org.studip.unofficial_app.api.routes.File;
 import org.studip.unofficial_app.api.routes.Folder;
 import org.studip.unofficial_app.api.routes.Forum;
@@ -78,6 +79,7 @@ public class API
     public final Studip studip;
     public final User user;
     public final Semester semester;
+    public final Dispatch dispatch;
     
     private final TestRoutes tests;
     
@@ -159,6 +161,7 @@ public class API
         user = retrofit.create(User.class);
         tests = retrofit.create(TestRoutes.class);
         semester = retrofit.create(Semester.class);
+        dispatch = retrofit.create(Dispatch.class);
     }
     
     public void downloadFile(@NonNull Context con, @NonNull String fid, String filename) {

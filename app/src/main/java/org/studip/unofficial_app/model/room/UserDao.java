@@ -26,6 +26,10 @@ public interface UserDao extends BasicDao<StudipUser>
 
     @Query("SELECT * FROM users WHERE user_id = :id")
     LiveData<StudipUser> observe(String id);
-    
+
+
+
+    @Query("SELECT * FROM users WHERE name_formatted LIKE '%:name%' OR username LIKE '%'+:name+'%'")
+    LiveData<StudipUser> search(String name);
     
 }

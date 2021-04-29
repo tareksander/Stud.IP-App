@@ -79,6 +79,9 @@
     <string name="semester_select">Semester auswählen</string>
     <string name="my_documents">Deine Dateien</string>
     <string name="not_logged_in">nicht eingeloggt</string>
+    <string name="message_no_search">keine Verbindung zum Server, kann beine Benutzer suchen</string>
+    <string name="message_no_send">Nachricht konnte nicht gesendet werden</string>
+    <string name="message_send_successfully">Nachricht gesendet</string>
 
 
 </resources>
