@@ -62,8 +62,13 @@ public class ServerSelectActivity extends AppCompatActivity
         Intent intent = new Intent(this,SettingsActivity.class);
         startActivity(intent);
     }
-
-
+    
+    public void onHelpButton(View v) {
+        Intent intent = new Intent(this,HelpActivity.class);
+        startActivity(intent);
+    }
+    
+    
     private void toLoginActivity()
     {
         Intent intent = new Intent(this,LoginActivity.class);

@@ -1,6 +1,5 @@
 package org.studip.unofficial_app.ui.fragments;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,12 +9,8 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.paging.LivePagedListBuilder;
-import androidx.paging.PagedList;
-import androidx.paging.PagedListAdapter;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.RecyclerView;
 
 import org.studip.unofficial_app.api.rest.StudipMessage;
 import org.studip.unofficial_app.api.rest.StudipUser;
@@ -29,9 +24,8 @@ import org.studip.unofficial_app.ui.fragments.dialog.MessageDialogFragment;
 import org.studip.unofficial_app.ui.fragments.dialog.MessageWriteDialogFragment;
 
 import java.util.Calendar;
-import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.reactivex.functions.BiConsumer;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,6 +44,8 @@ public class MessageFragment extends SwipeRefreshFragment
     {
         binding = FragmentMessagesBinding.inflate(inflater);
         m = new ViewModelProvider(requireActivity()).get(MessagesViewModel.class);
+        
+        System.out.println("messages fragment");
         
         setSwipeRefreshLayout(binding.messagesRefresh);
         
@@ -129,27 +125,32 @@ public class MessageFragment extends SwipeRefreshFragment
                 d.show(getParentFragmentManager(),"message_view_dialog");
             });
 
-
-
-            DBProvider.getDB(requireActivity()).userDao().observe(m.sender).observe(getViewLifecycleOwner(),(user) -> {
+            AtomicBoolean callback_made = new AtomicBoolean(false);
+            LiveData<StudipUser> d = DBProvider.getDB(requireActivity()).userDao().observe(m.sender);
+            d.observe(getViewLifecycleOwner(),(user) -> {
                 if (user == null) {
-                    APIProvider.getAPI(requireActivity()).user.user(m.sender).enqueue(new Callback<StudipUser>()
-                    {
-                        @Override
-                        public void onResponse(Call<StudipUser> call, Response<StudipUser> response)
+                    if (! callback_made.get()) {
+                        callback_made.set(true);
+                        APIProvider.getAPI(requireActivity()).user.user(m.sender).enqueue(new Callback<StudipUser>()
                         {
-                            StudipUser u = response.body();
-                            if (u != null) {
-                                //System.out.println(u.name.formatted);
-                                Schedulers.io().scheduleDirect(() -> DBProvider.getDB(requireActivity()).userDao().updateInsert(u));
+                            @Override
+                            public void onResponse(Call<StudipUser> call, Response<StudipUser> response) {
+                                StudipUser u = response.body();
+                                if (u != null) {
+                                    System.out.println(u.name.formatted);
+                                    //Schedulers.io().scheduleDirect(() -> DBProvider.getDB(requireActivity()).userDao().updateInsert(u));
+                                    DBProvider.getDB(requireActivity()).userDao().updateInsertAsync(u).subscribeOn(Schedulers.io()).subscribe();
+                                }
                             }
-                        }
-                        @Override
-                        public void onFailure(Call<StudipUser> call, Throwable t)
-                        {}
-                    });
+        
+                            @Override
+                            public void onFailure(Call<StudipUser> call, Throwable t) {
+                            }
+                        });
+                    }
                 } else {
                     b.messageSender.setText(user.name.formatted);
+                    d.removeObservers(getViewLifecycleOwner());
                 }
             });
 

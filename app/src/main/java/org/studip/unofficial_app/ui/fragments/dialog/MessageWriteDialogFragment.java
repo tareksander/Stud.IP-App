@@ -30,6 +30,9 @@ import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.room.DB;
 import org.studip.unofficial_app.ui.HomeActivity;
 
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.schedulers.Schedulers;
@@ -44,7 +47,6 @@ public class MessageWriteDialogFragment extends DialogFragment
     private static final String ADDRESSEE_LIST_AUTOCOMPLETE_KEY = "addressee_list_autocomplete";
     private static final String SUBJECT_KEY = "subject";
     private static final String CONTENT_KEY = "content";
-    
     
 
     private DialogNewMessageBinding b;

@@ -79,10 +79,13 @@ public class HomeActivity extends AppCompatActivity
         AppCompatDelegate.setDefaultNightMode(SettingsProvider.getSettings(this).theme);
         if (s.logout) {
             s.logout = false;
-            //System.out.println("clearing database");
+            System.out.println("clearing database");
             s.safe(SettingsProvider.getSettingsPreferences(this));
             DB db = DBProvider.getDB(this);
-            db.getTransactionExecutor().execute(db::clearAllTables);
+            db.getTransactionExecutor().execute(() -> {
+                db.clearAllTables();
+                System.out.println("database cleared");
+            });
             if (s.notification_service_enabled) {
                 NotificationWorker.enqueue(this);
             }

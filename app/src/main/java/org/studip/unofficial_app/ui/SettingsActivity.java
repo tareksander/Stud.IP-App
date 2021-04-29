@@ -119,7 +119,12 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         super.onStop();
         settings.safe(sharedPreferences);
     }
-
+    
+    public void onHelpClicked(View v) {
+        Intent i = new Intent(this,HelpActivity.class);
+        startActivity(i);
+    }
+    
     public void onThemeClicked(View v)
     {
         if (v.equals(binding.themeAuto))

@@ -78,6 +78,8 @@
     <string name="message_no_search">unable to connect to server, cannot search users</string>
     <string name="message_no_send">could not send message</string>
     <string name="message_send_successfully">message send</string>
+    <string name="help_button">view help</string>
+    <string name="help_content">placeholder</string>
 
 
 </resources>

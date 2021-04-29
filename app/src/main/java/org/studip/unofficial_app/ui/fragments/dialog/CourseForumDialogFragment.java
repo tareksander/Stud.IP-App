@@ -1,5 +1,10 @@
 package org.studip.unofficial_app.ui.fragments.dialog;
 
+import android.app.Dialog;
+import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 public class CourseForumDialogFragment extends DialogFragment
@@ -8,4 +13,29 @@ public class CourseForumDialogFragment extends DialogFragment
     
     
     
+    
+    
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        
+        
+        
+    }
+    
+    
+    
+    
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        
+        
+        
+        
+        
+        
+        
+        return super.onCreateDialog(savedInstanceState);
+    }
 }
