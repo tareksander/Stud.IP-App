@@ -28,7 +28,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.HelpActivity"></activity>
+        <activity android:name=".ui.HelpActivity" />
 
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"

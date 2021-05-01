@@ -85,20 +85,44 @@
     <string name="help_button">Hilfe anzeigen</string>
     <string name="help_content"><![CDATA["<big><h1>Hilfe</h1></big>
 <h2>1. Anmeldung</h2>
-Zuerst sollten Sie in den Einstellungen die Authetifizierungsmethode festlegen.<br>
+Zuerst sollten Sie in den Einstellungen die Authentifizierungsmethode festlegen.<br>
 Wenn Sie sich nur einmal einloggen wollen, sollten sie HTTP Basic Authentication benutzen.<br>
 Wenn Sie nicht wollen, dass Benutzername und Passwort auf dem Gerät gespeichert ist (keine Sorge, es ist verschlüsselt), dann sollten Sie Session Cookie wählen.<br>
 OAuth ist noch nicht implementiert.<br>
-Weiter Informationen zu den einzelnen Authentifizierungsmethoden bekommen Sie, wenn sie in den Einstellungen lange auf die Entsprechende Einstellung drücken.<br><br>
-Zum Anmelden müssen Sie dann ihren Stud.IP-Server auswählen.<br>
-Sie können schauen, ob Ihr Server in der Liste ist (scrollen ist möglich), oder sie geben im Eingabefeld selbst den Hostnamen (ohne https://) ein<br>
-Dann müssen Sie Ihren Benutzernamen und Irh Passwort eingeben.<br>
+Weiter Informationen zu den einzelnen Authentifizierungsmethoden bekommen Sie, wenn Sie in den Einstellungen lange auf die entsprechende Einstellung drücken.<br><br>
+Zum Anmelden müssen Sie dann Ihren Stud.IP-Server auswählen.<br>
+Sie können schauen, ob Ihr Server in der Liste ist (scrollen ist möglich), oder sie geben im Eingabefeld selbst den Hostnamen (ohne https://) ein.<br>
+Dann müssen Sie Ihren Benutzernamen und Ihr Passwort eingeben.<br>
 <br><br>
 <h2>2. Generell</h2>
 Alle Dialoge und Bildschirme können mit einem nach unten Ziehen dazu gebracht werden, aktuelle Daten vom Server zu beziehen.<br>
 Bis auf die Dateien sind alle Daten auf dem Gerät zwischengespeichert und können auch ohne Netzwerkverbindung angeschaut werden.<br>
-Die Dateien müssen jeweils explizit heruntergeladen werden.<br><br>
+Die Dateien müssen jeweils explizit heruntergeladen werden, um Datenvolumen zu sparen.<br>
+(noch nicht implementiert) Der Benachrichtigungs-Service aktualisiert auch periodisch die Daten und gibt dann Benachrichtigungen falls gewünscht.
+<br>Periode and Anderes kann in den Einstellungen angepasst werden.<br><br>
 
+<h2>3. Startbildschirm</h2>
+Auf diesem Bildschirm wird Ihr Name, wie er in dem Stud.IP-System steht, angezeigt, und dazu die globalen Ankündigungen des Systems.<br><br>
+
+<h2>4. Kursbildschirm</h2>
+Auf diesem Bildschirm können Sie Ihre Kurse für ein ausgewähltes Semester anschauen.<br>
+Die Symbole zu den Kursen funktionieren wie auf der Weboberfläche, aber für manche sind die Funktionen noch nicht implementiert.<br>
+Mit dem Flaggen-Symbol können Sie die Ankündigungen eines Kurses lesen.<br>
+Mit dem Datei-Symbol können Sie sich die Dateien eines Kurses anschauen, herunterladen und hochladen.<br><br>
+
+<h2>5. Dateibildschirm</h2>
+Auf diesem Bildschirm können Sie Sich ihre Dateien auf dem System und die Dateien von Kursen ansehen.<br>
+Durch tippen auf den \"...\"-Eintrag kommen Sie in das Elternverzeichnis zurück, falls vorhanden, durch halten kommen sie zu Ihren eigenen Dateien zurück.<br>
+Beim antippen eines Verzeichnisses werden die Inhalte angezeigt, bei einer Datei wird sie heruntergeladen.<br>
+Durch Halten auf eine Datei oder ein Verzeichnis wird es gelöscht.<br><br>
+
+<h2>6. Nachrichtenbildschirm</h2>
+Auf diesem Bildschirm können Sie Ihre Stud.IP-Nachrichten lesen und neue Verfassen.<br>
+Durch lange auf eine Nachricht halten wird diese gelöscht.<br>
+Beim Addressat auswählen schlägt die App Ihnen schon bekannte Benutzer vor.<br>
+Wenn Sie den "Suchen"-Button benutzen, sucht die App im System nach Benutzern mit dem im Addressat-Feld befindlichen Namen.<br>
+Ein Addressat wird hinzugefügt, indem Sie ihn in der Liste antippen.<br>
+Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br>
 
 "]]></string>
 

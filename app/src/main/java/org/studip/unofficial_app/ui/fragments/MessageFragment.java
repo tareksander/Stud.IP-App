@@ -10,20 +10,35 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
+import org.jetbrains.annotations.NotNull;
+import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.rest.StudipMessage;
 import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.databinding.FragmentMessagesBinding;
 import org.studip.unofficial_app.databinding.MessageEntryBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.DBProvider;
+import org.studip.unofficial_app.model.GetMessageUsersWork;
 import org.studip.unofficial_app.model.viewmodels.MessagesViewModel;
 import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.fragments.dialog.MessageDialogFragment;
 import org.studip.unofficial_app.ui.fragments.dialog.MessageWriteDialogFragment;
 
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.schedulers.Schedulers;
@@ -52,8 +67,12 @@ public class MessageFragment extends SwipeRefreshFragment
         m.mes.getStatus().observe(getViewLifecycleOwner(), status -> HomeActivity.onStatusReturn(requireActivity(),status));
         m.mes.isRefreshing().observe(getViewLifecycleOwner(), ref -> binding.messagesRefresh.setRefreshing(ref));
         
-        ad = new MessageAdapter(requireActivity(),ArrayAdapter.IGNORE_ITEM_VIEW_TYPE);
+        //ad = new MessageAdapter(requireActivity(),ArrayAdapter.IGNORE_ITEM_VIEW_TYPE);
+        ad = new MessageAdapter();
         binding.messagesList.setAdapter(ad);
+    
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL);
+        binding.messagesList.addItemDecoration(dividerItemDecoration);
         
         m.mes.get().observe(getViewLifecycleOwner(), (messages) -> {
             //System.out.println("messages");
@@ -61,28 +80,14 @@ public class MessageFragment extends SwipeRefreshFragment
                 //System.out.println("refreshing");
                 binding.messagesRefresh.setRefreshing(true);
                 m.mes.refresh(requireActivity());
-                return;
             }
-            binding.messagesList.setAdapter(ad);
-            ad.clear();
-            ad.addAll(messages);
-            //System.out.println(messages.length);
-            binding.messagesList.setAdapter(ad); // when the fragment is first shown, the data will not be visible without this
-            
         });
         
-        /*
-        PagedList.Config conf = new PagedList.Config.Builder().setEnablePlaceholders(false).setPageSize(10).build();
         
-        new LivePagedListBuilder<>(DBProvider.getDB(requireActivity()).messagesDao().getPagedList(), conf).build().observe(getViewLifecycleOwner(), (l) -> {
-            System.out.println("list");
-            System.out.println(l.size());
-            for (StudipMessage m : l.snapshot()) {
-                System.out.println(m.subject);
-            }
-            ad.submitList(l);
-        });
-        */
+        PagedList.Config conf = new PagedList.Config.Builder().setEnablePlaceholders(true).setPageSize(10).build();
+        
+        new LivePagedListBuilder<>(DBProvider.getDB(requireActivity()).messagesDao().getPagedList(), conf).build().observe(getViewLifecycleOwner(), (l) -> ad.submitList(l));
+        
         
         binding.messageWrite.setOnClickListener((v) -> new MessageWriteDialogFragment().show(getParentFragmentManager(),"message_write"));
         
@@ -94,80 +99,9 @@ public class MessageFragment extends SwipeRefreshFragment
         
         return binding.getRoot();
     }
-
-
-    public class MessageAdapter extends ArrayAdapter<StudipMessage> {
-
-        public MessageAdapter(@NonNull Context context, int resource)
-        {
-            super(context, resource);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)
-        {
-            MessageEntryBinding b;
-            if (convertView != null) {
-                b = MessageEntryBinding.bind(convertView);
-            } else {
-                b = MessageEntryBinding.inflate(getLayoutInflater());
-            }
-            StudipMessage m = getItem(position);
-            View layout = b.getRoot();
-            // TODO onClick and onLongClick for layout
-
-            layout.setOnClickListener((v) -> {
-                MessageDialogFragment d = new MessageDialogFragment();
-                Bundle args = new Bundle();
-                args.putSerializable(MessageDialogFragment.ARG_MESSAGE_ID,m);
-                d.setArguments(args);
-                d.show(getParentFragmentManager(),"message_view_dialog");
-            });
-
-            AtomicBoolean callback_made = new AtomicBoolean(false);
-            LiveData<StudipUser> d = DBProvider.getDB(requireActivity()).userDao().observe(m.sender);
-            d.observe(getViewLifecycleOwner(),(user) -> {
-                if (user == null) {
-                    if (! callback_made.get()) {
-                        callback_made.set(true);
-                        APIProvider.getAPI(requireActivity()).user.user(m.sender).enqueue(new Callback<StudipUser>()
-                        {
-                            @Override
-                            public void onResponse(Call<StudipUser> call, Response<StudipUser> response) {
-                                StudipUser u = response.body();
-                                if (u != null) {
-                                    System.out.println(u.name.formatted);
-                                    //Schedulers.io().scheduleDirect(() -> DBProvider.getDB(requireActivity()).userDao().updateInsert(u));
-                                    DBProvider.getDB(requireActivity()).userDao().updateInsertAsync(u).subscribeOn(Schedulers.io()).subscribe();
-                                }
-                            }
-        
-                            @Override
-                            public void onFailure(Call<StudipUser> call, Throwable t) {
-                            }
-                        });
-                    }
-                } else {
-                    b.messageSender.setText(user.name.formatted);
-                    d.removeObservers(getViewLifecycleOwner());
-                }
-            });
-
-            b.messageSubject.setText(m.subject);
-
-            Calendar c = Calendar.getInstance();
-            c.setTimeInMillis(1000*Long.parseLong(m.mkdate));
-
-            b.messageTime.setText(c.get(Calendar.DATE)+"."+(c.get(Calendar.MONTH)+1)+"."+c.get(Calendar.YEAR)+" "+c.get(Calendar.HOUR_OF_DAY)+":"+c.get(Calendar.MINUTE));
-            return b.getRoot();
-        }
-    }
     
     
-    
-    /*
-    public class MessageViewHolder extends RecyclerView.ViewHolder {
+    public static class MessageViewHolder extends RecyclerView.ViewHolder {
         public MessageViewHolder(@NonNull View itemView)
         {
             super(itemView);
@@ -200,19 +134,23 @@ public class MessageFragment extends SwipeRefreshFragment
         @Override
         public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
         {
-            System.out.println("create");
-            MessageEntryBinding b;
-            b = MessageEntryBinding.inflate(getLayoutInflater());
-            return new MessageViewHolder(b.getRoot());
+            //System.out.println("create");
+            return new MessageViewHolder(getLayoutInflater().inflate(R.layout.message_entry, parent, false));
         }
 
         @Override
         public void onBindViewHolder(@NonNull MessageViewHolder holder, int position)
         {
-            System.out.println("bind");
+            //System.out.println("bind");
             MessageEntryBinding b;
             b = MessageEntryBinding.bind(holder.itemView);
             StudipMessage m = getItem(position);
+            if (m == null) {
+                b.messageSubject.setText("");
+                b.messageSender.setText("");
+                b.messageTime.setText("");
+                return;
+            }
             View layout = b.getRoot();
             // TODO onClick and onLongClick for layout
 
@@ -224,27 +162,34 @@ public class MessageFragment extends SwipeRefreshFragment
                 d.show(getParentFragmentManager(),"message_view_dialog");
             });
 
-
-
-            DBProvider.getDB(requireActivity()).userDao().observe(m.sender).observe(getViewLifecycleOwner(),(user) -> {
-                if (user == null) {
-                    APIProvider.getAPI(requireActivity()).user.user(m.sender).enqueue(new Callback<StudipUser>()
-                    {
-                        @Override
-                        public void onResponse(Call<StudipUser> call, Response<StudipUser> response)
-                        {
-                            StudipUser u = response.body();
-                            if (u != null) {
-                                //System.out.println(u.name.formatted);
-                                Schedulers.io().scheduleDirect(() -> DBProvider.getDB(requireActivity()).userDao().updateInsert(u));
-                            }
+            layout.setOnLongClickListener(v -> {
+                binding.messagesRefresh.setRefreshing(true);
+                APIProvider.getAPI(requireActivity()).message.delete(m.message_id).enqueue(new Callback<Void>()
+                {
+                    @Override
+                    public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                        binding.messagesRefresh.setRefreshing(false);
+                        if (response.code() == 204 || response.code() == 404) {
+                            DBProvider.getDB(requireActivity()).messagesDao().deleteAsync(m).subscribeOn(Schedulers.io()).subscribe();
+                        } else {
+                            HomeActivity.onStatusReturn(requireActivity(),response.code());
                         }
-                        @Override
-                        public void onFailure(Call<StudipUser> call, Throwable t)
-                        {}
-                    });
+                    }
+                    @Override
+                    public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                        binding.messagesRefresh.setRefreshing(false);
+                    }
+                });
+                return true;
+            });
+    
+            Transformations.distinctUntilChanged(DBProvider.getDB(requireActivity()).userDao().observe(m.sender)).observe(getViewLifecycleOwner(),(user) -> {
+                if (user != null) {
+                    if (! b.messageSender.getText().toString().equals(user.name.formatted)) {
+                        b.messageSender.setText(user.name.formatted);
+                    }
                 } else {
-                    b.messageSender.setText(user.name.formatted);
+                    WorkManager.getInstance(requireActivity()).enqueueUniqueWork(GetMessageUsersWork.WORK_NAME, ExistingWorkPolicy.KEEP, OneTimeWorkRequest.from(GetMessageUsersWork.class));
                 }
             });
 
@@ -259,7 +204,7 @@ public class MessageFragment extends SwipeRefreshFragment
             
         }
     }
-    */
+    
     
     
 }

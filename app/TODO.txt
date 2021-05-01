@@ -18,11 +18,22 @@ TODO: caching
     https://f-droid.org/wiki/page/Category:Apps_with_failing_builds
     
     
+TODO: replace ListViews with RecyclerViews: LayoutManager: LinearLayoutManager, Scrollbar: Vertical
     
     
     
-TODO: help screen, or wiki on github, or detailed description on f-droid
+TODO: for getting the mail users, use a UniqueWork that gets activated of a user cannot be found. That work then gets the list of mails, and fetches the users
     
+    
+TODO
+
+    maybe use Html.fromHtml for messages?
+    
+    
+TODO: translate help text
+    
+    
+TODO: delete data which is not in a server response, but still in the database.
     
     
     For the notification service:
@@ -154,6 +165,10 @@ https://developer.android.com/guide/topics/graphics/drawables#nine-patch
             TODO A WebView reloads when the parent is destroyed because of a configuration change. That would result in someone being temporarily kicked out of a meeting when the device is turned.
                  Make the meetings plugin its own activity and disable configuration changes in it.
                 ( Or try a custom tab. Maybe the invite link is enough to join a meeting.) No, the session cookie is needed
+                
+                use android:keepScreenOn in the layout of the activity
+            
+            
             
             Enable PiP-Mode when a meeting is displayed and add custom controls to toggle audio, microphone, camera, screen share.
             
