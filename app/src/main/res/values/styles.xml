@@ -10,7 +10,8 @@
         <item name="android:textSize">18sp</item>
         <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>
     </style>
-
+    
+    
     <style name="ActionButtonStyle" parent="Widget.AppCompat.ActionButton">
         <item name="android:minWidth">0dip</item>
         <item name="android:paddingStart">0dip</item>

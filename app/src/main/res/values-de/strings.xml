@@ -69,7 +69,7 @@
     Aber wenn das Betriebssystem selbst angegriffen wurde (oder das Gerät gerooted ist), könnte ein anderes Programm sich den Schlüssel für die Datei vom Betriebssytsem nehmen und die Daten auslesen.
     Für normalen Gebrauch sollte es aber sicher genug sein. Der Vorteil gegenüber des Session Cookies ist, dass man unbegrenzte Zeit angemeldet bleibt (solange sich das Passwort nicht ändert)</string>
     <string name="auth_cookie">Session Cookie</string>
-    <string name="auth_cookie_desc">Dies ist die Methode, die auch ein Browser verwendet. Mit dem Benutzernamen und Passwort wird ein Session Cookie vom Server angefragt, dannach wird das Password gelöscht.
+    <string name="auth_cookie_desc">Dies ist die Methode, die auch ein Browser verwendet. Mit dem Benutzernamen und Passwort wird ein Session Cookie vom Server angefragt, dannach wird das Passwort gelöscht.
     Es wird nur der Cookie auf dem Gerät gespeichert, mit der Gleichen Sicherheit wie das Passwort bei Basic Authentication. Wenn der Cookie von anderen Programmen genommen wird, könnten sich diese als Sie ausgeben, aber nicht ihr Passwort ändern.
     Der Nachteil ist, dass die Sitzung irgendwann abläuft und man sich wieder anmelden muss.</string>
     <string name="auth_oauth">OAuth 2</string>
@@ -78,6 +78,53 @@
     <string name="settings_developer">Entwicklereinstellungen:\nDiese Einstellungen können die App instabil machen oder die Sicherheit herabsetzen. Benutzen auf eigene Gefahr.</string>
     <string name="semester_select">Semester auswählen</string>
     <string name="my_documents">Deine Dateien</string>
+    <string name="not_logged_in">nicht eingeloggt</string>
+    <string name="message_no_search">keine Verbindung zum Server, kann beine Benutzer suchen</string>
+    <string name="message_no_send">Nachricht konnte nicht gesendet werden</string>
+    <string name="message_send_successfully">Nachricht gesendet</string>
+    <string name="help_button">Hilfe anzeigen</string>
+    <string name="help_content"><![CDATA["<big><h1>Hilfe</h1></big>
+<h2>1. Anmeldung</h2>
+Zuerst sollten Sie in den Einstellungen die Authentifizierungsmethode festlegen.<br>
+Wenn Sie sich nur einmal einloggen wollen, sollten sie HTTP Basic Authentication benutzen.<br>
+Wenn Sie nicht wollen, dass Benutzername und Passwort auf dem Gerät gespeichert ist (keine Sorge, es ist verschlüsselt), dann sollten Sie Session Cookie wählen.<br>
+OAuth ist noch nicht implementiert.<br>
+Weiter Informationen zu den einzelnen Authentifizierungsmethoden bekommen Sie, wenn Sie in den Einstellungen lange auf die entsprechende Einstellung drücken.<br><br>
+Zum Anmelden müssen Sie dann Ihren Stud.IP-Server auswählen.<br>
+Sie können schauen, ob Ihr Server in der Liste ist (scrollen ist möglich), oder sie geben im Eingabefeld selbst den Hostnamen (ohne https://) ein.<br>
+Dann müssen Sie Ihren Benutzernamen und Ihr Passwort eingeben.<br>
+<br><br>
+<h2>2. Generell</h2>
+Alle Dialoge und Bildschirme können mit einem nach unten Ziehen dazu gebracht werden, aktuelle Daten vom Server zu beziehen.<br>
+Bis auf die Dateien sind alle Daten auf dem Gerät zwischengespeichert und können auch ohne Netzwerkverbindung angeschaut werden.<br>
+Die Dateien müssen jeweils explizit heruntergeladen werden, um Datenvolumen zu sparen.<br>
+(noch nicht implementiert) Der Benachrichtigungs-Service aktualisiert auch periodisch die Daten und gibt dann Benachrichtigungen falls gewünscht.
+<br>Periode and Anderes kann in den Einstellungen angepasst werden.<br><br>
+
+<h2>3. Startbildschirm</h2>
+Auf diesem Bildschirm wird Ihr Name, wie er in dem Stud.IP-System steht, angezeigt, und dazu die globalen Ankündigungen des Systems.<br><br>
+
+<h2>4. Kursbildschirm</h2>
+Auf diesem Bildschirm können Sie Ihre Kurse für ein ausgewähltes Semester anschauen.<br>
+Die Symbole zu den Kursen funktionieren wie auf der Weboberfläche, aber für manche sind die Funktionen noch nicht implementiert.<br>
+Mit dem Flaggen-Symbol können Sie die Ankündigungen eines Kurses lesen.<br>
+Mit dem Datei-Symbol können Sie sich die Dateien eines Kurses anschauen, herunterladen und hochladen.<br><br>
+
+<h2>5. Dateibildschirm</h2>
+Auf diesem Bildschirm können Sie Sich ihre Dateien auf dem System und die Dateien von Kursen ansehen.<br>
+Durch tippen auf den \"...\"-Eintrag kommen Sie in das Elternverzeichnis zurück, falls vorhanden, durch halten kommen sie zu Ihren eigenen Dateien zurück.<br>
+Beim antippen eines Verzeichnisses werden die Inhalte angezeigt, bei einer Datei wird sie heruntergeladen.<br>
+Durch Halten auf eine Datei oder ein Verzeichnis wird es gelöscht.<br><br>
+
+<h2>6. Nachrichtenbildschirm</h2>
+Auf diesem Bildschirm können Sie Ihre Stud.IP-Nachrichten lesen und neue Verfassen.<br>
+Durch lange auf eine Nachricht halten wird diese gelöscht.<br>
+Beim Addressat auswählen schlägt die App Ihnen schon bekannte Benutzer vor.<br>
+Wenn Sie den "Suchen"-Button benutzen, sucht die App im System nach Benutzern mit dem im Addressat-Feld befindlichen Namen.<br>
+Ein Addressat wird hinzugefügt, indem Sie ihn in der Liste antippen.<br>
+Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br>
+
+"]]></string>
 
 
 </resources>

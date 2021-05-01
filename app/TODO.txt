@@ -14,17 +14,40 @@ TODO: caching
     put the database in the cache directory, so the OS can remove it if there isn't enough storage
     
     
+    to check if the build on f-droid worked: https://f-droid.org/wiki/page/Main_Page
+    https://f-droid.org/wiki/page/Category:Apps_with_failing_builds
+    
+    
+TODO: replace ListViews with RecyclerViews: LayoutManager: LinearLayoutManager, Scrollbar: Vertical
     
     
     
-TODO: help screen, or wiki on github, or detailed description on f-droid
+TODO: for getting the mail users, use a UniqueWork that gets activated of a user cannot be found. That work then gets the list of mails, and fetches the users
+    
+    
+TODO
+
+    maybe use Html.fromHtml for messages?
+    
+    
+TODO: translate help text
+    
+    
+TODO: delete data which is not in a server response, but still in the database.
+    
+    
+TODO: supply database migrations for every database change once the app is on f-droid
     
     
     
     For the notification service:
     Notifications work over this api with the session cookie: /dispatch.php/jsupdater/get
     caution: just returns an empty list if the session isn't valid
-    test whether it works with basic auth
+    test whether it works with basic auth: no, only works with a session cookie.
+    When using basic auth: add a method to API to refresh the session cookie.
+    
+    For the mails: presumably all javascript-used routes only work with a session cookie.
+    Use the same technique for the route to get users
     
     
     
@@ -146,6 +169,10 @@ https://developer.android.com/guide/topics/graphics/drawables#nine-patch
             TODO A WebView reloads when the parent is destroyed because of a configuration change. That would result in someone being temporarily kicked out of a meeting when the device is turned.
                  Make the meetings plugin its own activity and disable configuration changes in it.
                 ( Or try a custom tab. Maybe the invite link is enough to join a meeting.) No, the session cookie is needed
+                
+                use android:keepScreenOn in the layout of the activity
+            
+            
             
             Enable PiP-Mode when a meeting is displayed and add custom controls to toggle audio, microphone, camera, screen share.
             

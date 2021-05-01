@@ -5,4 +5,12 @@ Vor dem rewrite konnte die App Kurse abrufen, Foren anzeigen,
 eigene Dateien und Dateien von Kursen downloaden und uploaden, Nachrichten lesen und schreiben, Ankündigungen des Systems und von Kursen anzeigen.
 Allerdings gab es auch einige Fehler, die ohne einen rewrite schwer zu beheben sind und es war nicht einfach daran weiterzuarbeiten.
 
-Im Moment können noch keine Nachrichten abgerufen oder geschrieben werden.
+Für Hilfe: Einstellungen->Hilfe anzeigen
+
+Falls die App crasht und im Crash log (dafür muss man meistens etwas runterscrollen)
+Caused by: java.lang.IllegalStateException: Room cannot verify the data integrity. Looks like you've changed schema...
+oder
+Caused by: java.lang.IllegalStateException: A migration from 1 to 2 was required but not found...
+vorkommt, hat es Änderungen an der Datenbank gegeben.
+Um diesen Fehler zu beheben, müssen die App-Daten gelöscht werden unter
+Einstellungen->Apps->alle Apps->Stud.IP->Speicher und Cache->Speicherinhalt löschen.

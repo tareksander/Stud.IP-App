@@ -31,6 +31,6 @@ public interface Message
     
     @FormUrlEncoded
     @POST("api.php/messages")
-    Call<StudipMessage> create(@Field("subject") String subject, @Field("message") String message, @Field("recipients") String[] userIDs);
+    Call<Void> create(@Field("subject") String subject, @Field("message") String message, @Field("recipients") String[] userIDs);
     
 }

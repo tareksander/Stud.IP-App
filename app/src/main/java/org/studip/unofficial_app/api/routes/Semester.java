@@ -13,5 +13,5 @@ public interface Semester
     Call<StudipCollection<StudipSemester>> semesters(@Query("offset") int offset, @Query("limit") int limit);
 
     @GET("api.php/semester/{sid}")
-    Call<StudipCollection<StudipSemester>> semester(@Path("sid") String id);
+    Call<StudipSemester> semester(@Path("sid") String id);
 }

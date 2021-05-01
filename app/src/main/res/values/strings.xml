@@ -74,6 +74,12 @@
     <string name="semester_select">select semester</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="my_documents">Your files</string>
+    <string name="not_logged_in">not logged in</string>
+    <string name="message_no_search">unable to connect to server, cannot search users</string>
+    <string name="message_no_send">could not send message</string>
+    <string name="message_send_successfully">message send</string>
+    <string name="help_button">view help</string>
+    <string name="help_content">placeholder</string>
 
 
 </resources>

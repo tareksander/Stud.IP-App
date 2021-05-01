@@ -13,4 +13,8 @@ public interface ForumEntryDao extends BasicDao<StudipForumEntry>
 
     @Query("SELECT * FROM forum_entries WHERE parent_id = :id")
     LiveData<StudipForumEntry[]> observeChildren(String id);
+
+
+    @Query("SELECT * FROM forum_entries WHERE topic_id = :id")
+    LiveData<StudipForumEntry> observe(String id);
 }

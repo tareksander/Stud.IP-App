@@ -9,21 +9,13 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import org.studip.unofficial_app.R;
+import org.studip.unofficial_app.model.viewmodels.MkdirDialogViewModel;
 
 public class MkdirDialogFragment extends DialogFragment
 {
-    public void setListener(MkdirDialogListener listener)
-    {
-        this.list = listener;
-    }
-
-    public interface MkdirDialogListener {
-        void onSubmit(String name);
-    }
-    
-    private MkdirDialogListener list = null;
     private EditText ed = null;
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState)
@@ -33,8 +25,6 @@ public class MkdirDialogFragment extends DialogFragment
         }
         super.onSaveInstanceState(outState);
     }
-    
-    
     
     @NonNull
     @Override
@@ -48,6 +38,8 @@ public class MkdirDialogFragment extends DialogFragment
             ed.setText(savedInstanceState.getString("editor_text",""));
         }
         b.setView(ed);
+
+        MkdirDialogViewModel m = new ViewModelProvider(requireActivity()).get(MkdirDialogViewModel.class);
         
         b.setTitle(R.string.mkdir);
         b.setCancelable(true);
@@ -56,12 +48,9 @@ public class MkdirDialogFragment extends DialogFragment
             if (ed.getText().toString().equals("")) {
                 dismiss();
             } else {
-                if (list != null) {
-                    list.onSubmit(ed.getText().toString());
-                }
+                m.dirName.setValue(ed.getText().toString());
             }
         });
-        
         
         return b.create();
     }

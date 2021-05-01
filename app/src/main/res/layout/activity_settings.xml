@@ -6,7 +6,7 @@
     android:focusableInTouchMode="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingsActivity">
+    tools:context=".ui.SettingsActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -17,6 +17,17 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical">
+
+            <Button
+                android:id="@+id/settings_help"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onHelpClicked"
+                android:text="@string/help_button" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="40dp" />
 
             <TextView
                 android:layout_width="match_parent"

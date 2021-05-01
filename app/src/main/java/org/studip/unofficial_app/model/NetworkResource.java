@@ -4,14 +4,18 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-public abstract class NetworkResource<T,R>
+public abstract class NetworkResource<T>
 {
     protected abstract LiveData<T> getDBData(Context c);
-    protected abstract Call<R> getCall(Context c);
-    protected abstract void updateDB(Context c,R res);
+    protected abstract Call getCall(Context c);
+    protected abstract void updateDB(Context c,Object res);
     
     protected final MutableLiveData<Integer> status = new MutableLiveData<>(-1);
     protected final MutableLiveData<Boolean> refreshing = new MutableLiveData<>(false);
@@ -41,18 +45,20 @@ public abstract class NetworkResource<T,R>
         Context c = con.getApplicationContext();
         if (! refreshing.getValue()) {
             refreshing.setValue(true);
-            getCall(con).enqueue(new Callback<R>()
+            getCall(con).enqueue(new Callback()
             {
                 @Override
-                public void onResponse(@NotNull Call<R> call, @NotNull Response<R> response)
+                public void onResponse(@NotNull Call call, @NotNull Response response)
                 {
-                    R res = response.body();
+                    Object res = response.body();
                     status.setValue(response.code());
                     if (res != null) {
                         new Thread(() -> {
                             try {
                                 updateDB(c,res);
-                            } catch (Exception ignored) {}
+                            } catch (Exception ignored) {
+                                //ignored.printStackTrace();
+                            }
                             refreshing.postValue(false);
                         }).start();
                     } else {
@@ -61,7 +67,7 @@ public abstract class NetworkResource<T,R>
                     }
                 }
                 @Override
-                public void onFailure(@NotNull Call<R> call, @NotNull Throwable t)
+                public void onFailure(@NotNull Call call, @NotNull Throwable t)
                 {
                     System.out.println("newtwork call failed");
                     t.printStackTrace();
@@ -69,5 +75,22 @@ public abstract class NetworkResource<T,R>
                 }
             });
         }
+    }
+    private static final Pattern pathPattern = Pattern.compile(".*/([^/]+)$");
+    public static String lastPathSegment(String path) {
+        if (path != null) {
+            //System.out.println("Path: "+path);
+            Matcher m = pathPattern.matcher(path);
+            if (m.matches())
+            {
+                String part = m.group(1);
+                if (part != null)
+                {
+                    path = part;
+                    //System.out.println("segment: " + path);
+                }
+            }
+        }
+        return path;
     }
 }

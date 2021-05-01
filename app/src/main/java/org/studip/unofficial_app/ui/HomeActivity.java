@@ -1,9 +1,12 @@
 package org.studip.unofficial_app.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +16,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
@@ -21,6 +25,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
+import org.studip.unofficial_app.api.rest.StudipCourse;
 import org.studip.unofficial_app.databinding.ActivityHomeBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.DBProvider;
@@ -29,18 +34,43 @@ import org.studip.unofficial_app.model.Notifications;
 import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.model.room.DB;
+import org.studip.unofficial_app.model.viewmodels.FileViewModel;
 import org.studip.unofficial_app.model.viewmodels.HomeActivityViewModel;
 import org.studip.unofficial_app.ui.fragments.CoursesFragment;
 import org.studip.unofficial_app.ui.fragments.FileFragment;
 import org.studip.unofficial_app.ui.fragments.HomeFragment;
+import org.studip.unofficial_app.ui.fragments.MessageFragment;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import io.reactivex.MaybeObserver;
+import io.reactivex.Scheduler;
+import io.reactivex.schedulers.Schedulers;
 
 public class HomeActivity extends AppCompatActivity
 {
+    public static final Pattern courseFilesPattern = Pattern.compile("/dispatch\\.php/course/files?(/index)\\?cid=(\\p{Alnum}+)$");
+    public static final Pattern courseFilesPatternFolder = Pattern.compile("/dispatch\\.php/course/files/index/(\\p{Alnum}+)\\?cid=(\\p{Alnum}+)$");
+    
+    
+    public static final Pattern courseForumPattern = Pattern.compile("/plugins\\.php/coreforum/index\\?cid=(\\p{Alnum}+)$");
+    
+    
+    public static final Pattern courseMembersPattern = Pattern.compile("/dispatch\\.php/course/members\\?cid=(\\p{Alnum}+)$");
+
+    public static final Pattern courseCoursewarePattern = Pattern.compile("/plugins\\.php/courseware/courseware\\?cid=(\\p{Alnum}+)?(&selected=(\\p{Alnum}+))$");
+    
+    
+    
     private ActivityHomeBinding binding;
+    @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        
+        
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
 
         Notifications.initChannels(this);
@@ -52,7 +82,10 @@ public class HomeActivity extends AppCompatActivity
             System.out.println("clearing database");
             s.safe(SettingsProvider.getSettingsPreferences(this));
             DB db = DBProvider.getDB(this);
-            db.getTransactionExecutor().execute(db::clearAllTables);
+            db.getTransactionExecutor().execute(() -> {
+                db.clearAllTables();
+                System.out.println("database cleared");
+            });
             if (s.notification_service_enabled) {
                 NotificationWorker.enqueue(this);
             }
@@ -61,18 +94,33 @@ public class HomeActivity extends AppCompatActivity
             finish();
             return;
         }
+
+
+        Uri data = getIntent().getData();
         
-        
-        
-        API api = APIProvider.loadAPI(this);
-        if (api == null)
-        {
-            Intent intent = new Intent(this,ServerSelectActivity.class);
-            startActivity(intent);
+        if (data != null && ! ("http".equals(data.getScheme()) || "https".equals(data.getScheme()))) {
             finish();
             return;
         }
         
+        API api = APIProvider.loadAPI(this);
+        if (api == null)
+        {
+            if (data != null) {
+                Toast.makeText(this, R.string.not_logged_in, Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+            Intent intent = new Intent(this,ServerSelectActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        } else {
+            if (data != null && ! api.getHostname().equals(data.getHost())) {
+                finish();
+                return;
+            }
+        }
         
         Activity a = this;
         
@@ -97,9 +145,11 @@ public class HomeActivity extends AppCompatActivity
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
-
-
-        binding.pager.setAdapter(new HomeFragmentsAdapter(this));
+        
+        
+        HomeFragmentsAdapter ad = new HomeFragmentsAdapter(this);
+        
+        binding.pager.setAdapter(ad);
         binding.pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback()
         {
             @Override
@@ -110,6 +160,71 @@ public class HomeActivity extends AppCompatActivity
             }
         });
 
+
+        if (data != null) {
+            // TODO handle the studip links
+            String query = data.getQuery();
+            String path = data.getPath();
+            if (path == null) {
+                finish();
+                return;
+            }
+            if (query != null) {
+                path  += "?"+query;
+            }
+            if (path.equals("/dispatch.php/start")) {
+                binding.pager.setCurrentItem(0);
+            }
+            if (path.equals("/dispatch.php/my_courses")) {
+                binding.pager.setCurrentItem(1);
+            }
+            if (path.equals("/dispatch.php/files")) {
+                binding.pager.setCurrentItem(2);
+            }
+            if (path.equals("/dispatch.php/messages/overview")) {
+                binding.pager.setCurrentItem(3);
+            }
+            //System.out.println(path);
+            Matcher matcher = courseFilesPattern.matcher(path);
+            if (matcher.matches()) {
+                HomeActivityViewModel m = new ViewModelProvider(this).get(HomeActivityViewModel.class);
+                binding.pager.setCurrentItem(2);
+                LiveData<StudipCourse> l = DBProvider.getDB(this).courseDao().observe(matcher.group(2));
+                l.observe(this,(c) -> {
+                    l.removeObservers(this);
+                    if (c != null) {
+                        m.setFilesCourse(c);
+                    }
+                });
+            }
+            matcher = courseFilesPatternFolder.matcher(path);
+            if (matcher.matches()) {
+                HomeActivityViewModel m = new ViewModelProvider(this).get(HomeActivityViewModel.class);
+                FileViewModel f = new ViewModelProvider(this).get(FileViewModel.class);
+                binding.pager.setCurrentItem(2);
+                LiveData<StudipCourse> l = DBProvider.getDB(this).courseDao().observe(matcher.group(2));
+                Matcher finalMatcher = matcher;
+                l.observe(this,(c) -> {
+                    l.removeObservers(this);
+                    if (c != null) {
+                        m.setFilesCourse(c);
+                        f.setFolder(this, finalMatcher.group(1),false);
+                    }
+                });
+            }
+            
+            
+            
+            
+            if (path.equals("/dispatch.php/settings/general") || path.equals("")) {
+                Intent i = new Intent(a,SettingsActivity.class);
+                startActivity(i);
+            }
+        }
+        
+        
+        
+        
         setContentView(binding.getRoot());
     }
     
@@ -184,6 +299,8 @@ public class HomeActivity extends AppCompatActivity
         public Fragment createFragment(int position)
         {
             switch (position) {
+                case 3:
+                    return new MessageFragment();
                 case 2:
                     return new FileFragment();
                 case 1:
@@ -197,7 +314,7 @@ public class HomeActivity extends AppCompatActivity
         @Override
         public int getItemCount()
         {
-            return 3;
+            return 4;
         }
     }
     

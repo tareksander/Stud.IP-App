@@ -25,6 +25,7 @@ import org.studip.unofficial_app.databinding.FragmentFileBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.viewmodels.FileViewModel;
 import org.studip.unofficial_app.model.viewmodels.HomeActivityViewModel;
+import org.studip.unofficial_app.model.viewmodels.MkdirDialogViewModel;
 import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.fragments.dialog.MkdirDialogFragment;
 
@@ -51,6 +52,8 @@ public class FileFragment extends SwipeRefreshFragment
         binding = FragmentFileBinding.inflate(inflater);
         h = new ViewModelProvider(requireActivity()).get(HomeActivityViewModel.class);
         m = new ViewModelProvider(requireActivity()).get(FileViewModel.class);
+        
+        setSwipeRefreshLayout(binding.fileRefresh);
         
         final FileAdapter ad = new FileAdapter(requireContext(),ArrayAdapter.IGNORE_ITEM_VIEW_TYPE);
         binding.fileList.setAdapter(ad);
@@ -85,13 +88,40 @@ public class FileFragment extends SwipeRefreshFragment
         });
         
         if (m.getStatus().getValue() == -1) {
-            System.out.println("refresh");
+            //System.out.println("refresh");
             m.refresh(requireActivity());
         }
         
         
         binding.buttonMkdir.setOnClickListener(this::onMkdir);
         binding.buttonUpload.setOnClickListener(this::onUpload);
+
+
+        MkdirDialogViewModel mkdirm = new ViewModelProvider(requireActivity()).get(MkdirDialogViewModel.class);
+        mkdirm.dirName.observe(getViewLifecycleOwner(),(dirname) -> {
+            if (dirname != null)
+            {
+                mkdirm.dirName.setValue(null);
+                API api = APIProvider.getAPI(requireActivity());
+                StudipFolder folder = m.get().getValue();
+                if (api != null && folder != null && folder.id != null)
+                {
+                    api.folder.createFolder(folder.id,dirname,null).enqueue(new Callback<StudipFolder>()
+                    {
+                        @Override
+                        public void onResponse(Call<StudipFolder> call, Response<StudipFolder> response)
+                        {
+                            if (response.code() == 200)
+                            {
+                                m.refresh(requireActivity());
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<StudipFolder> call, Throwable t) {}
+                    });
+                }
+            }
+        });
         
         return binding.getRoot();
     }
@@ -117,13 +147,6 @@ public class FileFragment extends SwipeRefreshFragment
                     API api = APIProvider.getAPI(requireActivity());
                     if (api != null)
                     {
-                        //System.out.println(api);
-                        /*
-                        MultipartBody.Part.Builder b = new MultipartBody.Builder()
-                                .addFormDataPart("name", "_FILES")
-                                .addFormDataPart("filename", getFileName(file, requireActivity()))
-                                .addPart(RequestBody.create(data));
-                         */
                         MultipartBody.Part p = MultipartBody.Part.createFormData("filename",getFileName(file,requireActivity()), RequestBody.create(data));
                         api.file.upload(f.id, p).enqueue(new Callback<StudipFolder.FileRef>()
                         {
@@ -193,20 +216,6 @@ public class FileFragment extends SwipeRefreshFragment
         if (api != null && folder != null)
         {
             MkdirDialogFragment f = new MkdirDialogFragment();
-            f.setListener((name) -> api.folder.createFolder(folder.id, name, null).enqueue(new Callback<StudipFolder>()
-            {
-                @Override
-                public void onResponse(Call<StudipFolder> call, Response<StudipFolder> response)
-                {
-                    if (response.code() == 200)
-                    {
-                        m.refresh(requireActivity());
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<StudipFolder> call, Throwable t) {}
-            }));
             f.show(getParentFragmentManager(), "mkdir_dialog");
         }
     }
@@ -244,7 +253,7 @@ public class FileFragment extends SwipeRefreshFragment
                     }
                 });
                 v.setOnLongClickListener(v1 -> {
-                    h.filesCourse.setValue(null);
+                    h.setFilesCourse(null);
                     m.setFolder(requireActivity(),null,false);
                     return true;
                 });
@@ -254,8 +263,12 @@ public class FileFragment extends SwipeRefreshFragment
                 if (o instanceof StudipFolder.SubFolder) {
                     StudipFolder.SubFolder f = (StudipFolder.SubFolder) o;
                     v.setText(f.name);
-                    v.setOnClickListener(v1 -> m.setFolder(requireActivity(),f.id,false));
+                    v.setOnClickListener(v1 -> {
+                        if (binding.fileRefresh.isRefreshing()) { return; }
+                        m.setFolder(requireActivity(),f.id,false);
+                    });
                     v.setOnLongClickListener(v1 -> {
+                        if (binding.fileRefresh.isRefreshing()) { return true; }
                         binding.fileRefresh.setRefreshing(true);
                         APIProvider.getAPI(requireActivity()).folder.delete(f.id).enqueue(new Callback<Void>()
                         {
@@ -279,8 +292,12 @@ public class FileFragment extends SwipeRefreshFragment
                 } else if (o instanceof StudipFolder.FileRef) {
                     StudipFolder.FileRef f = (StudipFolder.FileRef) o;
                     v.setText(f.name);
-                    v.setOnClickListener(v1 -> APIProvider.getAPI(requireActivity()).downloadFile(requireActivity(),f.id,f.name));
+                    v.setOnClickListener(v1 -> {
+                        if (binding.fileRefresh.isRefreshing()) { return; }
+                        APIProvider.getAPI(requireActivity()).downloadFile(requireActivity(),f.id,f.name);
+                    });
                     v.setOnLongClickListener(v1 -> {
+                        if (binding.fileRefresh.isRefreshing()) { return true; }
                         binding.fileRefresh.setRefreshing(true);
                         APIProvider.getAPI(requireActivity()).file.delete(f.id).enqueue(new Callback<Void>()
                         {

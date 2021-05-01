@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.api.routes.Course;
 import org.studip.unofficial_app.api.routes.Discovery;
+import org.studip.unofficial_app.api.routes.Dispatch;
 import org.studip.unofficial_app.api.routes.File;
 import org.studip.unofficial_app.api.routes.Folder;
 import org.studip.unofficial_app.api.routes.Forum;
@@ -66,7 +67,7 @@ public class API
     private static final String PASSWORD_KEY = "password";
     private static final String AUTH_METHOD_KEY = "method";
     
-    private static final String HTTPS = "https://";
+    public static final String HTTPS = "https://";
     
     
     public final Discovery discovery;
@@ -78,6 +79,7 @@ public class API
     public final Studip studip;
     public final User user;
     public final Semester semester;
+    public final Dispatch dispatch;
     
     private final TestRoutes tests;
     
@@ -159,6 +161,7 @@ public class API
         user = retrofit.create(User.class);
         tests = retrofit.create(TestRoutes.class);
         semester = retrofit.create(Semester.class);
+        dispatch = retrofit.create(Dispatch.class);
     }
     
     public void downloadFile(@NonNull Context con, @NonNull String fid, String filename) {
@@ -167,9 +170,17 @@ public class API
         if (URLUtil.isHttpsUrl(uri))
         {
             DownloadManager.Request r = new DownloadManager.Request(Uri.parse(uri));
-            String extension = MimeTypeMap.getFileExtensionFromUrl(filename);
+            String[] parts = filename.split("\\.");
+            String extension = null; 
+            if (parts != null) {
+                if (parts.length != 0) {
+                    extension = parts[parts.length-1];
+                }
+            }
+            //System.out.println(extension);
             if (extension != null)
             {
+                //System.out.println(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
                 r.setMimeType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
             }
             r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
@@ -343,8 +354,12 @@ public class API
             return null;
         }
         //System.out.println("Hostname: "+hostname);
+        
+        
         API api = new API(hostname);
         String auth = prefs.getString(AUTH_COOKIE_KEY,null);
+        
+        
         if (auth != null) {
             ArrayList<Cookie> l = new ArrayList<>();
             l.add(new Cookie.Builder().name(AUTH_COOKIE_NAME).hostOnlyDomain(hostname).value(auth).secure().build());
@@ -355,6 +370,8 @@ public class API
         
         String username = prefs.getString(USERNAME_KEY,null);
         String password = prefs.getString(PASSWORD_KEY,null);
+        
+        
         
         if (username != null && password != null) {
             api.username = username;
