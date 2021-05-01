@@ -36,6 +36,10 @@ TODO: translate help text
 TODO: delete data which is not in a server response, but still in the database.
     
     
+TODO: supply database migrations for every database change once the app is on f-droid
+    
+    
+    
     For the notification service:
     Notifications work over this api with the session cookie: /dispatch.php/jsupdater/get
     caution: just returns an empty list if the session isn't valid
