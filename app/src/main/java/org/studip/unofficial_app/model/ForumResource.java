@@ -46,8 +46,14 @@ public class ForumResource extends NetworkResource<Object>
         super(c);
         this.courseID = course;
         current = new ForumEntry(courseID, ForumEntry.Type.COURSE);
+        DB db = DBProvider.getDB(c);
+        source = db.courseDao().observeWithCategories(current.getId());
+        data.addSource(source, data::setValue);
     }
-
+    
+    public ForumEntry getSelectedEntry() {
+        return current;
+    }
     
     public void setEntry(Context c, ForumEntry e) {
         // we need current to be the same as when the request was made, to put the parent id in the database
@@ -62,15 +68,15 @@ public class ForumResource extends NetworkResource<Object>
             data.removeSource(source);
         }
         DB db = DBProvider.getDB(c);
-        switch (e.getType()) {
+        switch (current.getType()) {
             case CATEGORY:
-                source = db.forumEntryDao().observeChildren(e.getId());
+                source = db.forumCategoryDao().observeCategoryWithEntries(current.getId());
                 break;
             case ENTRY:
-                source = db.forumEntryDao().observe(e.getId());
+                source = db.forumEntryDao().observeThread(current.getId());
                 break;
             case COURSE:
-                source = db.courseDao().observeCategories(e.getId());
+                source = db.courseDao().observeWithCategories(current.getId());
         }
         data.addSource(source, data::setValue);
         refresh(c);
@@ -106,7 +112,9 @@ public class ForumResource extends NetworkResource<Object>
                 StudipCollection<StudipForumCategory> col = (StudipCollection<StudipForumCategory>) res;
                 for (StudipForumCategory cat : col.collection.values()) {
                     cat.course = lastPathSegment(cat.course);
+                    System.out.println(cat.course);
                     db.forumCategoryDao().updateInsert(cat);
+                    System.out.println("Category: "+cat.entry_name);
                 }
             } catch (ClassCastException ignored) {
                 StudipCollection<StudipForumEntry> col = (StudipCollection<StudipForumEntry>) res;
@@ -114,15 +122,20 @@ public class ForumResource extends NetworkResource<Object>
                     e.user = lastPathSegment(e.user);
                     e.course = lastPathSegment(e.course);
                     e.parent_id = current.getId();
+                    System.out.println(e.parent_id);
+                    System.out.println("Entry: "+e.subject);
                     db.forumEntryDao().updateInsert(e);
                 }
             }
         } else {
             StudipForumEntry e = (StudipForumEntry) res;
-            e.user = lastPathSegment(e.user);
-            e.course = lastPathSegment(e.course);
-            e.parent_id = current.getId();
-            db.forumEntryDao().updateInsert(e);
+            for (StudipForumEntry child : e.children) {
+                child.user = lastPathSegment(child.user);
+                child.course = lastPathSegment(child.course);
+                child.parent_id = e.topic_id;
+                //System.out.println("Child: "+child.subject);
+                db.forumEntryDao().updateInsert(child);
+            }
         }
     }
 }

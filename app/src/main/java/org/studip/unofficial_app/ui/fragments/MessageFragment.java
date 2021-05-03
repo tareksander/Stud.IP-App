@@ -81,6 +81,8 @@ public class MessageFragment extends SwipeRefreshFragment
                 binding.messagesRefresh.setRefreshing(true);
                 m.mes.refresh(requireActivity());
             }
+            
+            binding.messagesList.setAdapter(ad);
         });
         
         
@@ -146,6 +148,8 @@ public class MessageFragment extends SwipeRefreshFragment
             b = MessageEntryBinding.bind(holder.itemView);
             StudipMessage m = getItem(position);
             if (m == null) {
+                b.getRoot().setOnClickListener(null);
+                b.getRoot().setOnLongClickListener(null);
                 b.messageSubject.setText("");
                 b.messageSender.setText("");
                 b.messageTime.setText("");

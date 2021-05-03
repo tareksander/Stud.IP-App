@@ -39,6 +39,8 @@ TODO: delete data which is not in a server response, but still in the database.
 TODO: supply database migrations for every database change once the app is on f-droid
     
     
+TODO: open issue with prefedined content: https://docs.github.com/en/github/managing-your-work-on-github/about-automation-for-issues-and-pull-requests-with-query-parameters
+    
     
     For the notification service:
     Notifications work over this api with the session cookie: /dispatch.php/jsupdater/get
@@ -75,6 +77,12 @@ TODO: supply database migrations for every database change once the app is on f-
     
     use DownloadManager for downloads and add the session cookie to authenticate it:
     https://developer.android.com/reference/android/app/DownloadManager.Request
+    
+    
+TODO: JSONAPI: https://jsonapi.org/format
+    getting only specific fields to save mobilde data: https://jsonapi.org/format/#fetching-sparse-fieldsets
+    
+    
     
     
 

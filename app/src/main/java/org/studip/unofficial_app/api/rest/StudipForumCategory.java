@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity(tableName = "forum_categories")
-public class StudipForumCategory implements Serializable
+public class StudipForumCategory implements Serializable, Comparable<StudipForumCategory>
 {
     @NonNull
     @PrimaryKey
@@ -47,5 +47,10 @@ public class StudipForumCategory implements Serializable
     public int hashCode()
     {
         return Objects.hash(category_id, seminar_id, entry_name, pos, id, course, areas, areas_count);
+    }
+    
+    @Override
+    public int compareTo(StudipForumCategory o) {
+        return entry_name.compareTo(o.entry_name);
     }
 }
