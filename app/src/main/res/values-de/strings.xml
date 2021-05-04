@@ -125,6 +125,9 @@ Ein Addressat wird hinzugefügt, indem Sie ihn in der Liste antippen.<br>
 Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br>
 
 "]]></string>
+    <string name="view">Anschauen: %1$s</string>
+    <string name="download">Herunterladen: %1$s</string>
+    <string name="view_with">Anschauen mit:</string>
 
 
 </resources>

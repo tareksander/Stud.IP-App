@@ -5,6 +5,8 @@ import android.util.Log;
 
 import androidx.security.crypto.EncryptedSharedPreferences;
 
+import com.squareup.picasso.Picasso;
+
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.ui.CrashActivity;
 

@@ -45,6 +45,10 @@ TODO: open issue with predefined content: https://docs.github.com/en/github/mana
     It seems like there is a bug that prevents you from posting on the Forum via the API. Use the dispatch route instead?
     
     
+    opencast plugin: https://github.com/elan-ev/studip-opencast-plugin
+    License: GPLv2 or later
+    
+    
     
     
     For the notification service:

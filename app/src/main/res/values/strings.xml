@@ -80,6 +80,9 @@
     <string name="message_send_successfully">message send</string>
     <string name="help_button">view help</string>
     <string name="help_content">placeholder</string>
+    <string name="view">View: %1$s</string>
+    <string name="download">Download: %1$s</string>
+    <string name="view_with">View with:</string>
 
 
 </resources>

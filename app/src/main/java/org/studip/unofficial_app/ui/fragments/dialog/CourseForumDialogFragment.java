@@ -182,7 +182,7 @@ public class CourseForumDialogFragment extends DialogFragment
                                                 @Override
                                                 public void onResponse(Call<Void> call, Response<Void> response) {
                                                     binding.forumRefresh.setRefreshing(false);
-                                                    System.out.println(response.code());
+                                                    //System.out.println(response.code());
                                                     if (response.code() == 302 || response.code() == 200) {
                                                         m.f.refresh(requireActivity());
                                                         binding.forumSubject.setText("");

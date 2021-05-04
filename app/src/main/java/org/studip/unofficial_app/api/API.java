@@ -15,6 +15,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.security.crypto.EncryptedSharedPreferences;
 
 import org.jetbrains.annotations.NotNull;
+import org.studip.unofficial_app.api.plugins.opencast.Opencast;
 import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.api.routes.Course;
 import org.studip.unofficial_app.api.routes.Discovery;
@@ -51,6 +52,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
@@ -82,6 +84,10 @@ public class API
     public final Semester semester;
     public final Dispatch dispatch;
     
+    
+    public final Opencast opencast;
+    
+    
     private final TestRoutes tests;
     
     private final String hostname;
@@ -99,6 +105,7 @@ public class API
                 .baseUrl(HTTPS+hostname+"/")
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(GsonProvider.getGson()))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
                 .client(new OkHttpClient.Builder().cookieJar(new CookieJar()
                 {
                     // simple cookie jar implementation
@@ -138,6 +145,7 @@ public class API
                                 return clist;
                             }
                         } else {
+                            //System.out.println("cookies denied for: "+httpUrl.toString());
                             return Collections.emptyList();
                         }
                     }
@@ -149,6 +157,8 @@ public class API
                     if (route != null && route.address().url().isHttps() && route.address().url().host().equals(hostname) && password != null && auth_method == Settings.AUTHENTICATION_BASIC) {
                         //System.out.println("Basic Authentication used for "+route.address().url().toString());
                         return response.request().newBuilder().header("Authorization",Credentials.basic(username,password)).build();
+                    } else {
+                        //System.out.println("basic auth denied for: "+route.address().url().toString());
                     }
                     return null;
                 }).build())
@@ -164,6 +174,8 @@ public class API
         tests = retrofit.create(TestRoutes.class);
         semester = retrofit.create(Semester.class);
         dispatch = retrofit.create(Dispatch.class);
+        
+        opencast = new Opencast(retrofit);
     }
     
     public void downloadFile(@NonNull Context con, @NonNull String fid, String filename) {
