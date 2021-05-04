@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,7 +22,13 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Tag;
+import org.studip.unofficial_app.R;
+import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.api.rest.StudipCourse;
 import org.studip.unofficial_app.api.rest.StudipCourseWithForumCategories;
 import org.studip.unofficial_app.api.rest.StudipForumCategory;
@@ -29,6 +36,7 @@ import org.studip.unofficial_app.api.rest.StudipForumCategoryWithEntries;
 import org.studip.unofficial_app.api.rest.StudipForumEntry;
 import org.studip.unofficial_app.api.rest.StudipForumEntryWithChildren;
 import org.studip.unofficial_app.databinding.DialogForumBinding;
+import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.ForumResource;
 import org.studip.unofficial_app.model.viewmodels.ForumViewModel;
@@ -40,6 +48,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CourseForumDialogFragment extends DialogFragment
 {
@@ -48,7 +62,7 @@ public class CourseForumDialogFragment extends DialogFragment
     ForumViewModel m;
     DialogForumBinding binding;
     AlertDialog d;
-    
+    String cid;
     
     @NonNull
     @Override
@@ -61,7 +75,7 @@ public class CourseForumDialogFragment extends DialogFragment
             dismiss();
             return b.create();
         }
-        String cid = args.getString(COURSE_ID_KEY);
+        cid = args.getString(COURSE_ID_KEY);
         m = new ViewModelProvider(this,new StringViewModelFactory(requireActivity().getApplication(),cid)).get(ForumViewModel.class);
     
         binding = DialogForumBinding.inflate(getLayoutInflater());
@@ -102,10 +116,11 @@ public class CourseForumDialogFragment extends DialogFragment
                             m.f.setEntry(requireActivity(),null);
                             return true;
                         case ENTRY:
-                            System.out.println("entry");
-                            if (ad.o instanceof StudipForumEntryWithChildren) {
-                                StudipForumEntryWithChildren ents = (StudipForumEntryWithChildren) ad.o;
-                                System.out.println("parent: "+ents.entry.parent_id);
+                            //System.out.println("entry");
+                            Object o = ad.o;
+                            if (o instanceof StudipForumEntryWithChildren) {
+                                StudipForumEntryWithChildren ents = (StudipForumEntryWithChildren) o;
+                                //System.out.println("parent: "+ents.entry.parent_id);
                                 if (ents.entry.depth.equals("1")) {
                                     m.f.setEntry(requireActivity(),new ForumResource.ForumEntry(ents.entry.parent_id, ForumResource.ForumEntry.Type.CATEGORY));
                                     //System.out.println("category");
@@ -114,7 +129,7 @@ public class CourseForumDialogFragment extends DialogFragment
                                     //System.out.println("entry");
                                 }
                             } else {
-                                System.out.println("not loaded yet");
+                                //System.out.println("not loaded yet");
                             }
                             return true;
                     }
@@ -124,9 +139,108 @@ public class CourseForumDialogFragment extends DialogFragment
         });
         
         
+        binding.forumSubmit.setOnClickListener(v1 -> {
+            Object o = ad.o;
+            if (o instanceof StudipForumEntryWithChildren) {
+                StudipForumEntryWithChildren ents = (StudipForumEntryWithChildren) o;
+                String subject = binding.forumSubject.getText().toString();
+                String content = binding.forumContent.getText().toString();
+                if (subject.equals("") && ents.entry.depth.equals("1")) {
+                    Toast.makeText(requireActivity(), R.string.message_no_subject, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (content.equals("")) {
+                    Toast.makeText(requireActivity(), R.string.message_no_content, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                API api = APIProvider.getAPI(requireActivity());
+                if (api != null) {
+                    binding.forumRefresh.setRefreshing(true);
+                    // a workaround, as is seems impossible to create a forum post with the REST-API, it complains about permissions
+                    api.dispatch.getForumPage(ents.entry.topic_id,cid).enqueue(new Callback<String>()
+                    {
+                        @Override
+                        public void onResponse(@NotNull Call<String> call, @NotNull Response<String> response) {
+                            boolean found = false;
+                            String res = response.body();
+                            //System.out.println(res);
+                            if (res != null && response.code() == 200) {
+                                Document d = Jsoup.parse(res);
+                                Element head = d.head();
+                                for (Element h : head.children()) {
+                                    if (h.tag().equals(Tag.valueOf("script"))) {
+                                        String script = h.data();
+                                        //System.out.println(script);
+                                        Pattern p = Pattern.compile(".*CSRF_TOKEN: \\{[^}]+?value: \\'([^}]+?)\\'[^}]+?\\}\\,.*",Pattern.DOTALL);
+                                        Matcher mat = p.matcher(script);
+                                        if (mat.matches()) {
+                                            String token = mat.group(1);
+                                            //System.out.println("Token: \""+token+"\"");
+                                            found = true;
+                                            api.dispatch.postForumEntry(cid,ents.entry.topic_id,token,subject,content).enqueue(new Callback<Void>()
+                                            {
+                                                @Override
+                                                public void onResponse(Call<Void> call, Response<Void> response) {
+                                                    binding.forumRefresh.setRefreshing(false);
+                                                    System.out.println(response.code());
+                                                    if (response.code() == 302 || response.code() == 200) {
+                                                        m.f.refresh(requireActivity());
+                                                        binding.forumSubject.setText("");
+                                                        binding.forumContent.setText("");
+                                                    }
+                                                }
+    
+                                                @Override
+                                                public void onFailure(Call<Void> call, Throwable t) {
+                                                    binding.forumRefresh.setRefreshing(false);
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            } else {
+                                HomeActivity.onStatusReturn(requireActivity(),response.code());
+                            }
+                            if (! found) {
+                                binding.forumRefresh.setRefreshing(false);
+                            }
+                        }
+    
+                        @Override
+                        public void onFailure(@NotNull Call<String> call, @NotNull Throwable t) {
+                            //t.printStackTrace();
+                            binding.forumRefresh.setRefreshing(false);
+                        }
+                    });
+                }
+                /*
+                APIProvider.getAPI(requireActivity()).forum.addEntry(ents.entry.topic_id,subject,content).enqueue(new Callback<StudipForumEntry>()
+                {
+                    @Override
+                    public void onResponse(@NotNull Call<StudipForumEntry> call, @NotNull Response<StudipForumEntry> response) {
+                        System.out.println(response.code());
+                        StudipForumEntry e = response.body();
+                        if (e != null) {
+                            binding.forumContent.setText("");
+                            binding.forumSubject.setText("");
+                            m.f.setEntry(requireActivity(),new ForumResource.ForumEntry(e.topic_id, ForumResource.ForumEntry.Type.ENTRY));
+                        } else {
+                            HomeActivity.onStatusReturn(requireActivity(),response.code());
+                        }
+                    }
+    
+                    @Override
+                    public void onFailure(@NotNull Call<StudipForumEntry> call, @NotNull Throwable t) {}
+                });
+                */
+            }
+        });
+        
         d.setCanceledOnTouchOutside(false);
         return d;
     }
+    
+    
     
     public class ForumAdapter extends ArrayAdapter<Object> {
         private Object o;
@@ -136,21 +250,39 @@ public class CourseForumDialogFragment extends DialogFragment
         
         public void setObject(Object o) {
             this.o = o;
+            if (o == null) {
+                binding.forumSubject.setVisibility(View.GONE);
+                binding.forumContent.setVisibility(View.GONE);
+                binding.forumSubmit.setVisibility(View.GONE);
+            }
             if (o instanceof StudipCourseWithForumCategories) {
                 StudipCourseWithForumCategories cc = (StudipCourseWithForumCategories) o;
                 StudipCourse c = cc.c;
                 binding.forumParentName.setText(c.title);
+                binding.forumSubject.setVisibility(View.GONE);
+                binding.forumContent.setVisibility(View.GONE);
+                binding.forumSubmit.setVisibility(View.GONE);
             }
             if (o instanceof StudipForumCategoryWithEntries) {
                 StudipForumCategoryWithEntries catc = (StudipForumCategoryWithEntries) o;
                 StudipForumCategory cat = catc.category;
                 binding.forumParentName.setText(cat.entry_name);
+                binding.forumSubject.setVisibility(View.GONE);
+                binding.forumContent.setVisibility(View.GONE);
+                binding.forumSubmit.setVisibility(View.GONE);
             }
             if (o instanceof StudipForumEntryWithChildren) {
                 //System.out.println("count: "+(((StudipForumEntryWithChildren)o).children.size()+1));
                 //System.out.println(((StudipForumEntryWithChildren)o).entry.depth);
                 StudipForumEntryWithChildren e = (StudipForumEntryWithChildren) o;
                 binding.forumParentName.setText(Jsoup.parse(e.entry.subject).wholeText());
+                if (! ((StudipForumEntryWithChildren) o).entry.depth.equals("1")) {
+                    binding.forumSubject.setVisibility(View.GONE);
+                } else {
+                    binding.forumSubject.setVisibility(View.VISIBLE);
+                }
+                binding.forumContent.setVisibility(View.VISIBLE);
+                binding.forumSubmit.setVisibility(View.VISIBLE);
             }
             //System.out.println("object updated");
             notifyDataSetChanged();
@@ -197,7 +329,11 @@ public class CourseForumDialogFragment extends DialogFragment
                 Collections.sort(cats);
                 StudipForumCategory cat = cats.toArray(new StudipForumCategory[0])[position];
                 t.setText(cat.entry_name);
-                t.setOnClickListener(v1 -> m.f.setEntry(requireActivity(), new ForumResource.ForumEntry(cat.category_id, ForumResource.ForumEntry.Type.CATEGORY)));
+                t.setOnClickListener(v1 -> {
+                    if (! binding.forumRefresh.isRefreshing()) {
+                        m.f.setEntry(requireActivity(), new ForumResource.ForumEntry(cat.category_id, ForumResource.ForumEntry.Type.CATEGORY));
+                    }
+                });
             }
             
             if (o instanceof StudipForumCategoryWithEntries) {
@@ -212,7 +348,11 @@ public class CourseForumDialogFragment extends DialogFragment
                 });
                 StudipForumEntry e = children.toArray(new StudipForumEntry[0])[position];
                 t.setText(Jsoup.parse(e.subject).wholeText());
-                t.setOnClickListener(v1 -> m.f.setEntry(requireActivity(), new ForumResource.ForumEntry(e.topic_id, ForumResource.ForumEntry.Type.ENTRY)));
+                t.setOnClickListener(v1 -> {
+                    if (! binding.forumRefresh.isRefreshing()) {
+                        m.f.setEntry(requireActivity(), new ForumResource.ForumEntry(e.topic_id, ForumResource.ForumEntry.Type.ENTRY));
+                    }
+                });
             }
             if (o instanceof StudipForumEntryWithChildren) {
                 StudipForumEntryWithChildren ec = (StudipForumEntryWithChildren) o;
@@ -235,7 +375,11 @@ public class CourseForumDialogFragment extends DialogFragment
                     e = children.toArray(new StudipForumEntry[0])[position];
                     t.setText(Jsoup.parse(e.subject).wholeText());
                     final StudipForumEntry finalE = e;
-                    t.setOnClickListener(v1 -> m.f.setEntry(requireActivity(), new ForumResource.ForumEntry(finalE.topic_id, ForumResource.ForumEntry.Type.ENTRY)));
+                    t.setOnClickListener(v1 -> {
+                        if (! binding.forumRefresh.isRefreshing()) {
+                            m.f.setEntry(requireActivity(), new ForumResource.ForumEntry(finalE.topic_id, ForumResource.ForumEntry.Type.ENTRY));
+                        }
+                    });
                 }
             }
             return t;

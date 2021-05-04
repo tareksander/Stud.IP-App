@@ -39,7 +39,12 @@ TODO: delete data which is not in a server response, but still in the database.
 TODO: supply database migrations for every database change once the app is on f-droid
     
     
-TODO: open issue with prefedined content: https://docs.github.com/en/github/managing-your-work-on-github/about-automation-for-issues-and-pull-requests-with-query-parameters
+TODO: open issue with predefined content: https://docs.github.com/en/github/managing-your-work-on-github/about-automation-for-issues-and-pull-requests-with-query-parameters
+    
+    
+    It seems like there is a bug that prevents you from posting on the Forum via the API. Use the dispatch route instead?
+    
+    
     
     
     For the notification service:

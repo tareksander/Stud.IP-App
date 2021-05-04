@@ -112,9 +112,9 @@ public class ForumResource extends NetworkResource<Object>
                 StudipCollection<StudipForumCategory> col = (StudipCollection<StudipForumCategory>) res;
                 for (StudipForumCategory cat : col.collection.values()) {
                     cat.course = lastPathSegment(cat.course);
-                    System.out.println(cat.course);
+                    //System.out.println(cat.course);
                     db.forumCategoryDao().updateInsert(cat);
-                    System.out.println("Category: "+cat.entry_name);
+                    //System.out.println("Category: "+cat.entry_name);
                 }
             } catch (ClassCastException ignored) {
                 StudipCollection<StudipForumEntry> col = (StudipCollection<StudipForumEntry>) res;
@@ -122,10 +122,11 @@ public class ForumResource extends NetworkResource<Object>
                     e.user = lastPathSegment(e.user);
                     e.course = lastPathSegment(e.course);
                     e.parent_id = current.getId();
-                    System.out.println(e.parent_id);
-                    System.out.println("Entry: "+e.subject);
-                    db.forumEntryDao().updateInsert(e);
+                    //System.out.println(e.parent_id);
+                    //System.out.println("Entry: "+e.subject);
+                    //db.forumEntryDao().updateInsert(e);
                 }
+                db.forumEntryDao().updateSyncChildren(current.getId(),col.collection.values().toArray(new StudipForumEntry[0]));
             }
         } else {
             StudipForumEntry e = (StudipForumEntry) res;
@@ -134,8 +135,9 @@ public class ForumResource extends NetworkResource<Object>
                 child.course = lastPathSegment(child.course);
                 child.parent_id = e.topic_id;
                 //System.out.println("Child: "+child.subject);
-                db.forumEntryDao().updateInsert(child);
+                //db.forumEntryDao().updateInsert(child);
             }
+            db.forumEntryDao().updateSyncChildren(current.getId(),e.children);
         }
     }
 }

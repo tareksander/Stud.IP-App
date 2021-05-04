@@ -52,6 +52,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class API
 {
@@ -96,6 +97,7 @@ public class API
         this.hostname = hostname;
         retrofit = new Retrofit.Builder()
                 .baseUrl(HTTPS+hostname+"/")
+                .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(GsonProvider.getGson()))
                 .client(new OkHttpClient.Builder().cookieJar(new CookieJar()
                 {
