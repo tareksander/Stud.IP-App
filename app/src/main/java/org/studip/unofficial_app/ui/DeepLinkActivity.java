@@ -1,6 +1,7 @@
 package org.studip.unofficial_app.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationManagerCompat;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -13,7 +14,7 @@ import org.studip.unofficial_app.model.APIProvider;
 
 public class DeepLinkActivity extends AppCompatActivity
 {
-    // This is basically a redirect to HomeActivity, but it has to be lice that, because if a link is invalid and the activity returns instantly, there would be a small flash visible.
+    // This is basically a redirect to HomeActivity, but it has to be like that, because if a link is invalid and the activity returns instantly, there would be a small flash visible.
     // This activity is completely invisible, so there isn't a flash.
     // If the link is considered valid, it is redirected to HomeActivity.
     @Override
@@ -28,6 +29,12 @@ public class DeepLinkActivity extends AppCompatActivity
             {
                 finish();
                 return;
+            }
+            long notification = in.getLongExtra(getApplicationContext().getPackageName()+".notification_id",-1);
+            //System.out.println(notification);
+            if (notification != -1) {
+                NotificationManagerCompat m = NotificationManagerCompat.from(this);
+                m.cancel((int) (notification % Integer.MAX_VALUE));
             }
             API api = APIProvider.loadAPI(this);
             if (api == null)

@@ -94,7 +94,7 @@
         android:visibility="visible"
         app:layout_constraintEnd_toStartOf="@+id/course_files"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_opencast_grey" />
+        app:srcCompat="@drawable/opencast_grey" />
     
     
     <ImageView

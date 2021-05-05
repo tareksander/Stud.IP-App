@@ -83,6 +83,21 @@
     <string name="view">View: %1$s</string>
     <string name="download">Download: %1$s</string>
     <string name="view_with">View with:</string>
+    <string name="upload_failed">Error processing the file</string>
+    <string name="settings_system">Open system settings for the app</string>
+    <string name="settings_system_notification">Open system notification settings</string>
+    <string name="channel_forum">Forum</string>
+    <string name="channel_files">Files</string>
+    <string name="channel_messages">Messages</string>
+    <string name="channel_other">Other</string>
+    <string name="settings_notifications">Notifications:</string>
+    <string name="notification_visibility">Visibility:</string>
+    <string name="notification_public">always</string>
+    <string name="notification_private">only title on lockscreen</string>
+    <string name="notification_secret">not on lockscreen</string>
+    <string name="notification_priority">Priority:</string>
+    <string name="notification_priority_desc">Priority goes from invisible on the left, without sound, with sound to heads-up notification.</string>
+    <string name="own_files">Your files</string>
 
 
 </resources>

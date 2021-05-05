@@ -36,6 +36,7 @@ import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.model.room.DB;
 import org.studip.unofficial_app.model.viewmodels.FileViewModel;
 import org.studip.unofficial_app.model.viewmodels.HomeActivityViewModel;
+import org.studip.unofficial_app.model.viewmodels.MessagesViewModel;
 import org.studip.unofficial_app.ui.fragments.CoursesFragment;
 import org.studip.unofficial_app.ui.fragments.FileFragment;
 import org.studip.unofficial_app.ui.fragments.HomeFragment;
@@ -60,6 +61,9 @@ public class HomeActivity extends AppCompatActivity
     public static final Pattern courseMembersPattern = Pattern.compile("/dispatch\\.php/course/members\\?cid=(\\p{Alnum}+)$");
 
     public static final Pattern courseCoursewarePattern = Pattern.compile("/plugins\\.php/courseware/courseware\\?cid=(\\p{Alnum}+)?(&selected=(\\p{Alnum}+))$");
+    
+    public static final Pattern messagePattern = Pattern.compile("/dispatch.php/messages/read/(\\p{Alnum}+)");
+    
     
     
     
@@ -94,7 +98,8 @@ public class HomeActivity extends AppCompatActivity
             finish();
             return;
         }
-
+    
+        
 
         Uri data = getIntent().getData();
         
@@ -212,8 +217,11 @@ public class HomeActivity extends AppCompatActivity
                     }
                 });
             }
-            
-            
+            matcher = messagePattern.matcher(path);
+            if (matcher.matches()) {
+                new ViewModelProvider(this).get(MessagesViewModel.class).mes.refresh(this);
+                binding.pager.setCurrentItem(3);
+            }
             
             
             if (path.equals("/dispatch.php/settings/general") || path.equals("")) {

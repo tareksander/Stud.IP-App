@@ -60,7 +60,7 @@ public class MessageFragment extends SwipeRefreshFragment
         binding = FragmentMessagesBinding.inflate(inflater);
         m = new ViewModelProvider(requireActivity()).get(MessagesViewModel.class);
         
-        System.out.println("messages fragment");
+        //System.out.println("messages fragment");
         
         setSwipeRefreshLayout(binding.messagesRefresh);
         

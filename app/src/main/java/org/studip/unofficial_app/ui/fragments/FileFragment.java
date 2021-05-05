@@ -1,10 +1,13 @@
 package org.studip.unofficial_app.ui.fragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
@@ -12,9 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.jetbrains.annotations.NotNull;
@@ -123,6 +129,7 @@ public class FileFragment extends SwipeRefreshFragment
             }
         });
         
+        
         return binding.getRoot();
     }
 
@@ -158,6 +165,9 @@ public class FileFragment extends SwipeRefreshFragment
                                     m.refresh(requireActivity());
                                 } else {
                                     binding.fileRefresh.setRefreshing(false);
+                                    if (response.code() == 500) {
+                                        Toast.makeText(requireActivity(),R.string.upload_failed,Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             }
 
@@ -294,6 +304,11 @@ public class FileFragment extends SwipeRefreshFragment
                     v.setText(f.name);
                     v.setOnClickListener(v1 -> {
                         if (binding.fileRefresh.isRefreshing()) { return; }
+                        if (Build.VERSION.SDK_INT <= 28 && ContextCompat.checkSelfPermission(requireActivity(),
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+                            return;
+                        }
                         APIProvider.getAPI(requireActivity()).downloadFile(requireActivity(),f.id,f.name);
                     });
                     v.setOnLongClickListener(v1 -> {

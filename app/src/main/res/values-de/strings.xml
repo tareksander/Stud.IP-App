@@ -128,6 +128,21 @@ Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br
     <string name="view">Anschauen: %1$s</string>
     <string name="download">Herunterladen: %1$s</string>
     <string name="view_with">Anschauen mit:</string>
+    <string name="upload_failed">Fehler bei der Verarbeitung der Datei</string>
+    <string name="settings_system">Systemeinstellungen für die App öffnen</string>
+    <string name="settings_system_notification">Systemeinstellungen für Benachrichtigungen öffnen</string>
+    <string name="channel_forum">Forum</string>
+    <string name="channel_files">Dateien</string>
+    <string name="channel_messages">Nachrichten</string>
+    <string name="channel_other">Andere</string>
+    <string name="settings_notifications">Benachrichtigungen:</string>
+    <string name="notification_visibility">Sichtbarkeit:</string>
+    <string name="notification_public">immer</string>
+    <string name="notification_private">nur Titel auf dem Sperrbildschirm</string>
+    <string name="notification_secret">nicht auf dem Sperrbildschirm</string>
+    <string name="notification_priority">Priorität:</string>
+    <string name="notification_priority_desc">Die Priorität geht von links nach rechts von unsichtbar, ohne Ton, mit Ton zu auf dem Bildschirm anzeigen.</string>
+    <string name="own_files">Deine Dateien</string>
 
 
 </resources>

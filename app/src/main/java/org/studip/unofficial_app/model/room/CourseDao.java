@@ -30,6 +30,9 @@ public interface CourseDao extends BasicDao<StudipCourse>
     StudipForumCategory[] getCategories(String id);
     
     
+    @Query("SELECT * FROM courses WHERE documents IS NOT NULL")
+    StudipCourse[] getDocumentsCourses();
+    
     // WARNING: observable queries fire if any of the mentioned tables are changed, not only the object you look at
 
 
