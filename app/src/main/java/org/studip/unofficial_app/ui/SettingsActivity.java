@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -20,6 +21,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.lifecycle.Transformations;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.work.WorkManager;
 
@@ -27,13 +29,22 @@ import androidx.work.WorkManager;
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.databinding.ActivitySettingsBinding;
+import org.studip.unofficial_app.documentsprovider.DocumentRoot;
+import org.studip.unofficial_app.documentsprovider.DocumentsDB;
+import org.studip.unofficial_app.documentsprovider.DocumentsDBProvider;
+import org.studip.unofficial_app.documentsprovider.DocumentsProvider;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.NotificationWorker;
 import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
@@ -74,6 +85,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             return true; });
     }
     
+    @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -234,6 +246,65 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         binding.notificationServiceEnabled.setOnClickListener(this::onNotificationServiceClicked);
         
         s.setOnItemSelectedListener(this);
+        
+        
+        binding.enableDocumentsProvider.setChecked(settings.documents_provider);
+        binding.enableDocumentsProvider.setOnClickListener(v1 -> {
+                settings.documents_provider = binding.enableDocumentsProvider.isChecked();
+                getContentResolver().notifyChange(DocumentsContract.buildRootsUri(DocumentsProvider.AUTHORITIES), null);
+        });
+    
+        binding.enableDocThumbnails.setChecked(settings.documents_thumbnails);
+        binding.enableDocSearch.setChecked(settings.documents_search);
+        binding.enableDocRecents.setChecked(settings.documents_recents);
+        
+        binding.enableDocThumbnails.setOnClickListener(v1 -> {
+            settings.documents_thumbnails = binding.enableDocThumbnails.isChecked();
+            getContentResolver().notifyChange(DocumentsContract.buildRootsUri(DocumentsProvider.AUTHORITIES), null);
+        });
+        binding.enableDocSearch.setOnClickListener(v1 -> {
+            settings.documents_search = binding.enableDocSearch.isChecked();
+            getContentResolver().notifyChange(DocumentsContract.buildRootsUri(DocumentsProvider.AUTHORITIES), null);
+        });
+        binding.enableDocRecents.setOnClickListener(v1 -> {
+            settings.documents_recents = binding.enableDocRecents.isChecked();
+            getContentResolver().notifyChange(DocumentsContract.buildRootsUri(DocumentsProvider.AUTHORITIES), null);
+        });
+        
+        
+        DocumentsDB docs = DocumentsDBProvider.getDB(this);
+    
+        Transformations.distinctUntilChanged(docs.documents().observeRoots()).observe(this, roots -> {
+            binding.documentsProviderCourses.removeAllViews();
+            Arrays.sort(roots);
+            for (DocumentRoot r : roots) {
+                if (r.user) {
+                    continue;
+                }
+                SwitchCompat c = new SwitchCompat(this);
+                c.setChecked(r.enabled);
+                c.setText(r.title);
+                c.setOnClickListener(v1 -> {
+                    r.enabled = c.isChecked();
+                    docs.documents().updateInsertAsync(r).subscribeOn(Schedulers.io()).subscribe();
+                });
+                binding.documentsProviderCourses.addView(c);
+            }
+        });
+        
+        
+        
+        
+        
+        
+        API api = APIProvider.getAPI(this);
+        if (api != null) {
+            
+            
+            
+        }
+        
+        
     }
 
 

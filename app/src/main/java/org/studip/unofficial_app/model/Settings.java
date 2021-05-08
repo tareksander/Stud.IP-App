@@ -48,8 +48,22 @@ public class Settings
     
     
     private static final String NOTIFICATION_VISIBILITY_KEY = "notification_visibility";
-    
     public int notification_visibility;
+    
+    private static final String DOCUMENTS_PROVIDER_KEY = "documents_provider";
+    public boolean documents_provider;
+    
+    private static final String DOCUMENTS_PROVIDER_THUMBNAILS_KEY = "documents_thumbnails";
+    public boolean documents_thumbnails;
+    
+    
+    private static final String DOCUMENTS_PROVIDER_RECENTS_KEY = "documents_recents";
+    public boolean documents_recents;
+    
+    
+    private static final String DOCUMENTS_PROVIDER_SEARCH_KEY = "documents_search";
+    public boolean documents_search;
+    
     
     public Settings()
     {
@@ -69,6 +83,11 @@ public class Settings
         
         last_notification_id = 0;
         notification_visibility = NotificationCompat.VISIBILITY_SECRET;
+        
+        documents_provider = false;
+        documents_thumbnails = false;
+        documents_recents = false;
+        documents_search = false;
     }
     public static Settings load(SharedPreferences prefs)
     {
@@ -89,6 +108,11 @@ public class Settings
             
             s.last_notification_id = prefs.getLong(NOTIFICATION_ID_KEY, 0);
             s.notification_visibility = prefs.getInt(NOTIFICATION_VISIBILITY_KEY,NotificationCompat.VISIBILITY_SECRET);
+            
+            s.documents_provider = prefs.getBoolean(DOCUMENTS_PROVIDER_KEY, false);
+            s.documents_thumbnails = prefs.getBoolean(DOCUMENTS_PROVIDER_THUMBNAILS_KEY, false);
+            s.documents_recents = prefs.getBoolean(DOCUMENTS_PROVIDER_RECENTS_KEY, false);
+            s.documents_search = prefs.getBoolean(DOCUMENTS_PROVIDER_SEARCH_KEY, false);
         }
         else
         {
@@ -117,6 +141,11 @@ public class Settings
             
             e.putLong(NOTIFICATION_ID_KEY, last_notification_id);
             e.putInt(NOTIFICATION_VISIBILITY_KEY, notification_visibility);
+            
+            e.putBoolean(DOCUMENTS_PROVIDER_KEY, documents_provider);
+            e.putBoolean(DOCUMENTS_PROVIDER_THUMBNAILS_KEY, documents_thumbnails);
+            e.putBoolean(DOCUMENTS_PROVIDER_RECENTS_KEY, documents_recents);
+            e.putBoolean(DOCUMENTS_PROVIDER_SEARCH_KEY, documents_search);
             
             e.commit();
         }

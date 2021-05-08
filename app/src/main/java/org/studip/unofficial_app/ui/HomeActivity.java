@@ -108,7 +108,7 @@ public class HomeActivity extends AppCompatActivity
             return;
         }
         
-        API api = APIProvider.loadAPI(this);
+        API api = APIProvider.getAPI(this);
         if (api == null)
         {
             if (data != null) {

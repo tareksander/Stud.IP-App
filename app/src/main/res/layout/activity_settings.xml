@@ -153,6 +153,12 @@
                 android:text="@string/settings_system" />
 
             <LinearLayout
+                android:id="@+id/studip_notification_settings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"></LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/settings_notification_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -234,12 +240,6 @@
                 android:layout_height="40dp" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/settings_experimental"
-                android:visibility="gone" />
-
-            <TextView
                 android:id="@+id/auth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -277,6 +277,50 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="40dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_experimental" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/enable_documents_provider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/document_provider" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/enable_doc_thumbnails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/document_provider_thumbnails" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/enable_doc_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/document_provider_search" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/enable_doc_recents"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/document_provider_recents" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/document_provider_courses" />
+
+            <LinearLayout
+                android:id="@+id/documents_provider_courses"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"></LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"

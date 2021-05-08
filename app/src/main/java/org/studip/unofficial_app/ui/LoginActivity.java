@@ -25,7 +25,7 @@ public class LoginActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
 
-        API api = APIProvider.loadAPI(this);
+        API api = APIProvider.getAPI(this);
         if (APIProvider.getAPI(this) == null) {
             Intent intent = new Intent(this, ServerSelectActivity.class);
             startActivity(intent);

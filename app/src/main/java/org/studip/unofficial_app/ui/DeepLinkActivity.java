@@ -36,7 +36,7 @@ public class DeepLinkActivity extends AppCompatActivity
                 NotificationManagerCompat m = NotificationManagerCompat.from(this);
                 m.cancel((int) (notification % Integer.MAX_VALUE));
             }
-            API api = APIProvider.loadAPI(this);
+            API api = APIProvider.getAPI(this);
             if (api == null)
             {
                 Toast.makeText(this, R.string.not_logged_in, Toast.LENGTH_SHORT).show();

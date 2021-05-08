@@ -143,6 +143,11 @@ Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br
     <string name="notification_priority">Priorität:</string>
     <string name="notification_priority_desc">Die Priorität geht von links nach rechts von unsichtbar, ohne Ton, mit Ton zu auf dem Bildschirm anzeigen.</string>
     <string name="own_files">Deine Dateien</string>
+    <string name="document_provider">Document Provider</string>
+    <string name="document_provider_courses">Mit dem Document Privider benutzbare Kurse:</string>
+    <string name="document_provider_thumbnails">Vorschaubilder anzeigen</string>
+    <string name="document_provider_search">Suche einschalten</string>
+    <string name="document_provider_recents">Kürzlich benutzte Dateien anzeigen</string>
 
 
 </resources>

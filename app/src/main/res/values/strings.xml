@@ -98,6 +98,11 @@
     <string name="notification_priority">Priority:</string>
     <string name="notification_priority_desc">Priority goes from invisible on the left, without sound, with sound to heads-up notification.</string>
     <string name="own_files">Your files</string>
+    <string name="document_provider">Document provider</string>
+    <string name="document_provider_courses">Courses to accessible with the document provider:</string>
+    <string name="document_provider_thumbnails">Show Thumbnails</string>
+    <string name="document_provider_recents">Show recent documents</string>
+    <string name="document_provider_search">Enable search</string>
 
 
 </resources>

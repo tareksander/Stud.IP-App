@@ -46,8 +46,14 @@ Document provider:
     Add a setting to load image previews from the provider always/only wifi/never
     
     
+TODO:
+    add the studip notification settings to the settings screen, so you can control from the app what notifications you get.
+    add a SwitchCompat for every course with files, to include it in the documents provider
     
     
+TODO: intent filter for sending a message to someone
+
+
     
     For the notification service:
     Notifications work over this api with the session cookie: /dispatch.php/jsupdater/get

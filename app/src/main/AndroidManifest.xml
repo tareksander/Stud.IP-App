@@ -68,7 +68,7 @@
         </receiver>
         
         <provider
-            android:name=".DocumentsProvider"
+            android:name=".documentsprovider.DocumentsProvider"
             android:authorities="org.studip.unofficial_app.documents"
             android:grantUriPermissions="true"
             android:exported="true"

@@ -16,6 +16,7 @@ import androidx.security.crypto.EncryptedSharedPreferences;
 
 import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.api.plugins.opencast.Opencast;
+import org.studip.unofficial_app.api.rest.StudipFolder;
 import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.api.routes.Course;
 import org.studip.unofficial_app.api.routes.Discovery;
@@ -69,6 +70,8 @@ public class API
     private static final String USERNAME_KEY = "username";
     private static final String PASSWORD_KEY = "password";
     private static final String AUTH_METHOD_KEY = "method";
+    //private static final String USER_FOLDER_KEY = "user_top_folder";
+    
     
     public static final String HTTPS = "https://";
     
@@ -95,6 +98,7 @@ public class API
     
     private int auth_method = 0;
     
+    //private String folder_id = null;
     private String userID = null;
     private String username = null;
     private String password = null;
@@ -184,33 +188,27 @@ public class API
         if (URLUtil.isHttpsUrl(uri))
         {
             DownloadManager.Request r = new DownloadManager.Request(Uri.parse(uri));
-            String[] parts = filename.split("\\.");
-            String extension = null; 
-            if (parts != null) {
+            if (filename == null) {
+                r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
+                
+            } else {
+                String[] parts = filename.split("\\.");
+                String extension = null;
                 if (parts.length != 0) {
-                    extension = parts[parts.length-1];
+                    extension = parts[parts.length - 1];
                 }
+                //System.out.println(extension);
+                if (extension != null) {
+                    //System.out.println(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
+                    r.setMimeType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
+                }
+                r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+                r.setVisibleInDownloadsUi(true);
+                r.allowScanningByMediaScanner();
+    
+                r.setTitle(filename);
+                r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             }
-            //System.out.println(extension);
-            if (extension != null)
-            {
-                //System.out.println(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
-                r.setMimeType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
-            }
-            r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
-            r.setVisibleInDownloadsUi(true);
-            r.allowScanningByMediaScanner();
-
-            r.setTitle(filename);
-            r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            
-            java.io.File f = new java.io.File("/"+Environment.DIRECTORY_DOWNLOADS+"/"+filename);
-            //System.out.println(f.toString());
-            if (f.exists()) {
-                // TODO show a dialog to ask if the file should be deleted
-                //f.delete();
-            }
-            
             
             boolean authed = false;
 
@@ -358,6 +356,7 @@ public class API
             edit.putString(PASSWORD_KEY,password);
         }
         
+        //edit.putString(USER_FOLDER_KEY,folder_id);
         
         edit.apply();
     }
@@ -393,6 +392,25 @@ public class API
             api.auth_method = Settings.AUTHENTICATION_BASIC;
         }
         
+        /*
+        api.folder_id = prefs.getString(USER_FOLDER_KEY,null);
+        if (api.folder_id == null) {
+            api.folder_id = ""; // to indicate loading is in progress
+            api.save(prefs);
+            api.user.userFolder(api.userID).enqueue(new Callback<StudipFolder>()
+            {
+                @Override
+                public void onResponse(@NotNull Call<StudipFolder> call, @NotNull Response<StudipFolder> response) {
+                    StudipFolder f = response.body();
+                    if (f != null && f.id != null && ! f.id.equals("")) {
+                        api.folder_id = f.id;
+                    }
+                }
+                @Override
+                public void onFailure(@NotNull Call<StudipFolder> call, @NotNull Throwable t) {}
+            });
+        }
+        */
         
         // To test if authentication is used on foreign websites, but there should not be calls able to be made to foreign websites anyways
         /*
