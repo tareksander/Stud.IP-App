@@ -299,6 +299,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         
         API api = APIProvider.getAPI(this);
         if (api != null) {
+            // TODO integrate the studip notification settings
+            
+            
             
             
             

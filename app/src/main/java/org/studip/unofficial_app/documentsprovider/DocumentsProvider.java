@@ -802,7 +802,7 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
         DocumentRoot[] roots = docs.documents().getRoots();
         for (DocumentRoot r : roots) {
             if (r.parentID.equals(rootId)) {
-                SortedMap<Long,StudipFolder.FileRef> list = new TreeMap<>();
+                SortedMap<Long,StudipFolder.FileRef> list = new TreeMap<>((o1, o2) -> (int) -(o1-o2));
                 recentsRecursive(r.folderID, list, api);
                 for (Map.Entry<Long,StudipFolder.FileRef> e : list.entrySet()) {
                     addFileToCursor(result.newRow(), e.getValue(), false, api);

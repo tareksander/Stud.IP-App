@@ -94,12 +94,14 @@ Zum Anmelden müssen Sie dann Ihren Stud.IP-Server auswählen.<br>
 Sie können schauen, ob Ihr Server in der Liste ist (scrollen ist möglich), oder sie geben im Eingabefeld selbst den Hostnamen (ohne https://) ein.<br>
 Dann müssen Sie Ihren Benutzernamen und Ihr Passwort eingeben.<br>
 <br><br>
-<h2>2. Generell</h2>
+<h2>2. Generelles und Einstellungen</h2>
 Alle Dialoge und Bildschirme können mit einem nach unten Ziehen dazu gebracht werden, aktuelle Daten vom Server zu beziehen.<br>
 Bis auf die Dateien sind alle Daten auf dem Gerät zwischengespeichert und können auch ohne Netzwerkverbindung angeschaut werden.<br>
 Die Dateien müssen jeweils explizit heruntergeladen werden, um Datenvolumen zu sparen.<br>
-(noch nicht implementiert) Der Benachrichtigungs-Service aktualisiert auch periodisch die Daten und gibt dann Benachrichtigungen falls gewünscht.
-<br>Periode and Anderes kann in den Einstellungen angepasst werden.<br><br>
+Der Benachrichtigungs-Service aktualisiert auch periodisch die Daten und gibt dann Benachrichtigungen falls gewünscht.
+<br>Periode and Anderes kann in den Einstellungen angepasst werden.<br>
+Mit dem Document Provider können Sie auf die Stud.IP-Dateien zugreifen, wie auf alle anderen Dateien auf Ihrem Gerät.<br>
+Nachdem Sie sich angemeldet und Ihre Kurse abgerufen haben, können sie in den Einstellungen festlegen, welche Kurse so bereitgestellt werden sollen.<br><br>
 
 <h2>3. Startbildschirm</h2>
 Auf diesem Bildschirm wird Ihr Name, wie er in dem Stud.IP-System steht, angezeigt, und dazu die globalen Ankündigungen des Systems.<br><br>
