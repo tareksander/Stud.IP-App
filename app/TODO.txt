@@ -3,6 +3,18 @@
     https://f-droid.org/wiki/page/Category:Apps_with_failing_builds
     
     
+    
+    Release checklist:
+    - VersionName and VersionCode changed?
+    - fastlane descriptions updated?
+    - release tested?
+    - removed debug output?
+    
+    
+    
+    
+    
+    
 TODO: replace ListViews with RecyclerViews: LayoutManager: LinearLayoutManager, Scrollbar: Vertical
     
     
