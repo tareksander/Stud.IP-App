@@ -31,7 +31,7 @@ public class ServerSelectActivity extends AppCompatActivity
         
         
         
-        API api = APIProvider.loadAPI(this);
+        API api = APIProvider.getAPI(this);
         if (api != null) {
             //System.out.println("api found");
             toLoginActivity();

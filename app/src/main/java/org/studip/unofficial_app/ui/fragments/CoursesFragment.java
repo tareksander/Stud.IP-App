@@ -27,7 +27,9 @@ import org.studip.unofficial_app.model.room.DB;
 import org.studip.unofficial_app.model.viewmodels.CoursesViewModel;
 import org.studip.unofficial_app.model.viewmodels.HomeActivityViewModel;
 import org.studip.unofficial_app.ui.HomeActivity;
+import org.studip.unofficial_app.ui.fragments.dialog.CourseForumDialogFragment;
 import org.studip.unofficial_app.ui.fragments.dialog.CourseNewsDialogFragment;
+import org.studip.unofficial_app.ui.plugins.fragments.dialog.CourseOpencastDialog;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
@@ -184,6 +186,20 @@ public class CoursesFragment extends SwipeRefreshFragment
                 CourseNewsDialogFragment news = new CourseNewsDialogFragment();
                 news.setArguments(args);
                 news.show(getParentFragmentManager(),"course_news");
+            });
+            b.courseForum.setOnClickListener(v1 -> {
+                Bundle args = new Bundle();
+                args.putString("cid",c.course_id);
+                CourseForumDialogFragment forum = new CourseForumDialogFragment();
+                forum.setArguments(args);
+                forum.show(getParentFragmentManager(),"course_forum");
+            });
+            b.courseOpencast.setOnClickListener(v1 -> {
+                Bundle args = new Bundle();
+                args.putString("cid",c.course_id);
+                CourseOpencastDialog opencast = new CourseOpencastDialog();
+                opencast.setArguments(args);
+                opencast.show(getParentFragmentManager(),"course_opencast");
             });
             return v;
         }

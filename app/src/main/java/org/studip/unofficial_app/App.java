@@ -5,6 +5,10 @@ import android.util.Log;
 
 import androidx.security.crypto.EncryptedSharedPreferences;
 
+import com.squareup.picasso.Picasso;
+
+import org.studip.unofficial_app.api.rest.StudipNotifications;
+import org.studip.unofficial_app.model.Notifications;
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.ui.CrashActivity;
 
@@ -38,5 +42,7 @@ public class App extends Application
             }
             System.exit(0);
         });
+        // for API 26+
+        Notifications.initChannels(this);
     }
 }

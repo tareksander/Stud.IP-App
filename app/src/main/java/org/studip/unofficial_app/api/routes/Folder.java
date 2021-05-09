@@ -10,6 +10,7 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -21,9 +22,17 @@ public interface Folder
     @GET("api.php/folder/{fid}")
     Call<StudipFolder> get(@Path("fid") String folderID);
     
-    // TODO api.php/folder/{fid}  PUT
+    @FormUrlEncoded
+    @PUT("api.php/folder/{fid}")
+    Call<StudipFolder> put(@Path("fid") String folderID, @Field("name") String name, @Field("description") String description);
+    
 
-
+    @POST("api.php/folder/{source}/copy/{destination}")
+    Call<StudipFolder> copy(@Path("source") String source, @Path("destination") String destination);
+    
+    @POST("api.php/folder/{source}/move/{destination}")
+    Call<StudipFolder> move(@Path("source") String source, @Path("destination") String destination);
+    
     @GET("api.php/folder/{fid}/files")
     Call<StudipCollection<StudipFolder.FileRef>> getFiles(@Path("fid") String folderID, @Query("offset") int offset, @Query("limit") int limit);
 

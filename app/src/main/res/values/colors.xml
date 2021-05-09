@@ -13,4 +13,8 @@
     <color name="studip_light_darkmode">#899ab9</color>
     <color name="background_darkmode">#222222</color>
     <color name="list_divider">#EFEFEF</color>
+    
+    <color name="icon_blue">#24437c</color>
+    <color name="icon_gray">#6e6e6e</color>
+    
 </resources>

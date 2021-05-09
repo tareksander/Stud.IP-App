@@ -7,28 +7,41 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Streaming;
 
 public interface File
 {
+    @GET("api.php/file/{fid}")
+    Call<StudipFolder.FileRef> get(@Path("fid") String fileID);
     
     
+    @FormUrlEncoded
+    @PUT("api.php/file/{fid}")
+    Call<Void> put(@Path("fid") String fileID, @Field("name") String name, @Field("description") String description);
     
     
-    // TODO api.php/file/{fid}  GET + DELETE + PUT
     
     @DELETE("api.php/file/{fid}")
     Call<Void> delete(@Path("fid") String fileID);
     
     
+    @POST("api.php/file/{fid}/copy/{folder}")
+    Call<StudipFolder.FileRef> copy(@Path("fid") String fileID, @Path("folder") String folderID);
+    
+    @POST("api.php/file/{fid}/move/{folder}")
+    Call<StudipFolder.FileRef> move(@Path("fid") String fileID, @Path("folder") String folderID);
     
     
-    // TODO api.php/file/{fid}/copy/{folder}  POST
-    
+    // WARNING: @Streaming makes it return instantly, and the ResponseBody stream cannot be used on the main thread
+    @Streaming
     @GET("api.php/file/{fid}/download")
     Call<ResponseBody> download(@Path("fid") String fileID);
 

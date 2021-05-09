@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @Entity(tableName = "forum_entries")
-public class StudipForumEntry implements Serializable
+public class StudipForumEntry implements Serializable, Comparable<StudipForumEntry>
 {
     @NonNull
     @PrimaryKey
@@ -65,5 +65,14 @@ public class StudipForumEntry implements Serializable
     {
         int result = Objects.hash(topic_id, mkdate, chdate, anonymous, depth, subject, user, course, content_html, content);
         return result;
+    }
+    
+    @Override
+    public int compareTo(StudipForumEntry o) {
+        try {
+            return (Integer.parseInt(mkdate) - Integer.parseInt(o.mkdate))*-1;
+        } catch (NumberFormatException ignored) {
+            return 0;
+        }
     }
 }

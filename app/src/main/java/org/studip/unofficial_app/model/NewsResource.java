@@ -32,7 +32,7 @@ public class NewsResource extends NetworkResource<List<StudipNews>>
     @Override
     protected Call<StudipCollection<StudipNews>> getCall(Context c)
     {
-        System.out.println("refeshing news");
+        //System.out.println("refeshing news");
         if (cid == null)
         {
             return APIProvider.getAPI(c).studip.news(0, 1000);

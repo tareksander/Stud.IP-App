@@ -1,19 +1,4 @@
-TODO:
-    rework the api to also get session cookies on login, to use in VideoViews and WebViews
-    finish the option to only save a session cookie, so the password doesn't have to be stored and make it the default method
-    let logout send a logout request to the server with the cookie
-    add a method to try to force loading content from the server, for swipe-to-refresh
-    add a settings button to delete all the cached data, in case the caching somehow breaks
-    make another service/Job to periodically update the database or parts of it, depending on the battery state, airplane mode, data saving setting, and settings:
-    store the Work-tag if the work is started and don't re-start it if it is still registered
-    https://developer.android.com/topic/libraries/architecture/workmanager
-    https://developer.android.com/reference/android/app/AlarmManager
-    
-TODO: caching
-    cache the Data using Room
-    put the database in the cache directory, so the OS can remove it if there isn't enough storage
-    
-    
+
     to check if the build on f-droid worked: https://f-droid.org/wiki/page/Main_Page
     https://f-droid.org/wiki/page/Category:Apps_with_failing_builds
     
@@ -21,8 +6,6 @@ TODO: caching
 TODO: replace ListViews with RecyclerViews: LayoutManager: LinearLayoutManager, Scrollbar: Vertical
     
     
-    
-TODO: for getting the mail users, use a UniqueWork that gets activated of a user cannot be found. That work then gets the list of mails, and fetches the users
     
     
 TODO
@@ -39,6 +22,38 @@ TODO: delete data which is not in a server response, but still in the database.
 TODO: supply database migrations for every database change once the app is on f-droid
     
     
+TODO: open issue with predefined content: https://docs.github.com/en/github/managing-your-work-on-github/about-automation-for-issues-and-pull-requests-with-query-parameters
+    
+    
+    It seems like there is a bug that prevents you from posting on the Forum via the API. Use the dispatch route instead?
+    
+    
+    opencast plugin: https://github.com/elan-ev/studip-opencast-plugin
+    License: GPLv2 or later
+    
+    
+TODO: add the option to not load opencast previews when on mobile data
+    
+   
+    
+    
+TODO: use ACTION_CREATE_DOCUMENT do eliminate the storage permission altogether?
+    
+    
+Document provider:
+    https://developer.android.com/guide/topics/providers/create-document-provider
+    https://medium.com/androiddevelopers/building-a-documentsprovider-f7f2fb38e86a
+    Add a setting to load image previews from the provider always/only wifi/never
+    
+    
+TODO:
+    add the studip notification settings to the settings screen, so you can control from the app what notifications you get.
+    add a SwitchCompat for every course with files, to include it in the documents provider
+    
+    
+TODO: intent filter for sending a message to someone
+
+
     
     For the notification service:
     Notifications work over this api with the session cookie: /dispatch.php/jsupdater/get
@@ -75,6 +90,12 @@ TODO: supply database migrations for every database change once the app is on f-
     
     use DownloadManager for downloads and add the session cookie to authenticate it:
     https://developer.android.com/reference/android/app/DownloadManager.Request
+    
+    
+TODO: JSONAPI: https://jsonapi.org/format
+    getting only specific fields to save mobilde data: https://jsonapi.org/format/#fetching-sparse-fieldsets
+    
+    
     
     
 

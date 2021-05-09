@@ -4,17 +4,24 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.lifecycle.Transformations;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.work.WorkManager;
 
@@ -22,17 +29,53 @@ import androidx.work.WorkManager;
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.databinding.ActivitySettingsBinding;
+import org.studip.unofficial_app.documentsprovider.DocumentRoot;
+import org.studip.unofficial_app.documentsprovider.DocumentsDB;
+import org.studip.unofficial_app.documentsprovider.DocumentsDBProvider;
+import org.studip.unofficial_app.documentsprovider.DocumentsProvider;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.NotificationWorker;
 import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
-
+    public static int ProgressToPriority(int progress) {
+        switch (progress) {
+            case 0:
+                return NotificationCompat.PRIORITY_MIN;
+            case 1:
+                return NotificationCompat.PRIORITY_LOW;
+            case 2:
+            default:
+                return NotificationCompat.PRIORITY_DEFAULT;
+            case 3:
+                return NotificationCompat.PRIORITY_HIGH;
+        }
+    }
+    
+    public static int PriorityToProgress(int priority) {
+        switch (priority) {
+            case NotificationCompat.PRIORITY_MIN:
+                return 0;
+            case NotificationCompat.PRIORITY_LOW:
+                return 1;
+            case NotificationCompat.PRIORITY_DEFAULT:
+            default:
+                return 2;
+            case NotificationCompat.PRIORITY_HIGH:
+                return 3;
+        }
+    }
+    
     private SharedPreferences sharedPreferences;
     private Settings settings;
     private ActivitySettingsBinding binding;
@@ -42,6 +85,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             return true; });
     }
     
+    @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -109,7 +153,161 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         {
             s.setEnabled(false);
         }
+        
+        
+        switch (settings.notification_visibility) {
+            case NotificationCompat.VISIBILITY_PUBLIC:
+                binding.notificationVisibilityGroup.check(R.id.notification_public);
+                break;
+            case NotificationCompat.VISIBILITY_PRIVATE:
+                binding.notificationVisibilityGroup.check(R.id.notification_private);
+                break;
+            default:
+            case NotificationCompat.VISIBILITY_SECRET:
+                binding.notificationVisibilityGroup.check(R.id.notification_secret);
+        }
+        
+        
+        if (Build.VERSION.SDK_INT >= 26) {
+            binding.settingsNotificationLayout.setVisibility(View.GONE);
+            binding.settingsAppSettings.setVisibility(View.GONE);
+            binding.settingsNotificationChannels.setOnClickListener(vq -> {
+                Intent i = new Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                // maybe
+                //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE,getPackageName());
+                startActivity(i);
+            });
+            
+        } else {
+            binding.settingsNotificationLayout.setVisibility(View.VISIBLE);
+            binding.settingsNotificationChannels.setVisibility(View.GONE);
+            binding.settingsAppSettings.setOnClickListener(v1 -> {
+                Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                // maybe
+                //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.setData(Uri.parse("package:"+getPackageName()));
+                startActivity(i);
+            });
+            
+            binding.priorityForum.setProgress(PriorityToProgress(settings.forum_priority));
+            binding.priorityFiles.setProgress(PriorityToProgress(settings.files_priority));
+            binding.priorityMessages.setProgress(PriorityToProgress(settings.messages_priority));
+            binding.priorityOther.setProgress(PriorityToProgress(settings.other_priority));
+    
+            binding.priorityForum.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+            {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    settings.forum_priority = ProgressToPriority(progress);
+                }
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {}
+            });
+            binding.priorityFiles.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+            {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    settings.files_priority = ProgressToPriority(progress);
+                }
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {}
+            });
+            binding.priorityMessages.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+            {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    System.out.println(progress);
+                    settings.messages_priority = ProgressToPriority(progress);
+                }
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {}
+            });
+            binding.priorityOther.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+            {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    settings.other_priority = ProgressToPriority(progress);
+                }
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {}
+            });
+            
+        }
+        
+        binding.notificationServiceEnabled.setOnClickListener(this::onNotificationServiceClicked);
+        
         s.setOnItemSelectedListener(this);
+        
+        
+        binding.enableDocumentsProvider.setChecked(settings.documents_provider);
+        binding.enableDocumentsProvider.setOnClickListener(v1 -> {
+                settings.documents_provider = binding.enableDocumentsProvider.isChecked();
+                getContentResolver().notifyChange(DocumentsContract.buildRootsUri(DocumentsProvider.AUTHORITIES), null);
+        });
+    
+        binding.enableDocThumbnails.setChecked(settings.documents_thumbnails);
+        binding.enableDocSearch.setChecked(settings.documents_search);
+        binding.enableDocRecents.setChecked(settings.documents_recents);
+        
+        binding.enableDocThumbnails.setOnClickListener(v1 -> {
+            settings.documents_thumbnails = binding.enableDocThumbnails.isChecked();
+            getContentResolver().notifyChange(DocumentsContract.buildRootsUri(DocumentsProvider.AUTHORITIES), null);
+        });
+        binding.enableDocSearch.setOnClickListener(v1 -> {
+            settings.documents_search = binding.enableDocSearch.isChecked();
+            getContentResolver().notifyChange(DocumentsContract.buildRootsUri(DocumentsProvider.AUTHORITIES), null);
+        });
+        binding.enableDocRecents.setOnClickListener(v1 -> {
+            settings.documents_recents = binding.enableDocRecents.isChecked();
+            getContentResolver().notifyChange(DocumentsContract.buildRootsUri(DocumentsProvider.AUTHORITIES), null);
+        });
+        
+        
+        DocumentsDB docs = DocumentsDBProvider.getDB(this);
+    
+        Transformations.distinctUntilChanged(docs.documents().observeRoots()).observe(this, roots -> {
+            binding.documentsProviderCourses.removeAllViews();
+            Arrays.sort(roots);
+            for (DocumentRoot r : roots) {
+                if (r.user) {
+                    continue;
+                }
+                SwitchCompat c = new SwitchCompat(this);
+                c.setChecked(r.enabled);
+                c.setText(r.title);
+                c.setOnClickListener(v1 -> {
+                    r.enabled = c.isChecked();
+                    docs.documents().updateInsertAsync(r).subscribeOn(Schedulers.io()).subscribe();
+                });
+                binding.documentsProviderCourses.addView(c);
+            }
+        });
+        
+        
+        
+        
+        
+        
+        API api = APIProvider.getAPI(this);
+        if (api != null) {
+            // TODO integrate the studip notification settings
+            
+            
+            
+            
+            
+        }
+        
+        
     }
 
 
@@ -123,6 +321,18 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     public void onHelpClicked(View v) {
         Intent i = new Intent(this,HelpActivity.class);
         startActivity(i);
+    }
+    
+    public void onVisibilityClicked(View v) {
+        if (v.equals(binding.notificationPublic)) {
+            settings.notification_visibility = NotificationCompat.VISIBILITY_PUBLIC;
+        }
+        if (v.equals(binding.notificationPrivate)) {
+            settings.notification_visibility = NotificationCompat.VISIBILITY_PRIVATE;
+        }
+        if (v.equals(binding.notificationSecret)) {
+            settings.notification_visibility = NotificationCompat.VISIBILITY_SECRET;
+        }
     }
     
     public void onThemeClicked(View v)
@@ -207,6 +417,10 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         //System.out.println("logout");
         settings.logout = true;
         settings.safe(SettingsProvider.getSettingsPreferences(this));
+    
+        NotificationManagerCompat m = NotificationManagerCompat.from(this);
+        m.cancelAll();
+        
         Intent i = new Intent(this,HomeActivity.class);
         startActivity(i);
         System.exit(0);
@@ -231,8 +445,10 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
         Spinner s = (Spinner) parent;
-        settings.notification_period = (Integer) s.getAdapter().getItem(position);
-        NotificationWorker.enqueue(this);
+        if (((Integer) s.getAdapter().getItem(position)) != settings.notification_period) {
+            settings.notification_period = (Integer) s.getAdapter().getItem(position);
+            NotificationWorker.enqueue(this);
+        }
     }
 
     @Override
