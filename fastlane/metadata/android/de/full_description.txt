@@ -1,9 +1,10 @@
 Zum Benutzen muss das API des Systems angeschaltet sein.
 
-Ist noch in der Entwicklung und gerade in einem rewrite.
-Vor dem rewrite konnte die App Kurse abrufen, Foren anzeigen,
-eigene Dateien und Dateien von Kursen downloaden und uploaden, Nachrichten lesen und schreiben, Ankündigungen des Systems und von Kursen anzeigen.
-Allerdings gab es auch einige Fehler, die ohne einen rewrite schwer zu beheben sind und es war nicht einfach daran weiterzuarbeiten.
+Es können Ankündigungen des Systems gelesen werden, Kurse angeschaut werden,
+eigene Dateien und die von Kursen angeschaut, heruntergeladen und hochgeladen werden,
+Nachrichten gelesen und geschrieben werden, Forenbeiträge gelesen und geschrieben werden.
+Opencast-Videos können auch angeschaut werden.
+Mit dem document provider kann man auf die Dateien auf Stud.IP wie auf ganz normale Dateien auf dem Gerät zugreifen.
 
 Für Hilfe: Einstellungen->Hilfe anzeigen
 
