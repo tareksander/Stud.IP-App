@@ -304,7 +304,7 @@ public class API
                     user.updateInsertAsync(response.body()).timeout(10,TimeUnit.SECONDS).subscribeOn(Schedulers.io()).subscribe(() -> {
                         d.postValue(code);
                         if (! same) { // if using another account, delete all present data
-                            System.out.println("another account used");
+                            //System.out.println("another account used");
                             Settings settings = SettingsProvider.getSettings(appcon);
                             settings.logout = true;
                             settings.safe(SettingsProvider.getSettingsPreferences(appcon));

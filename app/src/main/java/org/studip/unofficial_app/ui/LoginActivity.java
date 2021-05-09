@@ -91,7 +91,7 @@ public class LoginActivity extends AppCompatActivity
                         finish();
                         APIProvider.getAPI(c).save(APIProvider.getPrefs(c));
                         login_running = false;
-                        System.out.println("logged in");
+                        //System.out.println("logged in");
                         l.removeObservers(c);
                     }
                     else
