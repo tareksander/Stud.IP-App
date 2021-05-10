@@ -45,10 +45,6 @@ import org.studip.unofficial_app.ui.fragments.MessageFragment;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.reactivex.MaybeObserver;
-import io.reactivex.Scheduler;
-import io.reactivex.schedulers.Schedulers;
-
 public class HomeActivity extends AppCompatActivity
 {
     public static final Pattern courseFilesPattern = Pattern.compile("/dispatch\\.php/course/files?(/index)\\?cid=(\\p{Alnum}+)$");

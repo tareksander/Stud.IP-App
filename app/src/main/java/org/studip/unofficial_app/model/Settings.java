@@ -2,14 +2,11 @@ package org.studip.unofficial_app.model;
 
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
 import android.content.SharedPreferences;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.NotificationCompat;
 import androidx.security.crypto.EncryptedSharedPreferences;
-
-import org.studip.unofficial_app.api.rest.StudipNotifications;
 
 public class Settings
 {

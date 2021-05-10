@@ -3,8 +3,6 @@ package org.studip.unofficial_app.model;
 import android.content.Context;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.Observer;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -14,7 +12,6 @@ import org.studip.unofficial_app.api.rest.StudipCourse;
 import org.studip.unofficial_app.model.room.DB;
 
 import java.util.Map;
-import java.util.Objects;
 
 import retrofit2.Call;
 

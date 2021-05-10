@@ -2,7 +2,6 @@ package org.studip.unofficial_app.ui.fragments.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.icu.util.MeasureUnit;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.widget.TextView;
@@ -10,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.studip.unofficial_app.api.rest.StudipMessage;

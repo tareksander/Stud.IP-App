@@ -1,18 +1,18 @@
 package org.studip.unofficial_app.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.security.crypto.EncryptedSharedPreferences;
-
-import org.studip.unofficial_app.App;
-import org.studip.unofficial_app.databinding.ActivityCrashBinding;
-import org.studip.unofficial_app.model.SettingsProvider;
-
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.security.crypto.EncryptedSharedPreferences;
+
+import org.studip.unofficial_app.App;
+import org.studip.unofficial_app.databinding.ActivityCrashBinding;
+import org.studip.unofficial_app.model.SettingsProvider;
 
 import java.util.Date;
 

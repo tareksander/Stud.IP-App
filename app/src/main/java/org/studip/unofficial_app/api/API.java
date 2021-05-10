@@ -16,7 +16,6 @@ import androidx.security.crypto.EncryptedSharedPreferences;
 
 import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.api.plugins.opencast.Opencast;
-import org.studip.unofficial_app.api.rest.StudipFolder;
 import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.api.routes.Course;
 import org.studip.unofficial_app.api.routes.Discovery;
@@ -41,7 +40,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Cookie;

@@ -4,9 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
@@ -37,17 +32,13 @@ import org.studip.unofficial_app.api.rest.StudipForumEntry;
 import org.studip.unofficial_app.api.rest.StudipForumEntryWithChildren;
 import org.studip.unofficial_app.databinding.DialogForumBinding;
 import org.studip.unofficial_app.model.APIProvider;
-import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.ForumResource;
 import org.studip.unofficial_app.model.viewmodels.ForumViewModel;
 import org.studip.unofficial_app.model.viewmodels.StringViewModelFactory;
 import org.studip.unofficial_app.ui.HomeActivity;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.SortedSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

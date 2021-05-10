@@ -1,5 +1,7 @@
 package org.studip.unofficial_app.model;
+
 import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -9,10 +11,6 @@ import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.api.rest.StudipMessage;
 import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.model.room.DB;
-
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.LinkedList;
 
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;

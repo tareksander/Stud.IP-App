@@ -1,11 +1,15 @@
 package org.studip.unofficial_app.model;
 
 import android.content.Context;
+
 import androidx.lifecycle.LiveData;
+
 import org.studip.unofficial_app.api.rest.StudipCollection;
 import org.studip.unofficial_app.api.rest.StudipMessage;
 import org.studip.unofficial_app.model.room.DB;
+
 import java.util.Map;
+
 import retrofit2.Call;
 
 public class MessagesResource extends NetworkResource<StudipMessage[]>

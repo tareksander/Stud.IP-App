@@ -27,8 +27,6 @@ import org.studip.unofficial_app.databinding.DialogOpencastEntryBinding;
 import org.studip.unofficial_app.model.viewmodels.OpencastViewModel;
 import org.studip.unofficial_app.model.viewmodels.StringViewModelFactory;
 
-import java.net.URI;
-
 public class CourseOpencastDialog  extends DialogFragment
 {
     public static final String COURSE_ID_KEY = "cid";

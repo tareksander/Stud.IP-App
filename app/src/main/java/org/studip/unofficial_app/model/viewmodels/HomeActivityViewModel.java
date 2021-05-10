@@ -6,7 +6,6 @@ import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
 
 import org.studip.unofficial_app.api.rest.StudipCourse;
-import org.studip.unofficial_app.ui.HomeActivity;
 
 public class HomeActivityViewModel extends ViewModel
 {

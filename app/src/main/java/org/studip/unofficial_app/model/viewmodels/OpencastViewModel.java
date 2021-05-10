@@ -8,11 +8,9 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
 import org.studip.unofficial_app.api.plugins.opencast.OpencastVideo;
 import org.studip.unofficial_app.model.APIProvider;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 public class OpencastViewModel extends AndroidViewModel
 {

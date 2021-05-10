@@ -17,7 +17,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -86,6 +85,8 @@ public class FileFragment extends SwipeRefreshFragment
         m.get().observe(getViewLifecycleOwner(), folder -> {
             if (folder != null)
             {
+                System.out.println(folder.subfolders);
+                System.out.println(folder.file_refs);
                 ad.clear();
                 ad.addAll((Object[]) folder.subfolders);
                 ad.addAll((Object[]) folder.file_refs);

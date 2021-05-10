@@ -12,9 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.fragment.NavHostFragment;
 
 import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.R;
@@ -32,8 +30,6 @@ import org.studip.unofficial_app.ui.fragments.dialog.CourseNewsDialogFragment;
 import org.studip.unofficial_app.ui.plugins.fragments.dialog.CourseOpencastDialog;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class CoursesFragment extends SwipeRefreshFragment
 {

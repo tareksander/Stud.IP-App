@@ -1,10 +1,11 @@
 package org.studip.unofficial_app.model.viewmodels;
 
 import android.app.Application;
-import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+
 import java.lang.reflect.InvocationTargetException;
 
 public class StringViewModelFactory implements ViewModelProvider.Factory

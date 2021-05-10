@@ -1,13 +1,12 @@
 package org.studip.unofficial_app.model;
 
 import android.content.Context;
+
 import androidx.lifecycle.LiveData;
+
 import org.studip.unofficial_app.api.rest.StudipCollection;
 import org.studip.unofficial_app.api.rest.StudipSemester;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import retrofit2.Call;
 
 public class SemesterResource extends NetworkResource<StudipSemester[]>{

@@ -1,4 +1,5 @@
 package org.studip.unofficial_app.model.room;
+
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Query;
@@ -10,9 +11,6 @@ import org.studip.unofficial_app.api.rest.StudipForumCategory;
 import org.studip.unofficial_app.api.rest.StudipNews;
 
 import java.util.List;
-
-import io.reactivex.Maybe;
-import io.reactivex.Single;
 
 @Dao
 public interface CourseDao extends BasicDao<StudipCourse>

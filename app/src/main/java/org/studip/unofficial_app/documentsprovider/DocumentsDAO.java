@@ -1,9 +1,11 @@
 package org.studip.unofficial_app.documentsprovider;
+
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Query;
+
 import org.studip.unofficial_app.model.room.BasicDao;
-import io.reactivex.Maybe;
+
 import io.reactivex.Single;
 
 @Dao

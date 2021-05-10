@@ -3,7 +3,9 @@ package org.studip.unofficial_app.model.room;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Query;
+
 import org.studip.unofficial_app.api.rest.StudipUser;
+
 import io.reactivex.Single;
 
 @Dao

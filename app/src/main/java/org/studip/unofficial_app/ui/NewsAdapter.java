@@ -1,16 +1,18 @@
 package org.studip.unofficial_app.ui;
 
-import org.studip.unofficial_app.R;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.rest.StudipNews;
 
 public class NewsAdapter extends ArrayAdapter

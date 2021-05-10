@@ -1,8 +1,6 @@
 package org.studip.unofficial_app.model;
 
-import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;

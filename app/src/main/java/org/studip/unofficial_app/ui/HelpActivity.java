@@ -1,10 +1,13 @@
 package org.studip.unofficial_app.ui;
-import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.studip.unofficial_app.R;
 public class HelpActivity extends AppCompatActivity
 {

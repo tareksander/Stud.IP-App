@@ -1,9 +1,7 @@
 package org.studip.unofficial_app.api.routes;
 
 import org.studip.unofficial_app.api.rest.StudipFolder;
-import org.studip.unofficial_app.api.rest.StudipMessage;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.DELETE;
 import retrofit2.http.Field;

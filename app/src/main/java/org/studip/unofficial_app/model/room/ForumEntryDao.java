@@ -1,4 +1,5 @@
 package org.studip.unofficial_app.model.room;
+
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Query;
@@ -6,8 +7,6 @@ import androidx.room.Transaction;
 
 import org.studip.unofficial_app.api.rest.StudipForumEntry;
 import org.studip.unofficial_app.api.rest.StudipForumEntryWithChildren;
-
-import java.util.List;
 
 @Dao
 public abstract class ForumEntryDao implements BasicDao<StudipForumEntry>

@@ -1,9 +1,10 @@
 package org.studip.unofficial_app.model.room;
+
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Query;
+
 import org.studip.unofficial_app.api.rest.StudipSemester;
-import org.studip.unofficial_app.model.room.BasicDao;
 @Dao
 public interface SemesterDao extends BasicDao<StudipSemester>
 {

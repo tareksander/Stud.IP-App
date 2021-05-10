@@ -25,7 +25,6 @@ import androidx.lifecycle.Transformations;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.work.WorkManager;
 
-
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.databinding.ActivitySettingsBinding;
@@ -42,8 +41,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener

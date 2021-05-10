@@ -1,8 +1,11 @@
 package org.studip.unofficial_app.model;
+
 import android.content.Context;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Matcher;

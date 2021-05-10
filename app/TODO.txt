@@ -13,7 +13,6 @@
     Roadmap:
         0.4.0:
             - Courseware plugin, play opencast videos linked in courseware
-            - repair code and resource shrinking
         0.5.0:
             - meetings plugin
                 - use android:keepScreenOn in the layout
@@ -32,10 +31,17 @@
         1.1.0:
             - add support for JSONAPI (probably requires abstracting away the api routes a bit more)
                 - use JSONAPI if possible
+            - make more specific rules for proguard, so unused code can be removed
+        1.2.0:
+            - plugins:
+                - vips
+                - etherpad
+            
         
         
-                
-    
+    reduce size:
+    https://developer.android.com/topic/performance/reduce-apk-size
+    https://medium.com/@kevalpatel2106/how-you-can-decrease-application-size-by-60-in-only-5-minutes-47eff3e7874e
     
     
     
@@ -49,7 +55,6 @@ TODO
     maybe use Html.fromHtml for messages?
     
     
-TODO: translate help text
     
     
 TODO: delete data which is not in a server response, but still in the database.
@@ -116,27 +121,13 @@ TODO: intent filter for sending a message to someone
     after logging in, check for available API-routes and tell the user if features aren't available because the provider disabled the API route
     add a settings button to re-perform the check, so the user doesn't have to log out if an API-route is enabled
     
-    rework the communication with the API with a library:
-    https://github.com/square/retrofit
-    https://stackoverflow.com/questions/23879567/how-to-prevent-retrofit-from-clearing-my-cookies
-    https://medium.com/@dileepsattawan/how-to-handle-cookies-with-retrofit-in-android-8b1812178949
-    https://stackoverflow.com/questions/38418809/add-cookies-to-retrofit-2-request/44694428
     
-    instead of playing the videos in the app itself, make a content provider and share a URI to access the video to a video player app
-    
-    use DownloadManager for downloads and add the session cookie to authenticate it:
-    https://developer.android.com/reference/android/app/DownloadManager.Request
     
     
 TODO: JSONAPI: https://jsonapi.org/format
     getting only specific fields to save mobilde data: https://jsonapi.org/format/#fetching-sparse-fieldsets
     
     
-    
-    
-
-split up the dialog into DialogFragments, this preserves them during a configuration change and they can be split up into their own files:
-https://developer.android.com/guide/fragments/dialogs
 
 battery saving:
 https://developer.android.com/training/efficient-downloads/regular_updates
@@ -150,7 +141,6 @@ A one-time-password is generated and the user has to enter it on the app of the 
 A key is derived from this password and all data encrypted with it.
 https://developer.android.com/guide/topics/connectivity/bluetooth
 
-TODO Use a ViewModel to fix the configuration change bugs once and for all
 
 IMPORTANT: If LiveData changes while an activity is in the stopped state and then returns to resumed, does it get the update?
 https://developer.android.com/topic/libraries/architecture/livedata
@@ -170,30 +160,12 @@ https://developer.android.com/guide/topics/appwidgets#fresh
 https://developer.android.com/guide/topics/graphics/drawables#nine-patch
 
 
-
-
-    TODO publish on f-droid:
-        https://f-droid.org/de/docs/Repository_Style_Guide
-        https://www.f-droid.org/en/docs/Inclusion_How-To
-        Wait for publishing in the submission queue or make a merge request?
-        https://www.f-droid.org/en/docs/Submitting_to_F-Droid_Quick_Start_Guide
-        and
-        https://www.f-droid.org/en/docs/Build_Server_Setup/#optionally-using-qemukvmlibvirt-instead-of-virtualbox
-        to use qemu
-    
-    TODO app links: most Stud.IP servers have a hostname of studip.*
-    Tools->App Links Assistant
-         dynamically add a broadcast receiver which listens for the specific hostname the user is currently logged in as
-         https://developer.android.com/reference/android/content/Context#registerReceiver(android.content.BroadcastReceiver,%20android.content.IntentFilter,%20java.lang.String,%20android.os.Handler)
-         
     
     
     
 
     general:
         To make a new icon from a svg, convert it to a png with GIMP and then use it in android studio
-        The API also seems to work with session cookies, as it works with them in the browser.
-        Fix freezing while refreshing by using a handler that gets called in the UI thread after a request is done.
     
     plugins:
         plugins don't seem to have a REST api defined, probably because there wasn't an app for so long
@@ -206,18 +178,6 @@ https://developer.android.com/guide/topics/graphics/drawables#nine-patch
         courseware:
             to get the courseware html for a course: /plugins.php/courseware/courseware?cid=
             cid is the course-id
-        opencast:
-            to get the opencast html for a course: /plugins.php/opencast/course/index/false?cid=
-            cid is the course-id
-            page for the individual videos:
-            /paella/ui/watch.html?cid=&id=
-            id is the video id
-            but the video pages use a special opencast video player.
-            but the links to the actual files are in the source of the course page near the download button.
-            
-            Use a VideoView to display the video.
-            
-            enable PiP-mode when using the opencast plugin, with normal media controls
             
         meetings:
             url: /plugins.php/meetingplugin/index?cid=
@@ -225,7 +185,6 @@ https://developer.android.com/guide/topics/graphics/drawables#nine-patch
             
             TODO A WebView reloads when the parent is destroyed because of a configuration change. That would result in someone being temporarily kicked out of a meeting when the device is turned.
                  Make the meetings plugin its own activity and disable configuration changes in it.
-                ( Or try a custom tab. Maybe the invite link is enough to join a meeting.) No, the session cookie is needed
                 
                 use android:keepScreenOn in the layout of the activity
             
@@ -233,17 +192,11 @@ https://developer.android.com/guide/topics/graphics/drawables#nine-patch
             
             Enable PiP-Mode when a meeting is displayed and add custom controls to toggle audio, microphone, camera, screen share.
             
-            screen capturing for screen share: https://developer.android.com/reference/android/media/projection/MediaProjectionManager
             
         vips:
             url: /plugins.php/vipsplugin/sheets?cid=
             
-            
         
-        
-        maybe use WebViews to display the plugins? or just include a html parser library and filter out the important parts?
-        html parsing+VideoView is viable for opencast, as you just need to get the individual video URLs.
-        You can set the URI for VideoView, as well as the HTML-headers, so the cookies
         
     
     
