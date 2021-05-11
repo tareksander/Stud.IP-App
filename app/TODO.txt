@@ -13,6 +13,10 @@
     Roadmap:
         0.4.0:
             - Courseware plugin, play opencast videos linked in courseware
+            - add the studip notification settings to the settings screen, so you can control from the app what notifications you get
+            - add the option to not load opencast previews when on mobile data
+            - add the option to not load image previews when on mobile data
+                - ask for permission to query network status at runtime, always load if not granted
         0.5.0:
             - meetings plugin
                 - use android:keepScreenOn in the layout
@@ -22,6 +26,7 @@
                 - support PiP for the meetings
                 - store the WebView in a Provider, and attach and detach it as needed?
         1.0.0:
+            - delete data which is not in a server response, but still in the database
             - support for the planner
             - app widget for the planner
             - API detection:
@@ -57,9 +62,6 @@ TODO
     
     
     
-TODO: delete data which is not in a server response, but still in the database.
-    
-    
 TODO: supply database migrations for every database change once the app is on f-droid
     
     
@@ -73,7 +75,6 @@ TODO: open issue with predefined content: https://docs.github.com/en/github/mana
     License: GPLv2 or later
     
     
-TODO: add the option to not load opencast previews when on mobile data
     
    
     
@@ -89,7 +90,6 @@ Document provider:
     
 TODO:
     add the studip notification settings to the settings screen, so you can control from the app what notifications you get.
-    add a SwitchCompat for every course with files, to include it in the documents provider
     
     
 TODO: intent filter for sending a message to someone

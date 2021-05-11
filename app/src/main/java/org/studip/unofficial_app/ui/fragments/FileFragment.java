@@ -85,8 +85,8 @@ public class FileFragment extends SwipeRefreshFragment
         m.get().observe(getViewLifecycleOwner(), folder -> {
             if (folder != null)
             {
-                System.out.println(folder.subfolders);
-                System.out.println(folder.file_refs);
+                //System.out.println(folder.subfolders);
+                //System.out.println(folder.file_refs);
                 ad.clear();
                 ad.addAll((Object[]) folder.subfolders);
                 ad.addAll((Object[]) folder.file_refs);

@@ -71,8 +71,6 @@ public class CourseOpencastDialog  extends DialogFragment
         AlertDialog d = b.create();
         d.setCanceledOnTouchOutside(false);
         
-        
-        
         return d;
     }
     

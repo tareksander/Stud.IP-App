@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -28,6 +29,7 @@ import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.fragments.dialog.CourseForumDialogFragment;
 import org.studip.unofficial_app.ui.fragments.dialog.CourseNewsDialogFragment;
 import org.studip.unofficial_app.ui.plugins.fragments.dialog.CourseOpencastDialog;
+import org.studip.unofficial_app.ui.plugins.fragments.dialog.CoursewareDialog;
 
 import java.util.Arrays;
 
@@ -196,6 +198,14 @@ public class CoursesFragment extends SwipeRefreshFragment
                 CourseOpencastDialog opencast = new CourseOpencastDialog();
                 opencast.setArguments(args);
                 opencast.show(getParentFragmentManager(),"course_opencast");
+            });
+            b.courseCourseware.setOnClickListener(v1 -> {
+                Bundle args = new Bundle();
+                args.putString("cid",c.course_id);
+                CoursewareDialog courseware = new CoursewareDialog();
+                courseware.setArguments(args);
+                requireActivity().getSupportFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .add(android.R.id.content, courseware, "dialog_courseware").addToBackStack(null).commit();
             });
             return v;
         }

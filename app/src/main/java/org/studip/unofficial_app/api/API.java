@@ -15,6 +15,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.security.crypto.EncryptedSharedPreferences;
 
 import org.jetbrains.annotations.NotNull;
+import org.studip.unofficial_app.api.plugins.courseware.Courseware;
+import org.studip.unofficial_app.api.plugins.meetings.Meetings;
 import org.studip.unofficial_app.api.plugins.opencast.Opencast;
 import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.api.routes.Course;
@@ -87,9 +89,10 @@ public class API
     
     
     public final Opencast opencast;
+    public final Courseware courseware;
+    public final Meetings meetings;
     
-    
-    private final TestRoutes tests;
+    //private final TestRoutes tests;
     
     private final String hostname;
     
@@ -173,11 +176,14 @@ public class API
         message = retrofit.create(Message.class);
         studip = retrofit.create(Studip.class);
         user = retrofit.create(User.class);
-        tests = retrofit.create(TestRoutes.class);
         semester = retrofit.create(Semester.class);
         dispatch = retrofit.create(Dispatch.class);
+    
+        //tests = retrofit.create(TestRoutes.class);
         
         opencast = new Opencast(retrofit);
+        courseware = new Courseware(retrofit);
+        meetings = new Meetings(retrofit);
     }
     
     public void downloadFile(@NonNull Context con, @NonNull String fid, String filename) {
