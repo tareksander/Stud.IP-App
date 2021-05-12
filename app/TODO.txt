@@ -2,7 +2,7 @@
     to check if the build on f-droid worked: https://f-droid.org/wiki/page/Main_Page
     https://f-droid.org/wiki/page/Category:Apps_with_failing_builds
     
-    
+    TODO for crash reports, send the android version the app was running with, so the bug can be reproduced
     
     Release checklist:
     - VersionName and VersionCode changed?
