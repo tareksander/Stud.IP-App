@@ -149,6 +149,7 @@ Long press on an addressee to remove it.<br>
     <string name="document_provider_thumbnails">Show Thumbnails</string>
     <string name="document_provider_recents">Show recent documents</string>
     <string name="document_provider_search">Enable search</string>
+    <string name="load_on_mobile">Load images while using mobile data</string>
 
 
 </resources>

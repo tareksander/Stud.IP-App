@@ -2,15 +2,20 @@ The API of the system has to be enabled to use this app.
 
 You can read system-wide news, view your courses, course news, course forums, post on forums,
 read and write messages, view, download and upload your files and course files.
-You can also view Opencast videos.
+You can also view Opencast videos, browse Courseware and join BigBlueButton meetings.
 With the document provider you can access your Stud.IP files like all other files on your device.
 
 For Help: Settings:view help
 
-If the app crashes and the crash log contains (you have to scroll down a bit)
-Caused by: java.lang.IllegalStateException: Room cannot verify the data integrity. Looks like you've changed schema...
-or
-Caused by: java.lang.IllegalStateException: A migration from 1 to 2 was required but not found...
-there have been changes to the database.
-To fix this, you have to delete the app data by using
-Settings->Apps->all apps->Stud.IP->Storage & cache->Clear storage.
+Permission description:
+
+View network connections: Used to not download pictures when mobile data is used, to preserve mobile data volume.
+
+Full network access: An internet connection is required to communicate with the Stud.IP-Server.
+
+Modify contents of shared storage: Is requested at runtime when you download files.
+Is needed to save the files to the downloads directory.
+Not used anymore for Android 10 or later.
+
+Record audio: Used for the BigBlueButton video conferences.
+

@@ -1,9 +1,11 @@
 package org.studip.unofficial_app.ui;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Transformations;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.work.WorkManager;
@@ -292,6 +295,10 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         
         
         
+        binding.loadImagesOnMobile.setChecked(settings.load_images_on_mobile);
+        
+        // register the listener now that the checked status is set
+        binding.loadImagesOnMobile.setOnClickListener(this::onLoadImagesOnMobileClicked);
         
         
         API api = APIProvider.getAPI(this);
@@ -314,6 +321,12 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         super.onStop();
         settings.safe(sharedPreferences);
     }
+    
+    public void onLoadImagesOnMobileClicked(View v) {
+        settings.load_images_on_mobile = binding.loadImagesOnMobile.isChecked();
+        getContentResolver().notifyChange(DocumentsContract.buildRootsUri(DocumentsProvider.AUTHORITIES), null);
+    }
+    
     
     public void onHelpClicked(View v) {
         Intent i = new Intent(this,HelpActivity.class);

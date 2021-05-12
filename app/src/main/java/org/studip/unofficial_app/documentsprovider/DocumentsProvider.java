@@ -3,13 +3,20 @@ package org.studip.unofficial_app.documentsprovider;
 import android.annotation.SuppressLint;
 import android.app.AuthenticationRequiredException;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.CancellationSignal;
 import android.os.Handler;
@@ -35,19 +42,21 @@ import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.model.room.DB;
 import org.studip.unofficial_app.ui.ServerSelectActivity;
+import org.studip.unofficial_app.ui.fragments.FileFragment;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import io.reactivex.schedulers.Schedulers;
-import kotlin.io.ByteStreamsKt;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -278,6 +287,14 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
         
     }
     
+    public static void copyStream(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024*1024];
+        int read;
+        while ((read = in.read(buffer)) != -1) {
+            out.write(buffer, 0, read);
+        }
+    }
+    
     
     @NotNull
     public API APICheckLogin() throws FileNotFoundException, AuthenticationRequiredException {
@@ -426,7 +443,7 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
                     try (ResponseBody b = api.file.download(documentId).execute().body();
                          FileOutputStream out = new FileOutputStream(tmp)) {
                         if (b != null) {
-                            ByteStreamsKt.copyTo(b.byteStream(), out, 1024 * 1024);
+                            copyStream(b.byteStream(), out);
                             //System.out.println("downloaded");
                         }
                         else {
@@ -442,7 +459,7 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
                         StudipFolder.FileRef f = api.file.get(documentId).execute().body();
                         if (f != null) {
                             api.file.update(documentId, MultipartBody.Part.createFormData("filename", f.name,
-                                    RequestBody.create(ByteStreamsKt.readBytes(in)))).execute();
+                                    RequestBody.create(FileFragment.readFully(in)))).execute();
                         }
                     }
                     catch (Exception ignored) {}
@@ -691,6 +708,14 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
         }
         checkDB();
     
+    
+        
+        
+        ConnectivityManager con = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (! s.load_images_on_mobile && con.isActiveNetworkMetered()) {
+            throw new FileNotFoundException();
+        }
+        
         API api = APICheckLogin();
         
         //System.out.println("thumbnail");
@@ -700,7 +725,7 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
             try (ResponseBody body = api.file.download(documentId).execute().body();
                  FileOutputStream out = new FileOutputStream(tmp)) {
                 if (body != null) {
-                    ByteStreamsKt.copyTo(body.byteStream(), out, 1024 * 1024);
+                    copyStream(body.byteStream(), out);
                     //System.out.println("thumbnail downloaded");
                 }
             }

@@ -296,6 +296,12 @@
                 android:text="@string/document_provider_thumbnails" />
 
             <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/load_images_on_mobile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/load_on_mobile" />
+
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/enable_doc_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -325,8 +331,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_developer"
-                android:visibility="gone" />
+                android:text="@string/settings_developer" />
 
         </LinearLayout>
     </ScrollView>

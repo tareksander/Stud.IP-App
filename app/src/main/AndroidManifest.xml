@@ -3,13 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="org.studip.unofficial_app">
     
+    <!-- used to connect to the Stud.IP server -->
     <uses-permission android:name="android.permission.INTERNET" />
-    
+
+    <!-- used to write to the downloads folder -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28"
         tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    
+    <!-- used to not load images when on mobile data -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- used for the BigBlueButton video conferences -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    
     
     <queries>
         <intent>

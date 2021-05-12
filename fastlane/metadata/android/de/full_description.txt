@@ -3,15 +3,20 @@ Zum Benutzen muss das API des Systems angeschaltet sein.
 Es können Ankündigungen des Systems gelesen werden, Kurse angeschaut werden,
 eigene Dateien und die von Kursen angeschaut, heruntergeladen und hochgeladen werden,
 Nachrichten gelesen und geschrieben werden, Forenbeiträge gelesen und geschrieben werden.
-Opencast-Videos können auch angeschaut werden.
+Opencast-Videos und Courseware können auch angeschaut werden, und es kann an BigBlueButton-Konferenzen teilgenommen werden.
 Mit dem document provider kann man auf die Dateien auf Stud.IP wie auf ganz normale Dateien auf dem Gerät zugreifen.
 
 Für Hilfe: Einstellungen->Hilfe anzeigen
 
-Falls die App crasht und im Crash log (dafür muss man meistens etwas runterscrollen)
-Caused by: java.lang.IllegalStateException: Room cannot verify the data integrity. Looks like you've changed schema...
-oder
-Caused by: java.lang.IllegalStateException: A migration from 1 to 2 was required but not found...
-vorkommt, hat es Änderungen an der Datenbank gegeben.
-Um diesen Fehler zu beheben, müssen die App-Daten gelöscht werden unter
-Einstellungen->Apps->alle Apps->Stud.IP->Speicher und Cache->Speicherinhalt löschen.
+Erklärung der Berechtigungen:
+
+Netzwerkstatus abrufen: Wird benötigt, damit keine Bilder über mobile Daten heruntergeladen werden, weil das viel Datenvolumen verbrauchen könnte.
+
+Internet: Verbindung zum Internet wird gebraucht, um mit dem Stud.IP-Server zu kommunizieren.
+
+auf freigegebenen Speicher schreiben: Wird beim Herunterladen von Dateien nocheinal angefragt.
+Wird gebraucht, damit die Dateien in den Downloads gespeichert werden können.
+Wird ab Android 10 nicht mehr benötigt.
+
+Audio aufnehmen: Wird für die BigBlueButton Videokonferenzen benötigt.
+

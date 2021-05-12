@@ -62,6 +62,11 @@ public class Settings
     public boolean documents_search;
     
     
+    private static final String LOAD_IMAGES_ON_MOBILE_KEY = "images_mobile";
+    public boolean load_images_on_mobile;
+    
+    
+    
     public Settings()
     {
         defaults();
@@ -85,6 +90,8 @@ public class Settings
         documents_thumbnails = false;
         documents_recents = false;
         documents_search = false;
+        
+        load_images_on_mobile = false;
     }
     public static Settings load(SharedPreferences prefs)
     {
@@ -110,6 +117,8 @@ public class Settings
             s.documents_thumbnails = prefs.getBoolean(DOCUMENTS_PROVIDER_THUMBNAILS_KEY, false);
             s.documents_recents = prefs.getBoolean(DOCUMENTS_PROVIDER_RECENTS_KEY, false);
             s.documents_search = prefs.getBoolean(DOCUMENTS_PROVIDER_SEARCH_KEY, false);
+            
+            s.load_images_on_mobile = prefs.getBoolean(LOAD_IMAGES_ON_MOBILE_KEY, false);
         }
         else
         {
@@ -143,6 +152,8 @@ public class Settings
             e.putBoolean(DOCUMENTS_PROVIDER_THUMBNAILS_KEY, documents_thumbnails);
             e.putBoolean(DOCUMENTS_PROVIDER_RECENTS_KEY, documents_recents);
             e.putBoolean(DOCUMENTS_PROVIDER_SEARCH_KEY, documents_search);
+            
+            e.putBoolean(LOAD_IMAGES_ON_MOBILE_KEY, load_images_on_mobile);
             
             e.commit();
         }

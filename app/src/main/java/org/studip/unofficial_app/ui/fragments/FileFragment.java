@@ -34,10 +34,10 @@ import org.studip.unofficial_app.model.viewmodels.MkdirDialogViewModel;
 import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.fragments.dialog.MkdirDialogFragment;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import kotlin.io.ByteStreamsKt;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -133,7 +133,18 @@ public class FileFragment extends SwipeRefreshFragment
         
         return binding.getRoot();
     }
-
+    
+    public static byte[] readFully(InputStream in) throws IOException {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream(1024*1024)) {
+            byte[] buffer = new byte[1024*1024];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            return out.toByteArray();
+        }
+    }
+    
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent intentData)
     {
@@ -147,7 +158,7 @@ public class FileFragment extends SwipeRefreshFragment
                 binding.fileRefresh.setRefreshing(true);
                 byte[] data = null;
                 try (InputStream in = requireActivity().getContentResolver().openInputStream(file)) {
-                    data = ByteStreamsKt.readBytes(in);
+                    data = readFully(in);
                 }
                 catch (IOException ignored) {}
                 if (data != null)

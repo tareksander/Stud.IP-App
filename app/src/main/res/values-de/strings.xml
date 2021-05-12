@@ -150,6 +150,7 @@ Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br
     <string name="document_provider_thumbnails">Vorschaubilder anzeigen</string>
     <string name="document_provider_search">Suche einschalten</string>
     <string name="document_provider_recents">Kürzlich benutzte Dateien anzeigen</string>
+    <string name="load_on_mobile">Bilder auch mit mobilen Daten laden</string>
 
 
 </resources>
