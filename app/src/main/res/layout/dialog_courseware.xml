@@ -7,6 +7,19 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
+    <TextView
+        android:id="@+id/courseware_section_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/courseware_chapters"
+        app:layout_constraintTop_toBottomOf="@+id/courseware_sections" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/courseware_sections"
         android:layout_width="0dp"
@@ -36,11 +49,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/courseware_chapters"
-        app:layout_constraintTop_toBottomOf="@+id/courseware_sections">
+        app:layout_constraintTop_toBottomOf="@+id/courseware_section_title">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/courseware_blocks"

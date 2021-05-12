@@ -1,12 +1,24 @@
 package org.studip.unofficial_app.ui.plugins.fragments.dialog;
 
 import android.app.Dialog;
+import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Base64;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,6 +26,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,30 +34,57 @@ import androidx.recyclerview.widget.RecyclerView.Adapter;
 
 import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.R;
+import org.studip.unofficial_app.api.API;
+import org.studip.unofficial_app.api.plugins.courseware.CoursewareBlock;
 import org.studip.unofficial_app.api.plugins.courseware.CoursewareChapter;
+import org.studip.unofficial_app.api.plugins.courseware.CoursewareSection;
 import org.studip.unofficial_app.api.plugins.courseware.CoursewareSubchapter;
+import org.studip.unofficial_app.api.plugins.courseware.blocks.CoursewareHTMLBlock;
+import org.studip.unofficial_app.api.plugins.courseware.blocks.CoursewareOpencastBlock;
+import org.studip.unofficial_app.api.plugins.courseware.blocks.CoursewarePDFBlock;
+import org.studip.unofficial_app.api.plugins.opencast.OpencastQueryResult;
+import org.studip.unofficial_app.api.plugins.opencast.OpencastVideo;
 import org.studip.unofficial_app.databinding.DialogCoursewareBinding;
 import org.studip.unofficial_app.databinding.DialogCoursewareChapterBinding;
+import org.studip.unofficial_app.databinding.DialogOpencastCoursewareBinding;
+import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.viewmodels.CoursewareViewModel;
 import org.studip.unofficial_app.model.viewmodels.StringViewModelFactory;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static org.studip.unofficial_app.api.plugins.opencast.OpencastQueryResult.SearchResults.Result.MediaPackage.Media.Track;
 
 public class CoursewareDialog extends DialogFragment
 {
     public static final String COURSE_ID_KEY = "cid";
     private CoursewareViewModel m;
+    private DialogCoursewareBinding binding;
     
+    @Override
+    public void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("section_name",binding.coursewareSectionTitle.getText().toString());
+    }
     
     @Nullable
     @Override
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        DialogCoursewareBinding binding = DialogCoursewareBinding.inflate(getLayoutInflater(), container, false);
+        binding = DialogCoursewareBinding.inflate(getLayoutInflater(), container, false);
+        
+        if (savedInstanceState != null) {
+            binding.coursewareSectionTitle.setText(savedInstanceState.getString("section_name"));
+        }
         
         Bundle args = getArguments();
         if (args == null || args.getString(COURSE_ID_KEY) == null) {
             dismiss();
             return binding.getRoot();
         }
-        m = new ViewModelProvider(this,new StringViewModelFactory(requireActivity().getApplication(),args.getString(COURSE_ID_KEY))).get(CoursewareViewModel.class);
+        m = new ViewModelProvider(this,new StringViewModelFactory(requireActivity().getApplication(),args.getString(COURSE_ID_KEY)))
+                .get(CoursewareViewModel.class);
     
     
         binding.coursewareSections.addItemDecoration(new DividerItemDecoration(requireActivity(), RecyclerView.HORIZONTAL));
@@ -66,6 +106,7 @@ public class CoursewareDialog extends DialogFragment
     
     
         m.getChapters().observe(this, (chapters) -> {
+            /*
             if (chapters != null && chapters.length != 0) {
                 if (m.selectedChapter == null) {
                     m.selectedChapter = chapters[0].id;
@@ -73,19 +114,59 @@ public class CoursewareDialog extends DialogFragment
                 }
                 if (chapters[0].subchapters != null) {
                     if (chapters[0].subchapters.length != 0) {
-                        if (m.selectedSubchapter == null) {
+                        if (m.selectedSubchapter == null && m.selectedChapter.equals(chapters[0].id)) {
                             m.selectedSubchapter = chapters[0].subchapters[0].id;
                             m.refresh(requireActivity(), chapters[0].subchapters[0].id, CoursewareViewModel.TYPE_SUBCHAPTER);
                         }
                         if (chapters[0].subchapters[0].sections != null) {
                             if (chapters[0].subchapters[0].sections.length != 0) {
-                                if (m.selectedSection == null) {
+                                if (m.selectedSection == null && m.selectedSubchapter.equals(chapters[0].subchapters[0].id)) {
                                     m.selectedSection = chapters[0].subchapters[0].sections[0].id;
                                     m.refresh(requireActivity(), chapters[0].subchapters[0].sections[0].id, CoursewareViewModel.TYPE_SECTION);
                                 }
                             }
                         }
                     }
+                }
+            }
+            */
+            if (chapters != null) {
+                if (m.selectedChapter != null) {
+                    for (CoursewareChapter c : chapters) {
+                        if (c.id.equals(m.selectedChapter)) {
+                            if (c.subchapters == null) {
+                                m.refresh(requireActivity(), c.id, CoursewareViewModel.TYPE_CHAPTER);
+                            } else {
+                                if (m.selectedSection == null) {
+                                    for (CoursewareSubchapter sub : c.subchapters) {
+                                        if (sub.id.equals(m.selectedSubchapter)) {
+                                            if (sub.sections == null) {
+                                                m.refresh(requireActivity(), m.selectedSubchapter, CoursewareViewModel.TYPE_SUBCHAPTER);
+                                            } else {
+                                                if (sub.sections.length != 0) {
+                                                    m.selectedSection = sub.sections[0].id;
+                                                    binding.coursewareSectionTitle.setText(sub.sections[0].name);
+                                                    if (sub.sections[0].blocks == null) {
+                                                        m.refresh(requireActivity(), m.selectedSection, CoursewareViewModel.TYPE_SECTION);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                if (c.subchapters.length != 0 && m.selectedSubchapter == null) {
+                                    m.selectedSubchapter = c.subchapters[0].id;
+                                    if (c.subchapters[0].sections == null) {
+                                        m.refresh(requireActivity(), m.selectedSubchapter, CoursewareViewModel.TYPE_SUBCHAPTER);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (m.selectedChapter == null && chapters.length != 0) {
+                    m.selectedChapter = chapters[0].id;
+                    m.refresh(requireActivity(), m.selectedChapter, CoursewareViewModel.TYPE_CHAPTER);
                 }
             }
             binding.coursewareChapters.getAdapter().notifyDataSetChanged();
@@ -137,6 +218,7 @@ public class CoursewareDialog extends DialogFragment
             DialogCoursewareChapterBinding b = DialogCoursewareChapterBinding.bind(holder.itemView);
             
             b.chapterSubchapters.removeAllViews();
+            b.chapterTitle.setOnClickListener(null);
             
             CoursewareChapter[] chapters = m.getChapters().getValue();
             if (chapters != null && position < chapters.length) {
@@ -146,10 +228,48 @@ public class CoursewareDialog extends DialogFragment
                     for (CoursewareSubchapter s : sub) {
                         TextView t = new TextView(requireActivity());
                         t.setText(s.name);
-                        //System.out.println(s.name);
+                        t.setOnClickListener(v1 -> {
+                            m.selectedChapter = chapters[position].id;
+                            m.selectedSubchapter = s.id;
+                            m.selectedSection = null;
+                            if (s.sections == null) {
+                                m.refresh(requireActivity(), s.id, CoursewareViewModel.TYPE_SUBCHAPTER);
+                            } else {
+                                if (s.sections.length != 0) {
+                                    m.selectedSection = s.sections[0].id;
+                                    binding.coursewareSectionTitle.setText(s.sections[0].name);
+                                }
+                            }
+                            binding.coursewareChapters.getAdapter().notifyDataSetChanged();
+                            binding.coursewareSections.getAdapter().notifyDataSetChanged();
+                            binding.coursewareBlocks.getAdapter().notifyDataSetChanged();
+                        });
                         b.chapterSubchapters.addView(t);
                     }
                 }
+                b.chapterTitle.setOnClickListener(v1 -> {
+                    m.selectedChapter = chapters[position].id;
+                    m.selectedSubchapter = null;
+                    m.selectedSection = null;
+                    if (chapters[position].subchapters == null) {
+                        m.refresh(requireActivity(), m.selectedChapter, CoursewareViewModel.TYPE_CHAPTER);
+                    } else {
+                        if (chapters[position].subchapters.length != 0) {
+                            m.selectedSubchapter = chapters[position].subchapters[0].id;
+                            if (chapters[position].subchapters[0].sections == null) {
+                                m.refresh(requireActivity(), m.selectedSubchapter, CoursewareViewModel.TYPE_SUBCHAPTER);
+                            } else {
+                                if (chapters[position].subchapters[0].sections.length != 0) {
+                                    m.selectedSection = chapters[position].subchapters[0].sections[0].id;
+                                    binding.coursewareSectionTitle.setText(chapters[position].subchapters[0].sections[0].name);
+                                }
+                            }
+                        }
+                    }
+                    binding.coursewareChapters.getAdapter().notifyDataSetChanged();
+                    binding.coursewareSections.getAdapter().notifyDataSetChanged();
+                    binding.coursewareBlocks.getAdapter().notifyDataSetChanged();
+                });
             }
             
         }
@@ -182,7 +302,33 @@ public class CoursewareDialog extends DialogFragment
         
         @Override
         public void onBindViewHolder(@NonNull @NotNull SectionHolder holder, int position) {
-            
+            ImageView v = (ImageView) holder.itemView;
+            v.setOnClickListener(null);
+            CoursewareChapter[] chapters = m.getChapters().getValue();
+            boolean found = false;
+            if (chapters != null && m.selectedChapter != null && m.selectedSubchapter != null) {
+                for (CoursewareChapter c : chapters) {
+                    if (c.id.equals(m.selectedChapter) && c.subchapters != null) {
+                        for (CoursewareSubchapter s : c.subchapters) {
+                            if (s.id.equals(m.selectedSubchapter)) {
+                                found = true;
+                                if (s.sections != null && position < s.sections.length) {
+                                    v.setOnClickListener(v1 -> {
+                                        m.selectedSection = s.sections[position].id;
+                                        binding.coursewareSectionTitle.setText(s.sections[position].name);
+                                        if (s.sections[position].blocks == null) {
+                                            m.refresh(requireActivity(), m.selectedSection, CoursewareViewModel.TYPE_SECTION);
+                                        }
+                                        binding.coursewareBlocks.getAdapter().notifyDataSetChanged();
+                                    });
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    if (found) break;
+                }
+            }
         }
         
         @Override
@@ -192,7 +338,10 @@ public class CoursewareDialog extends DialogFragment
                 for (CoursewareChapter c : chapters) {
                     if (c.id.equals(m.selectedChapter) && c.subchapters != null) {
                         for (CoursewareSubchapter s : c.subchapters) {
-                            if (s.id.equals(m.selectedSubchapter) && s.sections != null) {
+                            if (s.id.equals(m.selectedSubchapter)) {
+                                if (s.sections == null) {
+                                    return 0;
+                                }
                                 return s.sections.length;
                             }
                         }
@@ -220,15 +369,202 @@ public class CoursewareDialog extends DialogFragment
         public void onBindViewHolder(@NonNull @NotNull BlockHolder holder, int position) {
             FrameLayout f = (FrameLayout) holder.itemView;
             f.removeAllViews();
-            TextView v = new TextView(requireActivity());
-            v.setText("lorem ipsum\ndolor si tamet");
-            v.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
-            f.addView(v);
+            CoursewareChapter[] chapters = m.getChapters().getValue();
+            if (chapters != null && m.selectedChapter != null && m.selectedSubchapter != null && m.selectedSection != null) {
+                for (CoursewareChapter c : chapters) {
+                    if (c.id.equals(m.selectedChapter) && c.subchapters != null) {
+                        for (CoursewareSubchapter s : c.subchapters) {
+                            if (s.id.equals(m.selectedSubchapter) && s.sections != null) {
+                                for (CoursewareSection sect : s.sections) {
+                                    if (sect.id.equals(m.selectedSection)) {
+                                        if (sect.blocks != null && position < sect.blocks.length) {
+                                            CoursewareBlock b = sect.blocks[position];
+                                            if (b instanceof CoursewareHTMLBlock) {
+                                                CoursewareHTMLBlock html = (CoursewareHTMLBlock) b;
+                                                WebView web = new WebView(requireActivity());
+                                                web.setBackgroundColor(Color.TRANSPARENT);
+                                                web.loadData(Base64.encodeToString(html.content.getBytes(), Base64.NO_PADDING),
+                                                        "text/html; charset=utf-8","base64");
+                                                // links should not be opened in this WebView
+                                                web.setWebViewClient(new WebViewClient() {
+                                                    private void handleURL(String url) {
+                                                        Intent i = new Intent(Intent.ACTION_VIEW);
+                                                        i.setData(Uri.parse(url));
+                                                        try {
+                                                            startActivity(i);
+                                                        } catch (ActivityNotFoundException ignored) {}
+                                                    }
+                                                    @Override
+                                                    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                                                        handleURL(request.getUrl().toString());
+                                                        return true;
+                                                    }
+                                                    @Override
+                                                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                                                        handleURL(url);
+                                                        return true;
+                                                    }
+                                                });
+                                                f.addView(web);
+                                                return;
+                                            }
+                                            if (b instanceof CoursewareOpencastBlock) {
+                                                CoursewareOpencastBlock opencast = (CoursewareOpencastBlock) b;
+                                                DialogOpencastCoursewareBinding entry = DialogOpencastCoursewareBinding.inflate(getLayoutInflater(),
+                                                        f, true);
+                                                //System.out.println(opencast.hostname+"  "+opencast.id);
+                                                opencastBlock(opencast, entry);
+                                                return;
+                                            }
+                                            if (b instanceof CoursewarePDFBlock) {
+                                                CoursewarePDFBlock pdf = (CoursewarePDFBlock) b;
+                                                TextView v = new TextView(requireActivity());
+                                                v.setText(getString(R.string.download, pdf.name));
+                                                v.setOnClickListener(v1 -> {
+                                                    API api = APIProvider.getAPI(requireActivity());
+                                                    if (api == null) {
+                                                        return;
+                                                    }
+                                                    api.downloadFile(requireActivity(), pdf.url, pdf.name, true);
+                                                });
+                                                v.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+                                                f.addView(v);
+                                                return;
+                                            }
+                                        }
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         
         @Override
         public int getItemCount() {
-            return 10;
+            CoursewareChapter[] chapters = m.getChapters().getValue();
+            if (chapters != null && m.selectedChapter != null && m.selectedSubchapter != null && m.selectedSection != null) {
+                for (CoursewareChapter c : chapters) {
+                    if (c.id.equals(m.selectedChapter) && c.subchapters != null) {
+                        for (CoursewareSubchapter s : c.subchapters) {
+                            if (s.id.equals(m.selectedSubchapter) && s.sections != null) {
+                                for (CoursewareSection sect : s.sections) {
+                                    if (sect.id.equals(m.selectedSection)) {
+                                        if (sect.blocks == null) {
+                                            return 0;
+                                        }
+                                        return sect.blocks.length;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return 0;
+        }
+        
+        private void opencastBlock(CoursewareOpencastBlock opencast, DialogOpencastCoursewareBinding entry) {
+            if (opencast.video == null) {
+                APIProvider.getAPI(requireActivity()).opencast.lti(opencast.hostname, opencast.ltidata).enqueue(new Callback<Void>()
+                {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        String cookie = response.headers().get("Set-Cookie");
+                        if (cookie == null) {
+                            return;
+                        }
+                        APIProvider.getAPI(requireActivity()).opencast.queryVideo(opencast.hostname, opencast.id, cookie)
+                            .enqueue(new Callback<OpencastQueryResult>()
+                            {
+                                @Override
+                                public void onResponse(Call<OpencastQueryResult> call, Response<OpencastQueryResult> response) {
+                                    OpencastQueryResult q = response.body();
+                                    FragmentActivity a = getActivity();
+                                    if (q != null && a != null) {
+                                        //System.out.println(GsonProvider.getGson().toJson(q));
+                                        try {
+                                            String title = q.search_results.result.mediapackage.title;
+                                            //System.out.println(title);
+                                            opencast.video = new OpencastVideo();
+                                            opencast.video.title = title;
+                                            opencast.video.versions = new OpencastVideo.VideoVersion[q.search_results.result.mediapackage.media.track.length];
+                                            entry.opencastTitle.setText(title);
+                                            int index = 0;
+                                            for (Track t : q.search_results.result.mediapackage.media.track) {
+                                                opencast.video.versions[index] = new OpencastVideo.VideoVersion();
+                                                opencast.video.versions[index].download = t.url;
+                                                opencast.video.versions[index].resolution = t.video.resolution;
+                                                Button download = new Button(a);
+                                                //System.out.println(t.video.resolution);
+                                                download.setText(getString(R.string.download, t.video.resolution));
+                                                download.setOnClickListener(v1 -> {
+                                                    DownloadManager m = (DownloadManager) requireActivity().
+                                                            getSystemService(Context.DOWNLOAD_SERVICE);
+                                                    DownloadManager.Request r = new DownloadManager.Request(Uri.parse(t.url));
+                                                    r.setMimeType(t.mimetype);
+                                                    r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, title);
+                                                    r.setVisibleInDownloadsUi(true);
+                                                    r.allowScanningByMediaScanner();
+                                                    r.setTitle(title);
+                                                    r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                                                    m.enqueue(r);
+                                                });
+                                                entry.opencastDownloads.addView(download);
+                                                Button view = new Button(a);
+                                                view.setText(getString(R.string.view, t.video.resolution));
+                                                view.setOnClickListener(v1 -> {
+                                                    Intent i = new Intent(Intent.ACTION_VIEW);
+                                                    i.setDataAndType(Uri.parse(t.url), "video/*");
+                                                    startActivity(Intent.createChooser(i, getString(R.string.view_with)));
+                                                });
+                                                entry.opencastView.addView(view);
+                                                index++;
+                                            }
+                                        }
+                                        catch (NullPointerException ignored) {
+                                        }
+                                    }
+                                }
+                                @Override
+                                public void onFailure(Call<OpencastQueryResult> call, Throwable t) {
+                                }
+                            });
+                    }
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {}
+                });
+            }  else  {
+                entry.opencastTitle.setText(opencast.video.title);
+                for (OpencastVideo.VideoVersion v : opencast.video.versions) {
+                    Button download = new Button(requireActivity());
+                    //System.out.println(t.video.resolution);
+                    download.setText(getString(R.string.download, v.resolution));
+                    download.setOnClickListener(v1 -> {
+                        DownloadManager m = (DownloadManager) requireActivity().
+                                getSystemService(Context.DOWNLOAD_SERVICE);
+                        DownloadManager.Request r = new DownloadManager.Request(Uri.parse(v.download));
+                        r.setMimeType("video/*");
+                        r.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, opencast.video.title);
+                        r.setVisibleInDownloadsUi(true);
+                        r.allowScanningByMediaScanner();
+                        r.setTitle(opencast.video.title);
+                        r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                        m.enqueue(r);
+                    });
+                    entry.opencastDownloads.addView(download);
+                    Button view = new Button(requireActivity());
+                    view.setText(getString(R.string.view, v.resolution));
+                    view.setOnClickListener(v1 -> {
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setDataAndType(Uri.parse(v.download), "video/*");
+                        startActivity(Intent.createChooser(i, getString(R.string.view_with)));
+                    });
+                    entry.opencastView.addView(view);
+                }
+            }
         }
     }
     
@@ -244,7 +580,7 @@ public class CoursewareDialog extends DialogFragment
     
         @SuppressWarnings("rawtypes")
         @Override
-        public void getItemOffsets(@NonNull @NotNull Rect outRect, @NonNull @NotNull View view, @NonNull @NotNull RecyclerView parent, @NonNull @NotNull RecyclerView.State state) {
+        public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
             Adapter ad = parent.getAdapter();
             if (ad != null && parent.getChildAdapterPosition(view) != ad.getItemCount()) {
                 if (horizontal) {

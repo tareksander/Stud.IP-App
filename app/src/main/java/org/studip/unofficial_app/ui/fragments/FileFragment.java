@@ -310,7 +310,7 @@ public class FileFragment extends SwipeRefreshFragment
                             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
                             return;
                         }
-                        APIProvider.getAPI(requireActivity()).downloadFile(requireActivity(),f.id,f.name);
+                        APIProvider.getAPI(requireActivity()).downloadFile(requireActivity(),f.id,f.name, false);
                     });
                     v.setOnLongClickListener(v1 -> {
                         if (binding.fileRefresh.isRefreshing()) { return true; }

@@ -186,9 +186,16 @@ public class API
         meetings = new Meetings(retrofit);
     }
     
-    public void downloadFile(@NonNull Context con, @NonNull String fid, String filename) {
+    public void downloadFile(@NonNull Context con, @NonNull String fid, String filename, boolean url) {
         DownloadManager m = (DownloadManager) con.getSystemService(Context.DOWNLOAD_SERVICE);
-        String uri = HTTPS+hostname+"/api.php/file/"+fid+"/download";
+        
+        String uri = HTTPS+hostname;
+        if (url) {
+            uri += fid;
+        } else {
+            uri += "/api.php/file/"+fid+"/download";
+        }
+        //System.out.println(uri);
         if (URLUtil.isHttpsUrl(uri))
         {
             DownloadManager.Request r = new DownloadManager.Request(Uri.parse(uri));
@@ -214,9 +221,11 @@ public class API
                 r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             }
             
+            
+            
             boolean authed = false;
 
-            if (auth_method == Settings.AUTHENTICATION_BASIC)
+            if (auth_method == Settings.AUTHENTICATION_BASIC && ! url)
             {
                 r.addRequestHeader("Authorization", Credentials.basic(username, password));
                 authed = true;
@@ -251,6 +260,9 @@ public class API
             throw new RuntimeException("download would not be secure");
         }
     }
+    
+    
+    
     
     public String getHostname() {
         return hostname;

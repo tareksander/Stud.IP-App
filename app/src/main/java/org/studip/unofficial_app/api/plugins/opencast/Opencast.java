@@ -2,11 +2,17 @@ package org.studip.unofficial_app.api.plugins.opencast;
 
 import androidx.annotation.NonNull;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.studip.unofficial_app.api.API;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import io.reactivex.Single;
 import retrofit2.Call;
@@ -87,7 +93,17 @@ public class Opencast
         });
     }
     
-    public Call<OpencastQueryResult> queryVideo(@NonNull String hostname, @NonNull String id) {
-        return routes.queryVideo(API.HTTPS+hostname+"/search/episode.json", id);
+    public Call<OpencastQueryResult> queryVideo(@NonNull String hostname, @NonNull String id, @NonNull String jsessionid) {
+        return routes.queryVideo(API.HTTPS+hostname+"/search/episode.json?id="+id, jsessionid);
     }
+    
+    public Call<Void> lti(@NonNull String hostname, @NonNull JsonObject ltidata) {
+        HashMap<String, String> map = new HashMap<>();
+        for (Map.Entry<String, JsonElement> e: ltidata.entrySet()) {
+            //System.out.println(e.getKey()+" "+e.getValue().getAsString());
+            map.put(e.getKey(),e.getValue().getAsString());
+        }
+        return routes.lti(API.HTTPS+hostname+"/lti",map);
+    }
+    
 }

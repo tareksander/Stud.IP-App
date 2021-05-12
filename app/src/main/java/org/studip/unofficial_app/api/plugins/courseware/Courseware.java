@@ -2,6 +2,8 @@ package org.studip.unofficial_app.api.plugins.courseware;
 
 import android.net.Uri;
 
+import com.google.gson.JsonObject;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,6 +11,10 @@ import org.jsoup.select.Elements;
 import org.studip.unofficial_app.api.plugins.courseware.blocks.CoursewareHTMLBlock;
 import org.studip.unofficial_app.api.plugins.courseware.blocks.CoursewareOpencastBlock;
 import org.studip.unofficial_app.api.plugins.courseware.blocks.CoursewarePDFBlock;
+import org.studip.unofficial_app.model.GsonProvider;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.reactivex.Single;
 import retrofit2.Retrofit;
@@ -96,8 +102,21 @@ public class Courseware
                     }
                     Element o = opencast.get(0);
                     String url = o.attr("data-src");
+                    //System.out.println(url);
                     Uri uri = Uri.parse(url);
-                    c[i] = new CoursewareOpencastBlock(uri.getHost(), uri.getQueryParameter("id"));
+                    JsonObject ltidata;
+                    Elements script = block.getElementsByTag("script");
+                    if (script.size() == 0) {
+                        throw new RuntimeException("Could not load ltidata for Courseware Opencast block");
+                    }
+                    Pattern p = Pattern.compile(".*OC_LTI_DATA {3}= {2}(\\{.*\\});.*", Pattern.DOTALL);
+                    Matcher m = p.matcher(script.html());
+                    if (! m.matches()) {
+                        throw new RuntimeException("Could not find ltidata for Courseware Opencast block");
+                    }
+                    //System.out.println(m.group(1));
+                    ltidata = GsonProvider.getGson().fromJson(m.group(1), JsonObject.class);
+                    c[i] = new CoursewareOpencastBlock(uri.getHost(), uri.getQueryParameter("id"), ltidata);
                 } else if ("PdfBlock".equals(type)) {
                     Elements file = block.getElementsByAttributeValueContaining("class","cw-pdf-file-url");
                     if (file.size() == 0) {
