@@ -13,10 +13,13 @@ import android.provider.DocumentsContract;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -24,10 +27,15 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.work.WorkManager;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.databinding.ActivitySettingsBinding;
@@ -45,6 +53,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.http.Query;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
@@ -302,18 +314,157 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         
         
         API api = APIProvider.getAPI(this);
-        if (api != null) {
-            // TODO integrate the studip notification settings
-            
-            
-            
-            
-            
+        if (api == null || api.getUserID() == null) {
+            binding.settingsLoadNotificationSettings.setVisibility(View.GONE);
+            binding.settingsSaveNotificationSettings.setVisibility(View.GONE);
         }
         
         
     }
-
+    
+    public void onLoadNotificationSettings(View v1) {
+        API api = APIProvider.getAPI(this);
+        final AppCompatActivity a = this;
+        if (api != null && api.getUserID() != null) {
+            final MutableLiveData<Integer> remaining = new MutableLiveData<>(-1);
+            api.dispatch.getNotificationSettings().enqueue(new Callback<String>()
+            {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    String html = response.body();
+                    if (response.code() == 200 && html != null) {
+                        Document d = Jsoup.parse(html);
+                        Elements forms = d.getElementsByAttributeValueContaining("action",
+                                "/dispatch.php/settings/notification/store");
+                        if (forms.size() != 1) {
+                            remaining.setValue(-2);
+                            System.err.println("could not find NotificationTable");
+                            return;
+                        }
+                        Element form = forms.get(0);
+                        Elements closed = form.getElementsByAttributeValue("href", "/dispatch.php/settings/notification/open/");
+                        remaining.setValue(closed.size());
+                        for (Element c : closed) {
+                            api.dispatch.openNotificationCategory(c.attr("name")).enqueue(new Callback<Void>()
+                            {
+                                @Override
+                                public void onResponse(Call<Void> call, Response<Void> response) {
+                                    remaining.setValue(remaining.getValue()-1);
+                                }
+                                @Override
+                                public void onFailure(Call<Void> call, Throwable t) {
+                                    remaining.setValue(remaining.getValue()-1);
+                                }
+                            });
+                        }
+                    }
+                }
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                    remaining.setValue(-2);
+                }
+            });
+            remaining.observe(this, (v) -> {
+                if (v == -1) return;
+                if (v == -2) {
+                    remaining.removeObservers(this);
+                    return;
+                }
+                if (v == 0) {
+                    api.dispatch.getNotificationSettings().enqueue(new Callback<String>()
+                    {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            String html = response.body();
+                            if (response.code() == 200 && html != null) {
+                                Document d = Jsoup.parse(html);
+                                Elements forms = d.getElementsByAttributeValueContaining("action",
+                                        "/dispatch.php/settings/notification/store");
+                                if (forms.size() != 1) {
+                                    remaining.setValue(-2);
+                                    System.err.println("could not find NotificationTable");
+                                }
+                                Element form = forms.get(0);
+                                Elements heads = form.getElementsByTag("thead");
+                                if (heads.size() != 1) {
+                                    remaining.setValue(-2);
+                                    System.err.println("could not find NotificationTable head");
+                                }
+                                binding.studipNotificationSettings.removeAllViews();
+                                Element head = heads.get(0);
+                                Elements categories = head.getElementsByTag("img");
+                                int index = 1;
+                                {
+                                    TextView t = new TextView(a);
+                                    t.setText(getString(R.string.courses));
+                                    GridLayout.LayoutParams par = new GridLayout.LayoutParams();
+                                    par.columnSpec = GridLayout.spec(0);
+                                    par.rightMargin = 100;
+                                    par.bottomMargin = 80;
+                                    par.rowSpec = GridLayout.spec(0);
+                                    binding.studipNotificationSettings.addView(t, par);
+                                }
+                                for (Element c : categories) {
+                                    TextView t = new TextView(a);
+                                    t.setText(c.attr("title"));
+                                    GridLayout.LayoutParams par = new GridLayout.LayoutParams();
+                                    par.columnSpec = GridLayout.spec(index);
+                                    if (index < categories.size()) {
+                                        par.rightMargin = 50;
+                                    }
+                                    index++;
+                                    par.bottomMargin = 80;
+                                    par.rowSpec = GridLayout.spec(0);
+                                    binding.studipNotificationSettings.addView(t, par);
+                                }
+                                int width = index;
+                                Elements courses = form.getElementsByAttributeValueContaining("href", "/seminar_main.php?username=");
+                                index = 1;
+                                for (Element c : courses) {
+                                    TextView t = new TextView(a);
+                                    t.setText(c.text());
+                                    GridLayout.LayoutParams par = new GridLayout.LayoutParams();
+                                    par.rowSpec = GridLayout.spec(index);
+                                    if (index < categories.size()) {
+                                        par.rightMargin = 100;
+                                    }
+                                    par.bottomMargin = 50;
+                                    par.columnSpec = GridLayout.spec(0);
+                                    binding.studipNotificationSettings.addView(t, par);
+                                    Elements checkboxes = c.parent().parent().getElementsByAttributeValue("type", "checkbox");
+                                    for (int x = 1; x < width; x++) {
+                                        SwitchCompat s = new SwitchCompat(a);
+                                        GridLayout.LayoutParams par2 = new GridLayout.LayoutParams();
+                                        if (x-1 < checkboxes.size()) {
+                                            s.setChecked(checkboxes.get(x-1).hasAttr("checked"));
+                                        }
+                                        par.columnSpec = GridLayout.spec(x);
+                                        par.bottomMargin = 50;
+                                        par.rightMargin = 50;
+                                        par.rowSpec = GridLayout.spec(index);
+                                        binding.studipNotificationSettings.addView(s, par2);
+                                    }
+                                    index++;
+                                }
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {}
+                    });
+                }
+            });
+        }
+    }
+    
+    public void onSaveNotificationSettings(View v) {
+        /*
+        form data: m_checked[course_id][colum_id] = 0 / 2^col
+        get studip_ticket and security_token from the form
+         */
+        
+        
+        
+    }
 
     @Override
     protected void onStop()

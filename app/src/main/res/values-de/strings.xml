@@ -151,6 +151,10 @@ Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br
     <string name="document_provider_search">Suche einschalten</string>
     <string name="document_provider_recents">Kürzlich benutzte Dateien anzeigen</string>
     <string name="load_on_mobile">Bilder auch mit mobilen Daten laden</string>
+    <string name="load_notification_settings">Laden</string>
+    <string name="save_notification_settings">Speichern</string>
+    <string name="studip_notification_settings">Stud.IP Benachrichtigungseinstellungen</string>
+    <string name="courses">Kurse</string>
 
 
 </resources>

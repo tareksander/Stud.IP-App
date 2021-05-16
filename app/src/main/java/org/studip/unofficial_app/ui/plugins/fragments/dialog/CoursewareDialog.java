@@ -5,6 +5,7 @@ import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.RenderProcessGoneDetail;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -31,6 +33,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
+import androidx.webkit.WebSettingsCompat;
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewFeature;
 
 import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.R;
@@ -106,30 +111,6 @@ public class CoursewareDialog extends DialogFragment
     
     
         m.getChapters().observe(this, (chapters) -> {
-            /*
-            if (chapters != null && chapters.length != 0) {
-                if (m.selectedChapter == null) {
-                    m.selectedChapter = chapters[0].id;
-                    m.refresh(requireActivity(),chapters[0].id, CoursewareViewModel.TYPE_CHAPTER);
-                }
-                if (chapters[0].subchapters != null) {
-                    if (chapters[0].subchapters.length != 0) {
-                        if (m.selectedSubchapter == null && m.selectedChapter.equals(chapters[0].id)) {
-                            m.selectedSubchapter = chapters[0].subchapters[0].id;
-                            m.refresh(requireActivity(), chapters[0].subchapters[0].id, CoursewareViewModel.TYPE_SUBCHAPTER);
-                        }
-                        if (chapters[0].subchapters[0].sections != null) {
-                            if (chapters[0].subchapters[0].sections.length != 0) {
-                                if (m.selectedSection == null && m.selectedSubchapter.equals(chapters[0].subchapters[0].id)) {
-                                    m.selectedSection = chapters[0].subchapters[0].sections[0].id;
-                                    m.refresh(requireActivity(), chapters[0].subchapters[0].sections[0].id, CoursewareViewModel.TYPE_SECTION);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            */
             if (chapters != null) {
                 if (m.selectedChapter != null) {
                     for (CoursewareChapter c : chapters) {
@@ -381,30 +362,8 @@ public class CoursewareDialog extends DialogFragment
                                             CoursewareBlock b = sect.blocks[position];
                                             if (b instanceof CoursewareHTMLBlock) {
                                                 CoursewareHTMLBlock html = (CoursewareHTMLBlock) b;
-                                                WebView web = new WebView(requireActivity());
-                                                web.setBackgroundColor(Color.TRANSPARENT);
-                                                web.loadData(Base64.encodeToString(html.content.getBytes(), Base64.NO_PADDING),
-                                                        "text/html; charset=utf-8","base64");
-                                                // links should not be opened in this WebView
-                                                web.setWebViewClient(new WebViewClient() {
-                                                    private void handleURL(String url) {
-                                                        Intent i = new Intent(Intent.ACTION_VIEW);
-                                                        i.setData(Uri.parse(url));
-                                                        try {
-                                                            startActivity(i);
-                                                        } catch (ActivityNotFoundException ignored) {}
-                                                    }
-                                                    @Override
-                                                    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                                                        handleURL(request.getUrl().toString());
-                                                        return true;
-                                                    }
-                                                    @Override
-                                                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                                                        handleURL(url);
-                                                        return true;
-                                                    }
-                                                });
+                                                WebView web = createWebView(html);
+                                                web.setWebViewClient(new CoursewareWebViewClient(html, f));
                                                 f.addView(web);
                                                 return;
                                             }
@@ -441,6 +400,64 @@ public class CoursewareDialog extends DialogFragment
                 }
             }
         }
+        
+        public WebView createWebView(CoursewareHTMLBlock html) {
+            WebView web = new WebView(requireActivity());
+            web.setBackgroundColor(Color.TRANSPARENT);
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
+                    WebSettingsCompat.setForceDark(web.getSettings(), WebSettingsCompat.FORCE_DARK_ON);
+                    if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
+                        WebSettingsCompat.setForceDarkStrategy(web.getSettings(), WebSettingsCompat.DARK_STRATEGY_PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING);
+                    }
+                } else {
+                    WebSettingsCompat.setForceDark(web.getSettings(), WebSettingsCompat.FORCE_DARK_OFF);
+                }
+            } else {
+                if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
+                    web.setBackgroundColor(Color.WHITE);
+                }
+                System.out.println("dark mode not supported for WebView");
+            }
+            web.loadData(Base64.encodeToString(html.content.getBytes(), Base64.NO_PADDING), "text/html; charset=utf-8","base64");
+            return web;
+        }
+        
+        public class CoursewareWebViewClient extends WebViewClient {
+            private final CoursewareHTMLBlock b;
+            private final FrameLayout f;
+            public CoursewareWebViewClient(CoursewareHTMLBlock b, FrameLayout f) {
+                this.b = b;
+                this.f = f;
+            }
+            private void handleURL(String url) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                try {
+                    startActivity(i);
+                } catch (ActivityNotFoundException ignored) {}
+            }
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                handleURL(request.getUrl().toString());
+                return true;
+            }
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                handleURL(url);
+                return true;
+            }
+            @Override
+            public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+                f.removeAllViews();
+                WebView newweb = createWebView(b);
+                view.setWebViewClient(null);
+                newweb.setWebViewClient(this);
+                f.addView(newweb);
+                return true;
+            }
+        }
+        
         
         @Override
         public int getItemCount() {

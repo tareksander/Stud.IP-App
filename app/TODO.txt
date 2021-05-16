@@ -16,7 +16,11 @@
             [ ] add the studip notification settings to the settings screen, so you can control from the app what notifications you get
             [x] add the option to not load opencast previews when on mobile data
             [x] add the option to not load image previews when on mobile data
+            [x] bump version
+            [ ] update help text
+            [ ] release without the description and permission updates for 0.5.0
         0.5.0:
+            [ ] add screenshots
             [ ] meetings plugin
                 [x] add permission to record audio, update description accordingly
                 [ ] use android:keepScreenOn in the layout
@@ -25,22 +29,28 @@
                 [ ] or just lock the screen in landscape mode, but the WebView still has to be retained for other configuration changes
                 [ ] support PiP for the meetings
                 [ ] store the WebView in a Provider, and attach and detach it as needed?
+            [ ] bump version
         1.0.0:
             [ ] delete data which is not in a server response, but still in the database
             [ ] support for the planner
             [ ] app widget for the planner
+            [ ] option to browse the web version in an activity with a fullscreen WebView
             [ ] API detection:
                 [ ] if api.php/user failed, try discovery to see if the API is even enabled
                     [ ] if yes, but api.php/user is not enabled, tell the user
                 [ ] see what routes are needed for what features, tell user on login which features are unavailable
+                [ ] fail without message for features where the routes are disabled
+            [ ] bump version
         1.1.0:
             [ ] add support for JSONAPI (probably requires abstracting away the api routes a bit more)
                 [ ] use JSONAPI if possible
             [ ] make more specific rules for proguard, so unused code can be removed
+            [ ] bump version
         1.2.0:
             [ ] plugins:
                 [ ] vips
                 [ ] etherpad
+            [ ] bump version
             
         
         

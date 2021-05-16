@@ -150,6 +150,10 @@ Long press on an addressee to remove it.<br>
     <string name="document_provider_recents">Show recent documents</string>
     <string name="document_provider_search">Enable search</string>
     <string name="load_on_mobile">Load images while using mobile data</string>
+    <string name="load_notification_settings">Load</string>
+    <string name="save_notification_settings">Save</string>
+    <string name="studip_notification_settings">Stud.IP notification settings</string>
+    <string name="courses">Courses</string>
 
 
 </resources>

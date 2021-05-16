@@ -48,4 +48,16 @@ public interface Dispatch
     
     
     
+    @GET("dispatch.php/settings/notification")
+    Call<String> getNotificationSettings();
+    
+    
+    @GET("dispatch.php/settings/notification/open/{id}")
+    Call<Void> openNotificationCategory(@Path("id") String id);
+    
+    
+    @POST("/settings/notification/store")
+    Call<Void> saveNotificationSettings();
+    
+    
 }

@@ -44,6 +44,7 @@
         <activity android:name=".ui.SettingsActivity" android:exported="false" />
         <activity android:name=".ui.LoginActivity" android:exported="false" />
         <activity android:name=".ui.ServerSelectActivity" android:exported="false" />
+        <activity android:name=".ui.plugins.MeetingsActivity" android:exported="false" />
         <activity
             android:name=".ui.HomeActivity"
             android:label="@string/app_name">
