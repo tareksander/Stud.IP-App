@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -35,6 +36,7 @@ public class CrashActivity extends AppCompatActivity
             finish();
             return;
         }
+        trace = "Android API Version: " + Build.VERSION.SDK_INT + "\n" + trace;
         System.err.println(trace);
         System.out.println("crash activity");
         

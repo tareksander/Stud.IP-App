@@ -112,7 +112,7 @@ With the file icon you can view the files of a specific course.<br><br>
 
 <h2>5. Files</h2>
 On this screen you can view your files and course files.<br>
-Tap \"...\" to return to the parent directory, hold to return to you own files.<br>
+Tap \"…\" to return to the parent directory, hold to return to you own files.<br>
 Tap on a folder to view its contents, tap on a file to download it.<br>
 Long press on a file or folder to delete it.<br><br>
 
@@ -154,6 +154,8 @@ Long press on an addressee to remove it.<br>
     <string name="save_notification_settings">Save</string>
     <string name="studip_notification_settings">Stud.IP notification settings</string>
     <string name="courses">Courses</string>
+    <string name="notification_settings_error">could not set notification settings</string>
+    <string name="notification_settings_success">notification settings saved</string>
 
 
 </resources>

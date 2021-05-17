@@ -69,7 +69,7 @@
     Aber wenn das Betriebssystem selbst angegriffen wurde (oder das Gerät gerooted ist), könnte ein anderes Programm sich den Schlüssel für die Datei vom Betriebssytsem nehmen und die Daten auslesen.
     Für normalen Gebrauch sollte es aber sicher genug sein. Der Vorteil gegenüber des Session Cookies ist, dass man unbegrenzte Zeit angemeldet bleibt (solange sich das Passwort nicht ändert)</string>
     <string name="auth_cookie">Session Cookie</string>
-    <string name="auth_cookie_desc">Dies ist die Methode, die auch ein Browser verwendet. Mit dem Benutzernamen und Passwort wird ein Session Cookie vom Server angefragt, dannach wird das Passwort gelöscht.
+    <string name="auth_cookie_desc">Dies ist die Methode, die auch ein Browser verwendet. Mit dem Benutzernamen und Passwort wird ein Session Cookie vom Server angefragt, danach wird das Passwort gelöscht.
     Es wird nur der Cookie auf dem Gerät gespeichert, mit der Gleichen Sicherheit wie das Passwort bei Basic Authentication. Wenn der Cookie von anderen Programmen genommen wird, könnten sich diese als Sie ausgeben, aber nicht ihr Passwort ändern.
     Der Nachteil ist, dass die Sitzung irgendwann abläuft und man sich wieder anmelden muss.</string>
     <string name="auth_oauth">OAuth 2</string>
@@ -114,7 +114,7 @@ Mit dem Datei-Symbol können Sie sich die Dateien eines Kurses anschauen, herunt
 
 <h2>5. Dateibildschirm</h2>
 Auf diesem Bildschirm können Sie Sich ihre Dateien auf dem System und die Dateien von Kursen ansehen.<br>
-Durch tippen auf den \"...\"-Eintrag kommen Sie in das Elternverzeichnis zurück, falls vorhanden, durch halten kommen sie zu Ihren eigenen Dateien zurück.<br>
+Durch tippen auf den \"…\"-Eintrag kommen Sie in das Elternverzeichnis zurück, falls vorhanden, durch halten kommen sie zu Ihren eigenen Dateien zurück.<br>
 Beim antippen eines Verzeichnisses werden die Inhalte angezeigt, bei einer Datei wird sie heruntergeladen.<br>
 Durch Halten auf eine Datei oder ein Verzeichnis wird es gelöscht.<br><br>
 
@@ -155,6 +155,8 @@ Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br
     <string name="save_notification_settings">Speichern</string>
     <string name="studip_notification_settings">Stud.IP Benachrichtigungseinstellungen</string>
     <string name="courses">Kurse</string>
+    <string name="notification_settings_error">Benachrichtigungseinstellungen konnten nicht gesetzt werden</string>
+    <string name="notification_settings_success">Benachrichtigungseinstellungen gespeichert</string>
 
 
 </resources>

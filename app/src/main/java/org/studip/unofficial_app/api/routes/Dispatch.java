@@ -3,8 +3,11 @@ package org.studip.unofficial_app.api.routes;
 import org.studip.unofficial_app.api.rest.StudipNotifications;
 import org.studip.unofficial_app.api.rest.StudipSearchUser;
 
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.http.Field;
+import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -56,8 +59,9 @@ public interface Dispatch
     Call<Void> openNotificationCategory(@Path("id") String id);
     
     
-    @POST("/settings/notification/store")
-    Call<Void> saveNotificationSettings();
+    @POST("dispatch.php/settings/notification/store")
+    @FormUrlEncoded
+    Call<Void> saveNotificationSettings(@FieldMap Map<String, String> fields);
     
     
 }

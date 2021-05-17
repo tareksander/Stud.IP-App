@@ -2,23 +2,22 @@
     to check if the build on f-droid worked: https://f-droid.org/wiki/page/Main_Page
     https://f-droid.org/wiki/page/Category:Apps_with_failing_builds
     
-    TODO for crash reports, send the android version the app was running with, so the bug can be reproduced
     
     Release checklist:
     - VersionName and VersionCode changed?
     - fastlane descriptions updated?
     - release tested?
     - removed debug output?
+    - changelog for the version code written?
     
     Roadmap:
         0.4.0:
             [x] Courseware plugin, play opencast videos linked in courseware
-            [ ] add the studip notification settings to the settings screen, so you can control from the app what notifications you get
+            [x] add the studip notification settings to the settings screen, so you can control from the app what notifications you get
             [x] add the option to not load opencast previews when on mobile data
             [x] add the option to not load image previews when on mobile data
             [x] bump version
             [ ] update help text
-            [ ] release without the description and permission updates for 0.5.0
         0.5.0:
             [ ] add screenshots
             [ ] meetings plugin
@@ -30,6 +29,7 @@
                 [ ] support PiP for the meetings
                 [ ] store the WebView in a Provider, and attach and detach it as needed?
             [ ] bump version
+            [ ] update help text
         1.0.0:
             [ ] delete data which is not in a server response, but still in the database
             [ ] support for the planner
@@ -44,6 +44,7 @@
         1.1.0:
             [ ] add support for JSONAPI (probably requires abstracting away the api routes a bit more)
                 [ ] use JSONAPI if possible
+                [ ] for features only available for JSONAPI, fail gracefully and inform the user, or hide the feature to begin with, or emulate the feature
             [ ] make more specific rules for proguard, so unused code can be removed
             [ ] bump version
         1.2.0:
