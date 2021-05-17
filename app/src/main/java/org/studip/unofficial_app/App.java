@@ -34,6 +34,7 @@ public class App extends Application
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 StringWriter w = new StringWriter();
                 e.printStackTrace(new PrintWriter(w));
+                e.printStackTrace();
                 i.putExtra("Backtrace", w.toString());
                 startActivity(i);
             }

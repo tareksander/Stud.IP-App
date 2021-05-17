@@ -30,6 +30,7 @@ import org.studip.unofficial_app.ui.fragments.dialog.CourseForumDialogFragment;
 import org.studip.unofficial_app.ui.fragments.dialog.CourseNewsDialogFragment;
 import org.studip.unofficial_app.ui.plugins.fragments.dialog.CourseOpencastDialog;
 import org.studip.unofficial_app.ui.plugins.fragments.dialog.CoursewareDialog;
+import org.studip.unofficial_app.ui.plugins.fragments.dialog.MeetingsRoomsDialog;
 
 import java.util.Arrays;
 
@@ -206,6 +207,13 @@ public class CoursesFragment extends SwipeRefreshFragment
                 courseware.setArguments(args);
                 requireActivity().getSupportFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .add(android.R.id.content, courseware, "dialog_courseware").addToBackStack(null).commit();
+            });
+            b.courseMeetings.setOnClickListener(v1 -> {
+                Bundle args = new Bundle();
+                args.putString("cid",c.course_id);
+                MeetingsRoomsDialog opencast = new MeetingsRoomsDialog();
+                opencast.setArguments(args);
+                opencast.show(getParentFragmentManager(),"course_meetings");
             });
             return v;
         }

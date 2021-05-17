@@ -4,16 +4,8 @@ import retrofit2.Retrofit;
 
 public class Meetings
 {
-    
-    private final MeetingsRoutes routes;
+    public final MeetingsRoutes routes;
     public Meetings(Retrofit r) {
         routes = r.create(MeetingsRoutes.class);
     }
-    
-    
-    
-    
-    
-    
-    
 }

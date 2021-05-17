@@ -6,8 +6,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
+import android.webkit.CookieManager;
+import android.webkit.HttpAuthHandler;
 import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
+import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -119,6 +122,12 @@ public class API
                     {
                         if (httpUrl.isHttps())
                         {
+                            // sync the cookies with the WebViews, used for the Meetings plugin with cookie auth
+                            CookieManager m = CookieManager.getInstance();
+                            for (Cookie c : list)
+                            {
+                                m.setCookie(httpUrl.host(), c.toString());
+                            }
                             List<Cookie> clist = cookies.get(httpUrl.host());
                             if (clist != null)
                             {
@@ -261,6 +270,40 @@ public class API
         }
     }
     
+    private Cookie getSessionCookie() {
+        List<Cookie> l = cookies.get(hostname);
+        if (l != null) {
+            for (Cookie c : l) {
+                if (c.name().equals(AUTH_COOKIE_NAME)) {
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+    
+    
+    
+    public boolean authWebView(WebView v, HttpAuthHandler handler, String host) {
+        if (! handler.useHttpAuthUsernamePassword()) {
+            handler.cancel();
+            return false;
+        }
+        // only authenticate for the Stud.IP server
+        if (hostname.equals(host)) {
+            if (auth_method == Settings.AUTHENTICATION_BASIC) {
+                handler.proceed(username, password);
+                return true;
+            }
+            if (auth_method == Settings.AUTHENTICATION_COOKIE) {
+                // TODO redirect to login screen instead
+                
+                return false;
+            }
+        }
+        handler.cancel();
+        return false;
+    }
     
     
     

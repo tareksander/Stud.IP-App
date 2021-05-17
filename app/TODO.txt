@@ -16,19 +16,21 @@
             [x] add the studip notification settings to the settings screen, so you can control from the app what notifications you get
             [x] add the option to not load opencast previews when on mobile data
             [x] add the option to not load image previews when on mobile data
-            [x] bump version
-            [ ] update help text
-        0.5.0:
             [ ] add screenshots
             [ ] meetings plugin
                 [x] add permission to record audio, update description accordingly
-                [ ] use android:keepScreenOn in the layout
-                [ ] make it an activity, handle orientation changes myself, or else the WebView with the conference gets destroyed
-                [ ] https://medium.com/cs-random-thoughts-on-tech/android-retain-webview-on-orientation-change-best-practices-be29fd7e56e3
-                [ ] or just lock the screen in landscape mode, but the WebView still has to be retained for other configuration changes
+                [x] use android:keepScreenOn in the layout
+                [x] make it an activity, handle orientation changes myself, or else the WebView with the conference gets destroyed
+                [x] https://medium.com/cs-random-thoughts-on-tech/android-retain-webview-on-orientation-change-best-practices-be29fd7e56e3
+                [x] or just lock the screen in landscape mode, but the WebView still has to be retained for other configuration changes
+                [ ] bind the activity to a foreground service, so it doesn't get destroyed?
+                [ ] Test what the minimum API level is where BBB works in the WebView
                 [ ] support PiP for the meetings
-                [ ] store the WebView in a Provider, and attach and detach it as needed?
-            [ ] bump version
+                    [/] hide/show everything but the presentation for PiP-mode, with javascript injection
+                    [ ] add action buttons to mute/unmute
+            [x] bump version
+            [ ] update description, add camera and MODIFY_AUDIO_SETTINGS description
+            [ ] add explanation for additional permissions added by the libraries, namely FOREGROUND_SERVICE, WAKELOCK, START_AT_BOOT
             [ ] update help text
         1.0.0:
             [ ] delete data which is not in a server response, but still in the database
