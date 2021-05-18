@@ -17,23 +17,23 @@
             [x] add the option to not load opencast previews when on mobile data
             [x] add the option to not load image previews when on mobile data
             [x] add screenshots
-            [ ] meetings plugin
+            [x] meetings plugin
                 [x] add permission to record audio, update description accordingly
                 [x] use android:keepScreenOn in the layout
                 [x] make it an activity, handle orientation changes myself, or else the WebView with the conference gets destroyed
                 [x] https://medium.com/cs-random-thoughts-on-tech/android-retain-webview-on-orientation-change-best-practices-be29fd7e56e3
                 [x] or just lock the screen in landscape mode, but the WebView still has to be retained for other configuration changes
-                [ ] Test what the minimum API level is where BBB works in the WebView. works >= 25
-                [ ] Test why the webcam doesn't work on-device
-                [ ] check if the WebView is really destroyed when the activity is closed, so the user really exits the conference and can't be heard
-                [ ] support PiP for the meetings
-                    [/] hide/show everything but the presentation for PiP-mode, with javascript injection
-                    [ ] add action buttons to mute/unmute, disable webcam
+                [x] check if the WebView is really destroyed when the activity is closed, so the user really exits the conference and can't be heard
+                [x] support PiP for the meetings
+                    [x] hide/show everything but the presentation for PiP-mode, with javascript injection
+                    [x] add action buttons to mute/unmute
             [x] bump version
             [x] update description, add camera and MODIFY_AUDIO_SETTINGS description
             [x] add explanation for additional permissions added by the libraries, namely FOREGROUND_SERVICE, WAKELOCK, START_AT_BOOT
             [x] update help text
         1.0.0:
+            [ ] meetings plugin
+                [ ] Test why the webcam doesn't work on-device
             [ ] delete data which is not in a server response, but still in the database
             [ ] support for the planner
             [ ] app widget for the planner

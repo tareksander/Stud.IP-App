@@ -141,7 +141,10 @@ Tapping the meetings icon for a course loads all meeting rooms available.<br>
 When you click a button, a new window will open with the BigBlueButton conference.<br>
 Currently only works with HTTP basic auth.<br>
 When navigating away, the window automatically goes into picture-in-picture mode and the presentation is set to fullscreen, so the conference can continue without interruption.<br>
-
+As long as the conference is active, there is a non-dismissable notification present.<br>
+The notification has actions to exit the conference and to toggle the microphone.<br>
+Tapping the notification returns to the conference in full-screen.<br>
+The PiP-window also has a button to toggle the microphone.<br>
 <br><br>
 "]]></string>
     <string name="view">View: %1$s</string>
@@ -175,6 +178,10 @@ When navigating away, the window automatically goes into picture-in-picture mode
     <string name="notification_settings_error">could not set notification settings</string>
     <string name="notification_settings_success">notification settings saved</string>
     <string name="channel_meetings">Meetings</string>
+    <string name="logout">Logout</string>
+    <string name="toggle_mic">toggle microphone</string>
+    <string name="mic_on">microphone on</string>
+    <string name="mic_off">microphone off</string>
 
 
 </resources>

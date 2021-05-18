@@ -1,14 +1,17 @@
 package org.studip.unofficial_app.ui.plugins;
 
+import android.app.PendingIntent;
 import android.app.PictureInPictureParams;
 import android.app.RemoteAction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Rational;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -23,12 +26,21 @@ import java.util.LinkedList;
 
 public class MeetingsActivity extends AppCompatActivity
 {
-    private MeetingsFragment f;
+    public static final String ACTION_LOGOUT = "logout";
+    public static final String ACTION_TOGGLE_MIC = "microphone";
+    public static final String ACTION_VIEW = "view";
+    
+    public static MeetingsActivity instance = null;
+    
+    
+    MeetingsFragment f;
     
     public String url;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        instance = this;
         
         Intent i = getIntent();
         url = i.getStringExtra("url");
@@ -52,14 +64,16 @@ public class MeetingsActivity extends AppCompatActivity
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        String action = intent.getStringExtra("action");
+        String action = intent.getAction();
+        //System.out.println("action: "+action);
         if (action == null) {
             finish();
             startActivity(intent);
-        } else {
-            System.out.println(action);
         }
-        
+        // doing this raises a SecurityException on Android 12, so check the version
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+            sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+        }
     }
     
     @Override
@@ -67,19 +81,29 @@ public class MeetingsActivity extends AppCompatActivity
         super.onUserLeaveHint();
     
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
+            f.goFullscreen();
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 PictureInPictureParams.Builder b = new PictureInPictureParams.Builder();
+                
+                // https://stackoverflow.com/questions/54976761/how-do-i-create-a-custom-screen-size-for-picture-in-picture-mode-for-android
+                
+                
                 
                 // TODO
                 //  for android S: b.setSeamlessResizeEnabled(true);
                 //  f-droid doesn't have the android S sdk, so wait until android S is released
                 
                 LinkedList<RemoteAction> actions = new LinkedList<>();
-                //actions.add(new RemoteAction(android.R.drawable.ic_media_play,));
+                {
+                    Intent i = new Intent(this, MeetingsReceiver.class);
+                    i.setAction(ACTION_TOGGLE_MIC);
+                    actions.add(new RemoteAction(
+                            Icon.createWithResource(this, android.R.drawable.ic_btn_speak_now), getString(R.string.toggle_mic),
+                            getString(R.string.toggle_mic), PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_IMMUTABLE)));
+                }
                 
                 b.setActions(actions);
                 
-                f.goFullscreen();
                 
                 enterPictureInPictureMode(b.build());
             } else {
@@ -104,6 +128,13 @@ public class MeetingsActivity extends AppCompatActivity
         }
     }
     
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isFinishing()) {
+            instance = null;
+        }
+    }
     
     @Override
     protected void onResume() {

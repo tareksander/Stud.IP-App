@@ -2,6 +2,7 @@ package org.studip.unofficial_app.ui.plugins.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +27,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,6 +41,7 @@ import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.Notifications;
 import org.studip.unofficial_app.ui.plugins.MeetingsActivity;
+import org.studip.unofficial_app.ui.plugins.MeetingsReceiver;
 
 public class MeetingsFragment extends Fragment
 {
@@ -76,6 +79,33 @@ public class MeetingsFragment extends Fragment
         b.setOngoing(true);
         b.setContentTitle(title);
     
+        int flags = 0;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            flags = PendingIntent.FLAG_IMMUTABLE;
+        }
+    
+        {
+            Intent ret = new Intent(requireActivity(), MeetingsActivity.class);
+            ret.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            ret.setAction(MeetingsActivity.ACTION_VIEW);
+            b.setContentIntent(PendingIntent.getActivity(requireActivity(), 0, ret, flags));
+        }
+        
+        {
+            Intent logout = new Intent(requireActivity(), MeetingsReceiver.class);
+            logout.setAction(MeetingsActivity.ACTION_LOGOUT);
+            b.addAction(R.drawable.home_blue, getString(R.string.logout), 
+                    PendingIntent.getBroadcast(requireActivity(), 0, logout, flags));
+        }
+    
+        {
+            Intent logout = new Intent(requireActivity(), MeetingsReceiver.class);
+            logout.setAction(MeetingsActivity.ACTION_TOGGLE_MIC);
+            b.addAction(android.R.drawable.ic_btn_speak_now, getString(R.string.toggle_mic),
+                    PendingIntent.getBroadcast(requireActivity(), 0, logout, flags));
+        }
+        
+        
         NotificationManagerCompat m = NotificationManagerCompat.from(requireActivity());
         m.notify(Integer.MIN_VALUE, b.build());
     }
@@ -97,20 +127,19 @@ public class MeetingsFragment extends Fragment
                 //System.out.println(consoleMessage.message());
                 return true;
             }
-    
             @Override
             public void onReceivedTitle(WebView view, String title) {
                 super.onReceivedTitle(view, title);
                 notification(title);
             }
-    
             @Override
             public void onPermissionRequest(PermissionRequest request) {
                 for (String r : request.getResources()) {
                     //System.out.println("requesting: "+r);
                     if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(r)) {
                         if (requireActivity().getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_MICROPHONE)) {
-                            if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED) {
+                            if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.RECORD_AUDIO) == 
+                                    PackageManager.PERMISSION_DENIED) {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                     requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, 0);
                                 }
@@ -122,7 +151,8 @@ public class MeetingsFragment extends Fragment
                     }
                     if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(r)) {
                         if (requireActivity().getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-                            if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
+                            if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) == 
+                                    PackageManager.PERMISSION_DENIED) {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                     requestPermissions(new String[]{Manifest.permission.CAMERA}, 0);
                                 }
@@ -134,13 +164,11 @@ public class MeetingsFragment extends Fragment
                     }
                 }
             }
-    
             @Override
             public void onShowCustomView(View view, CustomViewCallback callback) {
                 l.removeAllViews();
                 l.addView(view);
             }
-    
             @Override
             public void onHideCustomView() {
                 l.removeAllViews();
@@ -151,18 +179,33 @@ public class MeetingsFragment extends Fragment
         // BigBlueButton needs Javascript enabled, and to counter malicious scripts, web navigation is disabled after the page finished loading
         settings.setJavaScriptEnabled(true);
         // needed for BigBlueButton to recognize the WebView as a browser
-        settings.setUserAgentString("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36");
+        settings.setUserAgentString(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36");
         settings.setMediaPlaybackRequiresUserGesture(false);
         CookieManager.getInstance().setAcceptThirdPartyCookies(conference, true);
         conference.loadUrl(url);
         return conference;
     }
     
-    public boolean isMicEnabled() {
-        return false;
+    public void isMicEnabled(ValueCallback<String> resultCallback) {
+        conference.evaluateJavascript("var e = document.querySelector(\"i[class*=\\\"icon-bbb-unmute\\\"]\");"+
+                "e != null;", resultCallback);
     }
     
-    
+    public void toggleMic() {
+        //System.out.println("toggle mic");
+        conference.evaluateJavascript("var e = document.querySelector(\"i[class*=\\\"icon-bbb-unmute\\\"]\");" +
+                        "if (e !== null && e !== undefined) {e.parentNode.parentNode.click(); false} else {" +
+                        "e = document.querySelector(\"i[class*=\\\"icon-bbb-mute\\\"]\");" +
+                        "if (e !== null && e !== undefined) {e.parentNode.parentNode.click(); true} }"
+                , value -> {
+                    if ("true".equals(value)) {
+                        Toast.makeText(requireActivity(),R.string.mic_on , Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(requireActivity(),R.string.mic_off , Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
     
     public void goFullscreen() {
         conference.evaluateJavascript("var e = document.querySelector(\"button[class*=\\\"fullScreenButton\\\"]\");" +
@@ -174,34 +217,11 @@ public class MeetingsFragment extends Fragment
         super.onDestroyView();
         //System.out.println("destroy view");
         if (requireActivity().isFinishing()) {
-            System.out.println("finishing");
+            //System.out.println("finishing");
             NotificationManagerCompat m = NotificationManagerCompat.from(requireActivity());
-            System.out.println("destroyed by timeout");
             conference.destroy();
             conference = null;
             m.cancel(Integer.MIN_VALUE);
-            /*
-            // try to log out normally
-            conference.evaluateJavascript("document.querySelector(\"i[class*=\\\"icon-bbb-logout\\\"]\").parentNode.click();", value -> {
-                l.removeAllViews();
-                if (conference != null) {
-                    System.out.println("destroyed after javascript");
-                    conference.destroy();
-                    conference = null;
-                    m.cancel(Integer.MIN_VALUE);
-                }
-            });
-            // if the logout javascript doesn't complete in time, destroy the WebView after 2 seconds
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                l.removeAllViews();
-                if (conference != null) {
-                    System.out.println("destroyed by timeout");
-                    conference.destroy();
-                    conference = null;
-                    m.cancel(Integer.MIN_VALUE);
-                }
-            }, 2000);
-             */
         }
     }
     
