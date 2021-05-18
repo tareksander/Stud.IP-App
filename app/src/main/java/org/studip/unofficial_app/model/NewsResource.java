@@ -1,11 +1,13 @@
 package org.studip.unofficial_app.model;
+
 import android.content.Context;
+
 import androidx.lifecycle.LiveData;
 
 import org.studip.unofficial_app.api.rest.StudipCollection;
 import org.studip.unofficial_app.api.rest.StudipNews;
+
 import java.util.List;
-import java.util.Map;
 
 import retrofit2.Call;
 public class NewsResource extends NetworkResource<List<StudipNews>>

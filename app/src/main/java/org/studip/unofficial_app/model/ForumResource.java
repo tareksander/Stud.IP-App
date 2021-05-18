@@ -1,14 +1,17 @@
 package org.studip.unofficial_app.model;
 
 import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.api.rest.StudipCollection;
 import org.studip.unofficial_app.api.rest.StudipForumCategory;
 import org.studip.unofficial_app.api.rest.StudipForumEntry;
 import org.studip.unofficial_app.model.room.DB;
+
 import retrofit2.Call;
 
 public class ForumResource extends NetworkResource<Object>

@@ -3,13 +3,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="org.studip.unofficial_app">
     
+    <!-- used to connect to the Stud.IP server -->
     <uses-permission android:name="android.permission.INTERNET" />
-    
+
+    <!-- used to write to the downloads folder -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28"
         tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    
+    <!-- used to not load images when on mobile data -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- used for the BigBlueButton video conferences -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+    <uses-feature android:name="android.hardware.audio.microphone" />
+    
     
     <queries>
         <intent>
@@ -21,21 +34,29 @@
     <application
         android:name=".App"
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/app_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.HelpActivity" />
 
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
-        
+
+        <activity android:name=".ui.HelpActivity" />
         <activity android:name=".ui.CrashActivity" android:exported="false" />
         <activity android:name=".ui.SettingsActivity" android:exported="false" />
         <activity android:name=".ui.LoginActivity" android:exported="false" />
         <activity android:name=".ui.ServerSelectActivity" android:exported="false" />
+        <activity android:name=".ui.plugins.MeetingsActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:launchMode="singleInstance"
+            android:taskAffinity=""
+            android:supportsPictureInPicture="true"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            tools:ignore="UnusedAttribute" />
         <activity
             android:name=".ui.HomeActivity"
             android:label="@string/app_name">
@@ -66,6 +87,10 @@
                 <action android:name="android.intent.action.LOCALE_CHANGED"/>
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".ui.plugins.MeetingsReceiver"
+            android:exported="false" />
         
         <provider
             android:name=".documentsprovider.DocumentsProvider"

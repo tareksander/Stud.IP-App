@@ -2,7 +2,6 @@ package org.studip.unofficial_app.ui.fragments.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.EditText;
 

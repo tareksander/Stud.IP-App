@@ -1,9 +1,7 @@
 package org.studip.unofficial_app.documentsprovider;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
 import android.app.AuthenticationRequiredException;
-import android.app.DownloadManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -12,28 +10,23 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.MemoryFile;
 import android.os.ParcelFileDescriptor;
-import android.os.ProxyFileDescriptorCallback;
-import android.os.storage.StorageManager;
 import android.provider.DocumentsContract;
-import android.system.ErrnoException;
 import android.webkit.MimeTypeMap;
 
-import static android.provider.DocumentsContract.Root;
-import static android.provider.DocumentsContract.Document;
-
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
-import androidx.room.Room;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
@@ -48,37 +41,31 @@ import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.model.room.DB;
-import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.ServerSelectActivity;
+import org.studip.unofficial_app.ui.fragments.FileFragment;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.SortedMap;
-import java.util.Timer;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.BiConsumer;
 import io.reactivex.schedulers.Schedulers;
-import kotlin.io.ByteStreamsKt;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static android.provider.DocumentsContract.Document;
+import static android.provider.DocumentsContract.Root;
 
 public class DocumentsProvider extends android.provider.DocumentsProvider
 {
@@ -117,6 +104,7 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
                     getContext().getContentResolver().notifyChange(DocumentsContract.buildRootsUri(AUTHORITIES), null);
                 });
                 {
+                    // TODO own files only show after restarting the app when the document provider is first enabled
                     API api = APIProvider.getAPI(getContext());
                     if (api != null && api.getUserID() != null) {
                         docs.documents().isInRoots(api.getUserID()).subscribeOn(Schedulers.io()).subscribe((documentRoots, throwable) -> {
@@ -299,6 +287,14 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
         
     }
     
+    public static void copyStream(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024*1024];
+        int read;
+        while ((read = in.read(buffer)) != -1) {
+            out.write(buffer, 0, read);
+        }
+    }
+    
     
     @NotNull
     public API APICheckLogin() throws FileNotFoundException, AuthenticationRequiredException {
@@ -447,7 +443,7 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
                     try (ResponseBody b = api.file.download(documentId).execute().body();
                          FileOutputStream out = new FileOutputStream(tmp)) {
                         if (b != null) {
-                            ByteStreamsKt.copyTo(b.byteStream(), out, 1024 * 1024);
+                            copyStream(b.byteStream(), out);
                             //System.out.println("downloaded");
                         }
                         else {
@@ -463,7 +459,7 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
                         StudipFolder.FileRef f = api.file.get(documentId).execute().body();
                         if (f != null) {
                             api.file.update(documentId, MultipartBody.Part.createFormData("filename", f.name,
-                                    RequestBody.create(ByteStreamsKt.readBytes(in)))).execute();
+                                    RequestBody.create(FileFragment.readFully(in)))).execute();
                         }
                     }
                     catch (Exception ignored) {}
@@ -712,6 +708,14 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
         }
         checkDB();
     
+    
+        
+        
+        ConnectivityManager con = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (! s.load_images_on_mobile && con.isActiveNetworkMetered()) {
+            throw new FileNotFoundException();
+        }
+        
         API api = APICheckLogin();
         
         //System.out.println("thumbnail");
@@ -721,7 +725,7 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
             try (ResponseBody body = api.file.download(documentId).execute().body();
                  FileOutputStream out = new FileOutputStream(tmp)) {
                 if (body != null) {
-                    ByteStreamsKt.copyTo(body.byteStream(), out, 1024 * 1024);
+                    copyStream(body.byteStream(), out);
                     //System.out.println("thumbnail downloaded");
                 }
             }

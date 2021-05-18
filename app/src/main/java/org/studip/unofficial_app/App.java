@@ -1,13 +1,10 @@
 package org.studip.unofficial_app;
+
 import android.app.Application;
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.security.crypto.EncryptedSharedPreferences;
 
-import com.squareup.picasso.Picasso;
-
-import org.studip.unofficial_app.api.rest.StudipNotifications;
 import org.studip.unofficial_app.model.Notifications;
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.ui.CrashActivity;
@@ -37,6 +34,7 @@ public class App extends Application
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 StringWriter w = new StringWriter();
                 e.printStackTrace(new PrintWriter(w));
+                e.printStackTrace();
                 i.putExtra("Backtrace", w.toString());
                 startActivity(i);
             }

@@ -3,22 +3,14 @@ package org.studip.unofficial_app.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.databinding.ActivityServerSelectBinding;
 import org.studip.unofficial_app.model.APIProvider;
-import org.studip.unofficial_app.model.DBProvider;
-import org.studip.unofficial_app.model.NotificationWorker;
-import org.studip.unofficial_app.model.Settings;
-import org.studip.unofficial_app.model.SettingsProvider;
-import org.studip.unofficial_app.model.room.DB;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 
 public class ServerSelectActivity extends AppCompatActivity
 {

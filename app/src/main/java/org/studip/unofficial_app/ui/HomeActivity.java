@@ -27,6 +27,8 @@ import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.api.rest.StudipCourse;
 import org.studip.unofficial_app.databinding.ActivityHomeBinding;
+import org.studip.unofficial_app.documentsprovider.DocumentsDB;
+import org.studip.unofficial_app.documentsprovider.DocumentsDBProvider;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.NotificationWorker;
@@ -44,10 +46,6 @@ import org.studip.unofficial_app.ui.fragments.MessageFragment;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import io.reactivex.MaybeObserver;
-import io.reactivex.Scheduler;
-import io.reactivex.schedulers.Schedulers;
 
 public class HomeActivity extends AppCompatActivity
 {
@@ -89,6 +87,11 @@ public class HomeActivity extends AppCompatActivity
             db.getTransactionExecutor().execute(() -> {
                 db.clearAllTables();
                 System.out.println("database cleared");
+            });
+            DocumentsDB docdb = DocumentsDBProvider.getDB(this);
+            docdb.getTransactionExecutor().execute(() -> {
+                docdb.clearAllTables();
+                System.out.println("document database cleared");
             });
             if (s.notification_service_enabled) {
                 NotificationWorker.enqueue(this);

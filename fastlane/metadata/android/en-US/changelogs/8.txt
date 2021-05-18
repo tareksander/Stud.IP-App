@@ -1,0 +1,3 @@
+Added support for Courseware and Meetings plugins.
+You can now set the Stud.IP notification settings in the app.
+Options to not load image previews for Opencast videos or the document provider when using mobile data.

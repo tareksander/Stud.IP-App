@@ -6,8 +6,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
+import android.webkit.CookieManager;
+import android.webkit.HttpAuthHandler;
 import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
+import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -15,8 +18,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.security.crypto.EncryptedSharedPreferences;
 
 import org.jetbrains.annotations.NotNull;
+import org.studip.unofficial_app.api.plugins.courseware.Courseware;
+import org.studip.unofficial_app.api.plugins.meetings.Meetings;
 import org.studip.unofficial_app.api.plugins.opencast.Opencast;
-import org.studip.unofficial_app.api.rest.StudipFolder;
 import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.api.routes.Course;
 import org.studip.unofficial_app.api.routes.Discovery;
@@ -41,7 +45,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Cookie;
@@ -89,9 +92,10 @@ public class API
     
     
     public final Opencast opencast;
+    public final Courseware courseware;
+    public final Meetings meetings;
     
-    
-    private final TestRoutes tests;
+    //private final TestRoutes tests;
     
     private final String hostname;
     
@@ -118,6 +122,12 @@ public class API
                     {
                         if (httpUrl.isHttps())
                         {
+                            // sync the cookies with the WebViews, used for the Meetings plugin with cookie auth
+                            CookieManager m = CookieManager.getInstance();
+                            for (Cookie c : list)
+                            {
+                                m.setCookie(httpUrl.host(), c.toString());
+                            }
                             List<Cookie> clist = cookies.get(httpUrl.host());
                             if (clist != null)
                             {
@@ -158,7 +168,7 @@ public class API
                     if (response.request().header("Authorization") != null) {
                         return null;
                     }
-                    if (route != null && route.address().url().isHttps() && route.address().url().host().equals(hostname) && password != null && auth_method == Settings.AUTHENTICATION_BASIC) {
+                    if (route != null && route.address().url().isHttps() && route.address().url().host().equals(hostname.split("/")[0]) && password != null && auth_method == Settings.AUTHENTICATION_BASIC) {
                         //System.out.println("Basic Authentication used for "+route.address().url().toString());
                         return response.request().newBuilder().header("Authorization",Credentials.basic(username,password)).build();
                     } else {
@@ -175,16 +185,26 @@ public class API
         message = retrofit.create(Message.class);
         studip = retrofit.create(Studip.class);
         user = retrofit.create(User.class);
-        tests = retrofit.create(TestRoutes.class);
         semester = retrofit.create(Semester.class);
         dispatch = retrofit.create(Dispatch.class);
+    
+        //tests = retrofit.create(TestRoutes.class);
         
         opencast = new Opencast(retrofit);
+        courseware = new Courseware(retrofit);
+        meetings = new Meetings(retrofit);
     }
     
-    public void downloadFile(@NonNull Context con, @NonNull String fid, String filename) {
+    public void downloadFile(@NonNull Context con, @NonNull String fid, String filename, boolean url) {
         DownloadManager m = (DownloadManager) con.getSystemService(Context.DOWNLOAD_SERVICE);
-        String uri = HTTPS+hostname+"/api.php/file/"+fid+"/download";
+        
+        String uri = HTTPS+hostname;
+        if (url) {
+            uri += fid;
+        } else {
+            uri += "/api.php/file/"+fid+"/download";
+        }
+        //System.out.println(uri);
         if (URLUtil.isHttpsUrl(uri))
         {
             DownloadManager.Request r = new DownloadManager.Request(Uri.parse(uri));
@@ -210,9 +230,11 @@ public class API
                 r.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             }
             
+            
+            
             boolean authed = false;
 
-            if (auth_method == Settings.AUTHENTICATION_BASIC)
+            if (auth_method == Settings.AUTHENTICATION_BASIC && ! url)
             {
                 r.addRequestHeader("Authorization", Credentials.basic(username, password));
                 authed = true;
@@ -247,6 +269,43 @@ public class API
             throw new RuntimeException("download would not be secure");
         }
     }
+    
+    private Cookie getSessionCookie() {
+        List<Cookie> l = cookies.get(hostname);
+        if (l != null) {
+            for (Cookie c : l) {
+                if (c.name().equals(AUTH_COOKIE_NAME)) {
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+    
+    
+    
+    public boolean authWebView(WebView v, HttpAuthHandler handler, String host) {
+        if (! handler.useHttpAuthUsernamePassword()) {
+            handler.cancel();
+            return false;
+        }
+        // only authenticate for the Stud.IP server
+        if (hostname.equals(host)) {
+            if (auth_method == Settings.AUTHENTICATION_BASIC) {
+                handler.proceed(username, password);
+                return true;
+            }
+            if (auth_method == Settings.AUTHENTICATION_COOKIE) {
+                // TODO redirect to login screen instead
+                
+                return false;
+            }
+        }
+        handler.cancel();
+        return false;
+    }
+    
+    
     
     public String getHostname() {
         return hostname;
@@ -375,7 +434,7 @@ public class API
         
         if (auth != null) {
             ArrayList<Cookie> l = new ArrayList<>();
-            l.add(new Cookie.Builder().name(AUTH_COOKIE_NAME).hostOnlyDomain(hostname).value(auth).secure().build());
+            l.add(new Cookie.Builder().name(AUTH_COOKIE_NAME).hostOnlyDomain(hostname.split("/")[0]).value(auth).secure().build());
             api.cookies.put(hostname, l);
             api.userID = prefs.getString(USERID_KEY,null);
             //System.out.println("cookie found: "+l.toString());
@@ -385,52 +444,11 @@ public class API
         String password = prefs.getString(PASSWORD_KEY,null);
         
         
-        
         if (username != null && password != null) {
             api.username = username;
             api.password = password;
             api.auth_method = Settings.AUTHENTICATION_BASIC;
         }
-        
-        /*
-        api.folder_id = prefs.getString(USER_FOLDER_KEY,null);
-        if (api.folder_id == null) {
-            api.folder_id = ""; // to indicate loading is in progress
-            api.save(prefs);
-            api.user.userFolder(api.userID).enqueue(new Callback<StudipFolder>()
-            {
-                @Override
-                public void onResponse(@NotNull Call<StudipFolder> call, @NotNull Response<StudipFolder> response) {
-                    StudipFolder f = response.body();
-                    if (f != null && f.id != null && ! f.id.equals("")) {
-                        api.folder_id = f.id;
-                    }
-                }
-                @Override
-                public void onFailure(@NotNull Call<StudipFolder> call, @NotNull Throwable t) {}
-            });
-        }
-        */
-        
-        // To test if authentication is used on foreign websites, but there should not be calls able to be made to foreign websites anyways
-        /*
-        System.out.println("trying google");
-        api.tests.tryGoogle().enqueue(new Callback<ResponseBody>()
-        {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response)
-            {
-                
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t)
-            {
-
-            }
-        });
-        */
-        
         
         return api;
     }

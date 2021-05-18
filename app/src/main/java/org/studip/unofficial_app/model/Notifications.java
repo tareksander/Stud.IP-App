@@ -4,9 +4,11 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
 import org.studip.unofficial_app.R;
 
 public class Notifications
@@ -15,6 +17,8 @@ public class Notifications
     public static final String CHANNEL_FILES = "channel_files";
     public static final String CHANNEL_MESSAGES = "channel_messages";
     public static final String CHANNEL_OTHER = "channel_other";
+    
+    public static final String CHANNEL_MEETINGS = "channel_meetings";
     
     public static void initChannels(Context c) {
         if (Build.VERSION.SDK_INT >= 26) {
@@ -30,6 +34,9 @@ public class Notifications
     
             NotificationChannel other = new NotificationChannel(CHANNEL_OTHER,c.getString(R.string.channel_other),NotificationManager.IMPORTANCE_LOW);
             n.createNotificationChannel(other);
+    
+            NotificationChannel meetings = new NotificationChannel(CHANNEL_MEETINGS,c.getString(R.string.channel_meetings),NotificationManager.IMPORTANCE_LOW);
+            n.createNotificationChannel(meetings);
         }
     }
     
@@ -44,7 +51,6 @@ public class Notifications
             b.setChannelId(type);
         } else {
             int priority = NotificationCompat.PRIORITY_DEFAULT;
-            b.setPriority(NotificationCompat.PRIORITY_DEFAULT);
             Settings s = SettingsProvider.getSettings(c);
             if (s != null) {
                 if (CHANNEL_FORUM.equals(type)) {
@@ -54,19 +60,19 @@ public class Notifications
                     priority = s.files_priority;
                 }
                 if (CHANNEL_MESSAGES.equals(type)) {
-                    //System.out.println(s.messages_priority);
                     priority = s.messages_priority;
                 }
                 if (CHANNEL_OTHER.equals(type)) {
                     priority = s.other_priority;
+                }
+                if (CHANNEL_MEETINGS.equals(type)) {
+                    priority = NotificationCompat.PRIORITY_LOW;
                 }
             }
             b.setPriority(priority);
             if (priority == NotificationCompat.PRIORITY_DEFAULT || priority == NotificationCompat.PRIORITY_HIGH) {
                 b.setDefaults(NotificationCompat.DEFAULT_SOUND);
             }
-            
-            
         }
     }
     

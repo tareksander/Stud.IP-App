@@ -1,8 +1,10 @@
 package org.studip.unofficial_app.model.viewmodels;
 
 import android.app.Application;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+
 import org.studip.unofficial_app.model.MessagesResource;
 
 public class MessagesViewModel extends AndroidViewModel

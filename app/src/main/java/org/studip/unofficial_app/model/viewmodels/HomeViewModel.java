@@ -1,14 +1,18 @@
 package org.studip.unofficial_app.model.viewmodels;
+
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
+
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
 import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.NewsResource;
+
 import io.reactivex.schedulers.Schedulers;
 public class HomeViewModel extends AndroidViewModel
 {

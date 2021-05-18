@@ -1,7 +1,9 @@
 package org.studip.unofficial_app.documentsprovider;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
 import org.jetbrains.annotations.NotNull;
 
 @Entity(tableName = "roots")

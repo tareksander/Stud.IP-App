@@ -1,0 +1,3 @@
+Unterstützung für Courseware und Meetings-Plugins hinzugefügt.
+Stud.IP Benachrichtigungseinstellungen können jetzt in der App geändert werden.
+Optionen, um Vorschaubilder für Opencast und für den document provider nicht zu laden, wenn mobile Daten benutzt werden.

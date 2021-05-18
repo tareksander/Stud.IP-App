@@ -1,15 +1,12 @@
 package org.studip.unofficial_app.ui.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.paging.LivePagedListBuilder;
@@ -17,7 +14,6 @@ import androidx.paging.PagedList;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
@@ -26,7 +22,6 @@ import androidx.work.WorkManager;
 import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.rest.StudipMessage;
-import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.databinding.FragmentMessagesBinding;
 import org.studip.unofficial_app.databinding.MessageEntryBinding;
 import org.studip.unofficial_app.model.APIProvider;
@@ -39,7 +34,6 @@ import org.studip.unofficial_app.ui.fragments.dialog.MessageWriteDialogFragment;
 
 import java.util.Calendar;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;

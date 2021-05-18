@@ -1,20 +1,19 @@
 package org.studip.unofficial_app.ui;
-import org.studip.unofficial_app.R;
-import org.studip.unofficial_app.api.API;
-import org.studip.unofficial_app.model.APIProvider;
-import org.studip.unofficial_app.model.SettingsProvider;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
-import androidx.security.crypto.EncryptedSharedPreferences;
-
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.security.crypto.EncryptedSharedPreferences;
+
+import org.studip.unofficial_app.R;
+import org.studip.unofficial_app.api.API;
+import org.studip.unofficial_app.model.APIProvider;
+import org.studip.unofficial_app.model.SettingsProvider;
 
 
 public class LoginActivity extends AppCompatActivity

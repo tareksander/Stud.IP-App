@@ -11,21 +11,30 @@ import android.provider.DocumentsContract;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.work.WorkManager;
 
-
+import org.jetbrains.annotations.NotNull;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.databinding.ActivitySettingsBinding;
@@ -40,11 +49,13 @@ import org.studip.unofficial_app.model.SettingsProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
@@ -83,6 +94,23 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         r.setOnLongClickListener(v2 -> {
             new AlertDialog.Builder(this).setTitle(r.getText()).setMessage(getResources().getText(res)).show();
             return true; });
+    }
+    private final String NOTIFICATION_LAYOUT = "notification_layout_";
+    private String[] notification_layout_titles;
+    private String[] notification_layout_courses;
+    private boolean[][] notification_layout_values;
+    private String[][] notification_names;
+    private String[][] notification_values;
+    
+    
+    @Override
+    protected void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putStringArray(NOTIFICATION_LAYOUT+"titles", notification_layout_titles);
+        outState.putStringArray(NOTIFICATION_LAYOUT+"courses", notification_layout_courses);
+        outState.putSerializable(NOTIFICATION_LAYOUT+"values", notification_layout_values);
+        outState.putSerializable(NOTIFICATION_LAYOUT+"names", notification_names);
+        outState.putSerializable(NOTIFICATION_LAYOUT+"values2", notification_values);
     }
     
     @SuppressLint("CheckResult")
@@ -295,21 +323,279 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         
         
         
+        binding.loadImagesOnMobile.setChecked(settings.load_images_on_mobile);
+        
+        // register the listener now that the checked status is set
+        binding.loadImagesOnMobile.setOnClickListener(this::onLoadImagesOnMobileClicked);
         
         
         API api = APIProvider.getAPI(this);
-        if (api != null) {
-            // TODO integrate the studip notification settings
-            
-            
-            
-            
-            
+        if (api == null || api.getUserID() == null) {
+            binding.settingsLoadNotificationSettings.setVisibility(View.GONE);
+            binding.settingsSaveNotificationSettings.setVisibility(View.GONE);
+        } else {
+            if (savedInstanceState != null) {
+                /*
+                outState.putStringArray(NOTIFICATION_LAYOUT+"titles", notification_layout_titles);
+                outState.putStringArray(NOTIFICATION_LAYOUT+"courses", notification_layout_courses);
+                outState.putSerializable(NOTIFICATION_LAYOUT+"values", notification_layout_values);
+                 */
+                notification_layout_titles = savedInstanceState.getStringArray(NOTIFICATION_LAYOUT+"titles");
+                notification_layout_courses = savedInstanceState.getStringArray(NOTIFICATION_LAYOUT+"courses");
+                try {
+                    notification_layout_values = (boolean[][]) savedInstanceState.getSerializable(NOTIFICATION_LAYOUT + "values");
+                    notification_names = (String[][]) savedInstanceState.getSerializable(NOTIFICATION_LAYOUT + "names");
+                    notification_values = (String[][]) savedInstanceState.getSerializable(NOTIFICATION_LAYOUT + "values2");
+                } catch (Exception ignored) {}
+                buildNotificationSettings();
+            }
         }
         
         
     }
-
+    
+    public void onLoadNotificationSettings(View v1) {
+        API api = APIProvider.getAPI(this);
+        if (api != null && api.getUserID() != null) {
+            final MutableLiveData<Integer> remaining = new MutableLiveData<>(-1);
+            api.dispatch.getNotificationSettings().enqueue(new Callback<String>()
+            {
+                @Override
+                public void onResponse(@NotNull Call<String> call, @NotNull Response<String> response) {
+                    String html = response.body();
+                    if (response.code() == 200 && html != null) {
+                        Document d = Jsoup.parse(html);
+                        Elements forms = d.getElementsByAttributeValueContaining("action",
+                                "/dispatch.php/settings/notification/store");
+                        if (forms.size() != 1) {
+                            remaining.setValue(-2);
+                            System.err.println("could not find NotificationTable");
+                            return;
+                        }
+                        Element form = forms.get(0);
+                        Elements closed = form.getElementsByAttributeValue("href", "/dispatch.php/settings/notification/open/");
+                        remaining.setValue(closed.size());
+                        for (Element c : closed) {
+                            api.dispatch.openNotificationCategory(c.attr("name")).enqueue(new Callback<Void>()
+                            {
+                                @Override
+                                public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                                    Integer i = remaining.getValue();
+                                    i = (i == null) ? 1 : i;
+                                    remaining.setValue(i-1);
+                                }
+                                @Override
+                                public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                                    Integer i = remaining.getValue();
+                                    i = (i == null) ? 1 : i;
+                                    remaining.setValue(i-1);
+                                }
+                            });
+                        }
+                    }
+                }
+                @Override
+                public void onFailure(@NotNull Call<String> call, @NotNull Throwable t) {
+                    remaining.setValue(-2);
+                }
+            });
+            remaining.observe(this, (v) -> {
+                if (v == -1) return;
+                if (v == -2) {
+                    remaining.removeObservers(this);
+                    return;
+                }
+                if (v == 0) {
+                    api.dispatch.getNotificationSettings().enqueue(new Callback<String>()
+                    {
+                        @Override
+                        public void onResponse(@NotNull Call<String> call, @NotNull Response<String> response) {
+                            String html = response.body();
+                            if (response.code() == 200 && html != null) {
+                                Document d = Jsoup.parse(html);
+                                Elements forms = d.getElementsByAttributeValueContaining("action",
+                                        "/dispatch.php/settings/notification/store");
+                                if (forms.size() != 1) {
+                                    remaining.setValue(-2);
+                                    System.err.println("could not find NotificationTable");
+                                    return;
+                                }
+                                Element form = forms.get(0);
+                                Elements heads = form.getElementsByTag("thead");
+                                if (heads.size() != 1) {
+                                    remaining.setValue(-2);
+                                    System.err.println("could not find NotificationTable head");
+                                    return;
+                                }
+                                Element head = heads.get(0);
+                                Elements categories = head.getElementsByTag("img");
+                                int index = 0;
+                                notification_layout_titles = new String[categories.size()];
+                                for (Element c : categories) {
+                                    notification_layout_titles[index] = c.attr("title");
+                                    index++;
+                                }
+                                int width = categories.size();
+                                Elements courses = form.getElementsByAttributeValueContaining("href", "/seminar_main.php?username=");
+                                notification_layout_courses = new String[courses.size()];
+                                notification_layout_values = new boolean[categories.size()][courses.size()];
+                                notification_names = new String[categories.size()][courses.size()];
+                                notification_values = new String[categories.size()][courses.size()];
+                                index = 0;
+                                for (Element c : courses) {
+                                    notification_layout_courses[index] = c.text();
+                                    Elements checkboxes = c.parent().parent().getElementsByAttributeValue("type", "checkbox");
+                                    for (int x = 0; x < width; x++) {
+                                        if (x < checkboxes.size()) {
+                                            notification_layout_values[x][index] = checkboxes.get(x).hasAttr("checked");
+                                        }
+                                        notification_names[x][index] = checkboxes.get(x).attr("name");
+                                        notification_values[x][index] = checkboxes.get(x).attr("value");
+                                    }
+                                    index++;
+                                }
+                                buildNotificationSettings();
+                            }
+                        }
+                        @Override
+                        public void onFailure(@NotNull Call<String> call, @NotNull Throwable t) {}
+                    });
+                }
+            });
+        }
+    }
+    
+    public void buildNotificationSettings() {
+        if (notification_layout_values == null ||
+            notification_layout_courses == null ||
+            notification_layout_titles == null ||
+            notification_names == null) {
+            return;
+        }
+        binding.studipNotificationSettings.removeAllViews();
+        try {
+            {
+                TextView t = new TextView(this);
+                t.setText(getString(R.string.courses));
+                GridLayout.LayoutParams par = new GridLayout.LayoutParams();
+                par.columnSpec = GridLayout.spec(0);
+                par.rightMargin = 100;
+                par.bottomMargin = 80;
+                par.rowSpec = GridLayout.spec(0);
+                binding.studipNotificationSettings.addView(t, par);
+            }
+            int index = 1;
+            for (String title : notification_layout_titles) {
+                TextView t = new TextView(this);
+                t.setText(title);
+                GridLayout.LayoutParams par = new GridLayout.LayoutParams();
+                par.columnSpec = GridLayout.spec(index);
+                if (index < notification_layout_titles.length) {
+                    par.rightMargin = 50;
+                }
+                index++;
+                par.bottomMargin = 80;
+                par.rowSpec = GridLayout.spec(0);
+                binding.studipNotificationSettings.addView(t, par);
+            }
+            index = 1;
+            for (String text : notification_layout_courses) {
+                TextView t = new TextView(this);
+                t.setText(text);
+                GridLayout.LayoutParams par = new GridLayout.LayoutParams();
+                par.rowSpec = GridLayout.spec(index);
+                if (index < notification_layout_courses.length) {
+                    par.rightMargin = 100;
+                }
+                par.bottomMargin = 50;
+                par.columnSpec = GridLayout.spec(0);
+                binding.studipNotificationSettings.addView(t, par);
+                index++;
+            }
+            for (int x = 0; x < notification_layout_values.length; x++) {
+                for (int y = 0; y < notification_layout_values[0].length; y++) {
+                    SwitchCompat s = new SwitchCompat(this);
+                    int finalX = x;
+                    int finalY = y;
+                    s.setOnClickListener(v1 -> {
+                        try {
+                            notification_layout_values[finalX][finalY] = s.isChecked();
+                        } catch (NullPointerException | ArrayIndexOutOfBoundsException ignored) {}
+                    });
+                    GridLayout.LayoutParams par2 = new GridLayout.LayoutParams();
+                    if (notification_layout_values[x][y]) {
+                        s.setChecked(true);
+                    }
+                    par2.columnSpec = GridLayout.spec(x + 1);
+                    par2.bottomMargin = 50;
+                    par2.rightMargin = 50;
+                    par2.rowSpec = GridLayout.spec(y + 1);
+                    binding.studipNotificationSettings.addView(s, par2);
+                }
+            }
+        } catch (NullPointerException | ArrayIndexOutOfBoundsException ignored) {}
+    }
+    
+    public void onSaveNotificationSettings(View v) {
+        API api = APIProvider.getAPI(this);
+        final AppCompatActivity a = this;
+        if (api != null && api.getUserID() != null && notification_layout_values != null
+                && notification_names != null && notification_values != null) {
+            api.dispatch.getNotificationSettings().enqueue(new Callback<String>()
+            {
+                @Override
+                public void onResponse(@NotNull Call<String> call, @NotNull Response<String> response) {
+                    String html = response.body();
+                    if (response.code() == 200 && html != null) {
+                        Document d = Jsoup.parse(html);
+                        Elements forms = d.getElementsByAttributeValueContaining("action",
+                                "/dispatch.php/settings/notification/store");
+                        if (forms.size() != 1) {
+                            System.err.println("could not find NotificationTable");
+                        }
+                        Element form = forms.get(0);
+                        Elements ticket = form.getElementsByAttributeValue("name", "studip_ticket");
+                        Elements token = form.getElementsByAttributeValue("name", "security_token");
+                        if (ticket.size() != 1 || token.size() != 1) {
+                            System.err.println("could not find security_token or studip_ticket");
+                            Toast.makeText(a, R.string.notification_settings_error, Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        HashMap<String, String> fields = new HashMap<>();
+                        fields.put("studip_ticket", ticket.get(0).attr("value"));
+                        fields.put("security_token", token.get(0).attr("value"));
+                        fields.put("store", "");
+                        for (int x = 0;x < notification_layout_values.length; x++) {
+                            for (int y = 0; y < notification_layout_values[0].length; y++) {
+                                if (notification_layout_values[x][y]) {
+                                    fields.put(notification_names[x][y], notification_values[x][y]);
+                                }
+                            }
+                        }
+                        api.dispatch.saveNotificationSettings(fields).enqueue(new Callback<Void>()
+                        {
+                            @Override
+                            public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                                if (response.code() != 302 && response.code() != 200) {
+                                    Toast.makeText(a, R.string.notification_settings_error, Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(a, R.string.notification_settings_success, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                            @Override
+                            public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                                Toast.makeText(a, R.string.notification_settings_error, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                }
+                @Override
+                public void onFailure(@NotNull Call<String> call, @NotNull Throwable t) {
+                    Toast.makeText(a, R.string.notification_settings_error, Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
 
     @Override
     protected void onStop()
@@ -317,6 +603,12 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         super.onStop();
         settings.safe(sharedPreferences);
     }
+    
+    public void onLoadImagesOnMobileClicked(View v) {
+        settings.load_images_on_mobile = binding.loadImagesOnMobile.isChecked();
+        getContentResolver().notifyChange(DocumentsContract.buildRootsUri(DocumentsProvider.AUTHORITIES), null);
+    }
+    
     
     public void onHelpClicked(View v) {
         Intent i = new Intent(this,HelpActivity.class);

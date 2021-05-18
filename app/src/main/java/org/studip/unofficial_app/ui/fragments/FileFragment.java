@@ -17,7 +17,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -35,10 +34,10 @@ import org.studip.unofficial_app.model.viewmodels.MkdirDialogViewModel;
 import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.fragments.dialog.MkdirDialogFragment;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import kotlin.io.ByteStreamsKt;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -86,9 +85,11 @@ public class FileFragment extends SwipeRefreshFragment
         m.get().observe(getViewLifecycleOwner(), folder -> {
             if (folder != null)
             {
+                //System.out.println(folder.subfolders);
+                //System.out.println(folder.file_refs);
                 ad.clear();
-                ad.addAll(folder.subfolders);
-                ad.addAll(folder.file_refs);
+                ad.addAll((Object[]) folder.subfolders);
+                ad.addAll((Object[]) folder.file_refs);
                 binding.fileList.setAdapter(ad); // when the fragment is first shown, the data will not be visible without this
             }
         });
@@ -132,7 +133,18 @@ public class FileFragment extends SwipeRefreshFragment
         
         return binding.getRoot();
     }
-
+    
+    public static byte[] readFully(InputStream in) throws IOException {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream(1024*1024)) {
+            byte[] buffer = new byte[1024*1024];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            return out.toByteArray();
+        }
+    }
+    
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent intentData)
     {
@@ -146,7 +158,7 @@ public class FileFragment extends SwipeRefreshFragment
                 binding.fileRefresh.setRefreshing(true);
                 byte[] data = null;
                 try (InputStream in = requireActivity().getContentResolver().openInputStream(file)) {
-                    data = ByteStreamsKt.readBytes(in);
+                    data = readFully(in);
                 }
                 catch (IOException ignored) {}
                 if (data != null)
@@ -309,7 +321,7 @@ public class FileFragment extends SwipeRefreshFragment
                             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
                             return;
                         }
-                        APIProvider.getAPI(requireActivity()).downloadFile(requireActivity(),f.id,f.name);
+                        APIProvider.getAPI(requireActivity()).downloadFile(requireActivity(),f.id,f.name, false);
                     });
                     v.setOnLongClickListener(v1 -> {
                         if (binding.fileRefresh.isRefreshing()) { return true; }

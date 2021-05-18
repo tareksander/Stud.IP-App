@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -24,10 +25,10 @@ import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.plugins.opencast.OpencastVideo;
 import org.studip.unofficial_app.databinding.DialogOpencastBinding;
 import org.studip.unofficial_app.databinding.DialogOpencastEntryBinding;
+import org.studip.unofficial_app.model.Settings;
+import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.model.viewmodels.OpencastViewModel;
 import org.studip.unofficial_app.model.viewmodels.StringViewModelFactory;
-
-import java.net.URI;
 
 public class CourseOpencastDialog  extends DialogFragment
 {
@@ -73,8 +74,6 @@ public class CourseOpencastDialog  extends DialogFragment
         AlertDialog d = b.create();
         d.setCanceledOnTouchOutside(false);
         
-        
-        
         return d;
     }
     
@@ -103,20 +102,14 @@ public class CourseOpencastDialog  extends DialogFragment
             b.opencastAuthor.setText(v.author);
             b.opencastDescription.setText(v.description);
             
-            if (! v.preview_url.equals("")) {
-                Picasso.get().load(v.preview_url).into(b.opencastPreview);
+            Settings s = SettingsProvider.getSettings(requireActivity());
+            ConnectivityManager con = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (s.load_images_on_mobile || ! con.isActiveNetworkMetered()) {
+                if (!v.preview_url.equals("")) {
+                    Picasso.get().load(v.preview_url).into(b.opencastPreview);
+                }
             }
             
-            //System.out.println(v.watch_opencast);
-            
-            // needs authentication, just redirects to the opencast login page
-            /*
-            b.opencastPreview.setOnClickListener(v1 -> {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(v.watch_opencast));
-                startActivity(i);
-            });
-             */
             
             for (OpencastVideo.VideoVersion q : v.versions) {
                 Button view = new Button(requireActivity());

@@ -11,10 +11,9 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.fragment.NavHostFragment;
 
 import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.R;
@@ -30,10 +29,10 @@ import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.fragments.dialog.CourseForumDialogFragment;
 import org.studip.unofficial_app.ui.fragments.dialog.CourseNewsDialogFragment;
 import org.studip.unofficial_app.ui.plugins.fragments.dialog.CourseOpencastDialog;
+import org.studip.unofficial_app.ui.plugins.fragments.dialog.CoursewareDialog;
+import org.studip.unofficial_app.ui.plugins.fragments.dialog.MeetingsRoomsDialog;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class CoursesFragment extends SwipeRefreshFragment
 {
@@ -200,6 +199,21 @@ public class CoursesFragment extends SwipeRefreshFragment
                 CourseOpencastDialog opencast = new CourseOpencastDialog();
                 opencast.setArguments(args);
                 opencast.show(getParentFragmentManager(),"course_opencast");
+            });
+            b.courseCourseware.setOnClickListener(v1 -> {
+                Bundle args = new Bundle();
+                args.putString("cid",c.course_id);
+                CoursewareDialog courseware = new CoursewareDialog();
+                courseware.setArguments(args);
+                requireActivity().getSupportFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .add(android.R.id.content, courseware, "dialog_courseware").addToBackStack(null).commit();
+            });
+            b.courseMeetings.setOnClickListener(v1 -> {
+                Bundle args = new Bundle();
+                args.putString("cid",c.course_id);
+                MeetingsRoomsDialog opencast = new MeetingsRoomsDialog();
+                opencast.setArguments(args);
+                opencast.show(getParentFragmentManager(),"course_meetings");
             });
             return v;
         }

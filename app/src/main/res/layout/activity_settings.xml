@@ -152,11 +152,47 @@
                 android:layout_height="wrap_content"
                 android:text="@string/settings_system" />
 
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/studip_notification_settings" />
+
             <LinearLayout
-                android:id="@+id/studip_notification_settings"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"></LinearLayout>
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/settings_load_notification_settings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="onLoadNotificationSettings"
+                    android:text="@string/load_notification_settings" />
+
+                <Button
+                    android:id="@+id/settings_save_notification_settings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="onSaveNotificationSettings"
+                    android:text="@string/save_notification_settings" />
+            </LinearLayout>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <GridLayout
+                    android:id="@+id/studip_notification_settings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"></GridLayout>
+            </HorizontalScrollView>
 
             <LinearLayout
                 android:id="@+id/settings_notification_layout"
@@ -296,6 +332,12 @@
                 android:text="@string/document_provider_thumbnails" />
 
             <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/load_images_on_mobile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/load_on_mobile" />
+
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/enable_doc_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -325,8 +367,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_developer"
-                android:visibility="gone" />
+                android:text="@string/settings_developer" />
 
         </LinearLayout>
     </ScrollView>

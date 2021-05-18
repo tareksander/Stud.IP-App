@@ -69,7 +69,7 @@
     Aber wenn das Betriebssystem selbst angegriffen wurde (oder das Gerät gerooted ist), könnte ein anderes Programm sich den Schlüssel für die Datei vom Betriebssytsem nehmen und die Daten auslesen.
     Für normalen Gebrauch sollte es aber sicher genug sein. Der Vorteil gegenüber des Session Cookies ist, dass man unbegrenzte Zeit angemeldet bleibt (solange sich das Passwort nicht ändert)</string>
     <string name="auth_cookie">Session Cookie</string>
-    <string name="auth_cookie_desc">Dies ist die Methode, die auch ein Browser verwendet. Mit dem Benutzernamen und Passwort wird ein Session Cookie vom Server angefragt, dannach wird das Passwort gelöscht.
+    <string name="auth_cookie_desc">Dies ist die Methode, die auch ein Browser verwendet. Mit dem Benutzernamen und Passwort wird ein Session Cookie vom Server angefragt, danach wird das Passwort gelöscht.
     Es wird nur der Cookie auf dem Gerät gespeichert, mit der Gleichen Sicherheit wie das Passwort bei Basic Authentication. Wenn der Cookie von anderen Programmen genommen wird, könnten sich diese als Sie ausgeben, aber nicht ihr Passwort ändern.
     Der Nachteil ist, dass die Sitzung irgendwann abläuft und man sich wieder anmelden muss.</string>
     <string name="auth_oauth">OAuth 2</string>
@@ -98,10 +98,14 @@ Dann müssen Sie Ihren Benutzernamen und Ihr Passwort eingeben.<br>
 Alle Dialoge und Bildschirme können mit einem nach unten Ziehen dazu gebracht werden, aktuelle Daten vom Server zu beziehen.<br>
 Bis auf die Dateien sind alle Daten auf dem Gerät zwischengespeichert und können auch ohne Netzwerkverbindung angeschaut werden.<br>
 Die Dateien müssen jeweils explizit heruntergeladen werden, um Datenvolumen zu sparen.<br>
-Der Benachrichtigungs-Service aktualisiert auch periodisch die Daten und gibt dann Benachrichtigungen falls gewünscht.
-<br>Periode and Anderes kann in den Einstellungen angepasst werden.<br>
+Der Benachrichtigungs-Service aktualisiert auch periodisch die Daten und gibt dann Benachrichtigungen falls gewünscht.<br>
+Periode and Anderes kann in den Einstellungen angepasst werden.<br>
+Es werden aber nur Benachrichtigugen angezeigt, die Sie in Stud.IP aktiviert haben.<br>
+Diese Einstellungen können Sie auch in der App verändern, unter "Stud.IP Benachrichtigungseinstellungen".<br>
 Mit dem Document Provider können Sie auf die Stud.IP-Dateien zugreifen, wie auf alle anderen Dateien auf Ihrem Gerät.<br>
-Nachdem Sie sich angemeldet und Ihre Kurse abgerufen haben, können sie in den Einstellungen festlegen, welche Kurse so bereitgestellt werden sollen.<br><br>
+Nachdem Sie sich angemeldet und Ihre Kurse abgerufen haben, können sie in den Einstellungen festlegen, welche Kurse so bereitgestellt werden sollen.<br>
+Sie können außerdem festlegen, ob Vorschaubilder angezeigt werden sollen, wenn mobile Daten benutzt werden.<br><br>
+
 
 <h2>3. Startbildschirm</h2>
 Auf diesem Bildschirm wird Ihr Name, wie er in dem Stud.IP-System steht, angezeigt, und dazu die globalen Ankündigungen des Systems.<br><br>
@@ -114,7 +118,7 @@ Mit dem Datei-Symbol können Sie sich die Dateien eines Kurses anschauen, herunt
 
 <h2>5. Dateibildschirm</h2>
 Auf diesem Bildschirm können Sie Sich ihre Dateien auf dem System und die Dateien von Kursen ansehen.<br>
-Durch tippen auf den \"...\"-Eintrag kommen Sie in das Elternverzeichnis zurück, falls vorhanden, durch halten kommen sie zu Ihren eigenen Dateien zurück.<br>
+Durch tippen auf den \"…\"-Eintrag kommen Sie in das Elternverzeichnis zurück, falls vorhanden, durch halten kommen sie zu Ihren eigenen Dateien zurück.<br>
 Beim antippen eines Verzeichnisses werden die Inhalte angezeigt, bei einer Datei wird sie heruntergeladen.<br>
 Durch Halten auf eine Datei oder ein Verzeichnis wird es gelöscht.<br><br>
 
@@ -126,6 +130,26 @@ Wenn Sie den "Suchen"-Button benutzen, sucht die App im System nach Benutzern mi
 Ein Addressat wird hinzugefügt, indem Sie ihn in der Liste antippen.<br>
 Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br>
 
+<h2>7. Courseware-Plugin</h2>
+Wenn Sie auf das Courseware-Icon im Kurs-Bildschirm tippen, können Sie sich die Courseware anschauen, falls vorhanden.<br>
+Tippen Sie auf ein Kapitel, um die Unterkapitel zu laden und auf ein Unterkaptiel, um die Abschnitte zu laden.<br>
+Unterstützte Courseware-Blöcke:<br>
+HTML<br>
+Opencast<br>
+PDF<br>
+<br><br>
+
+<h2>8. Meetings-Plugin</h2>
+Wenn sie das Meetings-Icon antippen, sehen sie alle verfügbaren Meeting-Räume eines Kurses.<br>
+Wenn sei auf einen der Buttins klicken, wird das Meeting in einem neuen Fenster geöffnet.<br>
+Funktioniert im Moment nur mit HTTP Basic Authentication.<br>
+Wenn sie wegnavigieren, wird das Meeting automatisch in den Picture-in-Picure Modus geschaltet, damit die Konferenz nicht unterbrochen wird.<br>
+Dabei wird auch automatisch die Präsentation in den Vollbildmodus geschaltet.<br>
+Währen die Konferend läuft, gibt es eine Benachrichtigung, die Sie nicht verwerfen können.<br>
+Din dieser Benachrichtigung gibt es Aktionen, um aus der Konferenz auszutreten und um das Mikrofon an/auszuschalten.<br>
+Auf die Benachrichtigung tippen bringt die Konferenz wieder in den Vollbildmodus.<br>
+Das PiP-Fenster hat auch einen Button, um das Mikrofon umzuschalten.<br>
+<br><br>
 "]]></string>
     <string name="view">Anschauen: %1$s</string>
     <string name="download">Herunterladen: %1$s</string>
@@ -150,6 +174,18 @@ Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br
     <string name="document_provider_thumbnails">Vorschaubilder anzeigen</string>
     <string name="document_provider_search">Suche einschalten</string>
     <string name="document_provider_recents">Kürzlich benutzte Dateien anzeigen</string>
+    <string name="load_on_mobile">Bilder auch mit mobilen Daten laden</string>
+    <string name="load_notification_settings">Laden</string>
+    <string name="save_notification_settings">Speichern</string>
+    <string name="studip_notification_settings">Stud.IP Benachrichtigungseinstellungen</string>
+    <string name="courses">Kurse</string>
+    <string name="notification_settings_error">Benachrichtigungseinstellungen konnten nicht gesetzt werden</string>
+    <string name="notification_settings_success">Benachrichtigungseinstellungen gespeichert</string>
+    <string name="channel_meetings">Meetings</string>
+    <string name="logout">Ausloggen</string>
+    <string name="toggle_mic">Mikrofon umschalten</string>
+    <string name="mic_on">Mikrofon an</string>
+    <string name="mic_off">Mikrofon aus</string>
 
 
 </resources>

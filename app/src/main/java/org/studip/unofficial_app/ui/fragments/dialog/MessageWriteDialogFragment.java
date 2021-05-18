@@ -3,10 +3,8 @@ package org.studip.unofficial_app.ui.fragments.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.provider.Telephony;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,14 +12,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.AlertDialogLayout;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
 
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
-import org.studip.unofficial_app.api.rest.StudipMessage;
 import org.studip.unofficial_app.api.rest.StudipSearchUser;
 import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.databinding.DialogNewMessageBinding;
@@ -30,9 +24,6 @@ import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.room.DB;
 import org.studip.unofficial_app.ui.HomeActivity;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.schedulers.Schedulers;

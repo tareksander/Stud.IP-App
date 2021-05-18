@@ -72,20 +72,19 @@
     <string name="auth_oauth_desc">Not implemented yet. The safest method: It works like a session cookie, but instead of entering the username and password in the app, you are redirected to the Stud.IP-Server and have to log in there.\nThe app only gets the authentication token afterwards, which works like a session cookie.</string>
     <string name="settings_developer">Developer settings:\nThese settings could make the app unstable or lower the security. Use at your own risk.</string>
     <string name="semester_select">select semester</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="my_documents">Your files</string>
     <string name="not_logged_in">not logged in</string>
     <string name="message_no_search">unable to connect to server, cannot search users</string>
     <string name="message_no_send">could not send message</string>
     <string name="message_send_successfully">message send</string>
     <string name="help_button">view help</string>
-    <string name="help_content"><![CDATA["<big><h1>Hilfe</h1></big>
+    <string name="help_content"><![CDATA["<big><h1>Help</h1></big>
 <h2>1. Login</h2>
 First you should choose you authentication method from the settings.<br>
 If you only want to log in once, you should use HTTP Basic authentication.<br>
 If you don't want you username and password stored on the device (don't worry they're encrypted), you should choose the session cookie.<br>
 OAuth isn't implemented yet.<br>
-If you want more informations about the authentication methods, long press on them in the settings screen.<br><br>
+If you want more information about the authentication methods, long press on them in the settings screen.<br><br>
 To log in you have to select you Stud.IP server.<br>
 You can look for it in the list (scrolling is possible), or type it in yourself (without https://).<br>
 Then you have to enter your username and password.<br>
@@ -96,15 +95,18 @@ Apart from the files all data is cached on the device and can be viewed without 
 The files have to be downloaded manually on demand.<br>
 The notification service can send you notifications if the data changes.<br>
 You can set the update frequency and notification priority in the settings.<br>
+The notification service only shows notifications you enabled in the Stud.IP notification settings.<br>
+These settings can be changed in-app under "Stud.IP notification settings".<br>
 With the document provider you can use your Stud.IP files like all other files on your device.<br>
-After you logged in, you can use the settings screen to select the courses you wish to expose via the document provider.<br><br>
+After you logged in, you can use the settings screen to select the courses you wish to expose via the document provider.<br>
+You can also set whether to show image previews when using mobile data.<br><br>
 
 <h2>3. Home</h2>
 On this screen you can see your Stud.IP name and the global Stud.IP news.<br><br>
 
 <h2>4. Courses</h2>
 On this screen you can view your courses for a specific semester.<br>
-The icons for the courses wor like on the website, but some features aren't implemented yet.<br>
+The icons for the courses work like on the website, but some features aren't implemented yet.<br>
 You can use the flag icon to view course news.<br>
 With the file icon you can view the files of a specific course.<br><br>
 
@@ -112,7 +114,7 @@ With the file icon you can view the files of a specific course.<br><br>
 
 <h2>5. Files</h2>
 On this screen you can view your files and course files.<br>
-Tap \"...\" to return to the parent directory, hold to return to you own files.<br>
+Tap \"…\" to return to the parent directory, hold to return to you own files.<br>
 Tap on a folder to view its contents, tap on a file to download it.<br>
 Long press on a file or folder to delete it.<br><br>
 
@@ -125,6 +127,25 @@ Add the addressee by tapping it in the list.<br>
 Long press on an addressee to remove it.<br>
 <br><br>
 
+<h2>7. Courseware plugin</h2>
+By clicking the courseware icon for a course in the courses screen you can view the Courseware, if there is any.<br>
+Tap in a chapter on the left to load the subchapters, tap on a subchapter to load the sections.<br>
+Supported blocks are:<br>
+HTML<br>
+Opencast<br>
+PDF<br>
+<br><br>
+
+<h2>8. Meetings plugin</h2>
+Tapping the meetings icon for a course loads all meeting rooms available.<br>
+When you click a button, a new window will open with the BigBlueButton conference.<br>
+Currently only works with HTTP basic auth.<br>
+When navigating away, the window automatically goes into picture-in-picture mode and the presentation is set to fullscreen, so the conference can continue without interruption.<br>
+As long as the conference is active, there is a non-dismissable notification present.<br>
+The notification has actions to exit the conference and to toggle the microphone.<br>
+Tapping the notification returns to the conference in full-screen.<br>
+The PiP-window also has a button to toggle the microphone.<br>
+<br><br>
 "]]></string>
     <string name="view">View: %1$s</string>
     <string name="download">Download: %1$s</string>
@@ -149,6 +170,18 @@ Long press on an addressee to remove it.<br>
     <string name="document_provider_thumbnails">Show Thumbnails</string>
     <string name="document_provider_recents">Show recent documents</string>
     <string name="document_provider_search">Enable search</string>
+    <string name="load_on_mobile">Load images while using mobile data</string>
+    <string name="load_notification_settings">Load</string>
+    <string name="save_notification_settings">Save</string>
+    <string name="studip_notification_settings">Stud.IP notification settings</string>
+    <string name="courses">Courses</string>
+    <string name="notification_settings_error">could not set notification settings</string>
+    <string name="notification_settings_success">notification settings saved</string>
+    <string name="channel_meetings">Meetings</string>
+    <string name="logout">Logout</string>
+    <string name="toggle_mic">toggle microphone</string>
+    <string name="mic_on">microphone on</string>
+    <string name="mic_off">microphone off</string>
 
 
 </resources>
