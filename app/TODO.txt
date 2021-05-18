@@ -43,6 +43,7 @@
                     [ ] if yes, but api.php/user is not enabled, tell the user
                 [ ] see what routes are needed for what features, tell user on login which features are unavailable
                 [ ] fail without message for features where the routes are disabled
+            [ ] support for OAuth1 for authentication
             [ ] bump version
             [ ] update help text
             [ ] update description
