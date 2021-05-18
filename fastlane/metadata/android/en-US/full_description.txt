@@ -5,6 +5,8 @@ read and write messages, view, download and upload your files and course files.
 You can also view Opencast videos, browse Courseware and join BigBlueButton meetings.
 With the document provider you can access your Stud.IP files like all other files on your device.
 
+You can enable the notification service to get your Stu.IP notification as notification on the device.
+
 For Help: Settings:view help
 
 Permission description:
@@ -17,5 +19,6 @@ Modify contents of shared storage: Is requested at runtime when you download fil
 Is needed to save the files to the downloads directory.
 Not used anymore for Android 10 or later.
 
-Record audio: Used for the BigBlueButton video conferences.
+Record audio, change audio settings, use camera, prevent phone from sleeping: Used for the BigBlueButton video conferences.
 
+foreground services, start ad boot: used for the Notification service.

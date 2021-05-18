@@ -168,7 +168,7 @@ public class API
                     if (response.request().header("Authorization") != null) {
                         return null;
                     }
-                    if (route != null && route.address().url().isHttps() && route.address().url().host().equals(hostname) && password != null && auth_method == Settings.AUTHENTICATION_BASIC) {
+                    if (route != null && route.address().url().isHttps() && route.address().url().host().equals(hostname.split("/")[0]) && password != null && auth_method == Settings.AUTHENTICATION_BASIC) {
                         //System.out.println("Basic Authentication used for "+route.address().url().toString());
                         return response.request().newBuilder().header("Authorization",Credentials.basic(username,password)).build();
                     } else {
@@ -434,7 +434,7 @@ public class API
         
         if (auth != null) {
             ArrayList<Cookie> l = new ArrayList<>();
-            l.add(new Cookie.Builder().name(AUTH_COOKIE_NAME).hostOnlyDomain(hostname).value(auth).secure().build());
+            l.add(new Cookie.Builder().name(AUTH_COOKIE_NAME).hostOnlyDomain(hostname.split("/")[0]).value(auth).secure().build());
             api.cookies.put(hostname, l);
             api.userID = prefs.getString(USERID_KEY,null);
             //System.out.println("cookie found: "+l.toString());
@@ -444,52 +444,11 @@ public class API
         String password = prefs.getString(PASSWORD_KEY,null);
         
         
-        
         if (username != null && password != null) {
             api.username = username;
             api.password = password;
             api.auth_method = Settings.AUTHENTICATION_BASIC;
         }
-        
-        /*
-        api.folder_id = prefs.getString(USER_FOLDER_KEY,null);
-        if (api.folder_id == null) {
-            api.folder_id = ""; // to indicate loading is in progress
-            api.save(prefs);
-            api.user.userFolder(api.userID).enqueue(new Callback<StudipFolder>()
-            {
-                @Override
-                public void onResponse(@NotNull Call<StudipFolder> call, @NotNull Response<StudipFolder> response) {
-                    StudipFolder f = response.body();
-                    if (f != null && f.id != null && ! f.id.equals("")) {
-                        api.folder_id = f.id;
-                    }
-                }
-                @Override
-                public void onFailure(@NotNull Call<StudipFolder> call, @NotNull Throwable t) {}
-            });
-        }
-        */
-        
-        // To test if authentication is used on foreign websites, but there should not be calls able to be made to foreign websites anyways
-        /*
-        System.out.println("trying google");
-        api.tests.tryGoogle().enqueue(new Callback<ResponseBody>()
-        {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response)
-            {
-                
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t)
-            {
-
-            }
-        });
-        */
-        
         
         return api;
     }

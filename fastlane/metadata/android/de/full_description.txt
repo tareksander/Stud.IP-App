@@ -6,6 +6,8 @@ Nachrichten gelesen und geschrieben werden, Forenbeiträge gelesen und geschrieb
 Opencast-Videos und Courseware können auch angeschaut werden, und es kann an BigBlueButton-Konferenzen teilgenommen werden.
 Mit dem document provider kann man auf die Dateien auf Stud.IP wie auf ganz normale Dateien auf dem Gerät zugreifen.
 
+Mit dem Benachrichtigungsservice können Stud.IP-Benachrichtigungen auf dem Gerät angezeigt werden.
+
 Für Hilfe: Einstellungen->Hilfe anzeigen
 
 Erklärung der Berechtigungen:
@@ -18,5 +20,7 @@ auf freigegebenen Speicher schreiben: Wird beim Herunterladen von Dateien nochei
 Wird gebraucht, damit die Dateien in den Downloads gespeichert werden können.
 Wird ab Android 10 nicht mehr benötigt.
 
-Audio aufnehmen: Wird für die BigBlueButton Videokonferenzen benötigt.
+Audio aufnehmen, Audioeinstellungen ändern, Kamera benutzen, Ruhezustand deaktivieren: Wird für die BigBlueButton Videokonferenzen benötigt.
+
+Vordergrunddienst, beim Start ausführen: Wird für den Benachrichtigungsservice benötigt.
 

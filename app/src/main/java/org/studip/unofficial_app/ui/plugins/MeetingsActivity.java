@@ -62,7 +62,11 @@ public class MeetingsActivity extends AppCompatActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 PictureInPictureParams.Builder b = new PictureInPictureParams.Builder();
-    
+                
+                // TODO
+                //  for android S: b.setSeamlessResizeEnabled(true);
+                //  f-droid doesn't have the android S sdk, so wait until android S is released
+                
                 LinkedList<RemoteAction> actions = new LinkedList<>();
                 //actions.add(new RemoteAction(android.R.drawable.ic_media_play,));
                 
