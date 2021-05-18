@@ -32,7 +32,7 @@
             [x] bump version
             [x] update description, add camera and MODIFY_AUDIO_SETTINGS description
             [x] add explanation for additional permissions added by the libraries, namely FOREGROUND_SERVICE, WAKELOCK, START_AT_BOOT
-            [ ] update help text
+            [x] update help text
         1.0.0:
             [ ] delete data which is not in a server response, but still in the database
             [ ] support for the planner

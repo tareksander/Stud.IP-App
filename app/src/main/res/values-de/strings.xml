@@ -98,10 +98,14 @@ Dann müssen Sie Ihren Benutzernamen und Ihr Passwort eingeben.<br>
 Alle Dialoge und Bildschirme können mit einem nach unten Ziehen dazu gebracht werden, aktuelle Daten vom Server zu beziehen.<br>
 Bis auf die Dateien sind alle Daten auf dem Gerät zwischengespeichert und können auch ohne Netzwerkverbindung angeschaut werden.<br>
 Die Dateien müssen jeweils explizit heruntergeladen werden, um Datenvolumen zu sparen.<br>
-Der Benachrichtigungs-Service aktualisiert auch periodisch die Daten und gibt dann Benachrichtigungen falls gewünscht.
-<br>Periode and Anderes kann in den Einstellungen angepasst werden.<br>
+Der Benachrichtigungs-Service aktualisiert auch periodisch die Daten und gibt dann Benachrichtigungen falls gewünscht.<br>
+Periode and Anderes kann in den Einstellungen angepasst werden.<br>
+Es werden aber nur Benachrichtigugen angezeigt, die Sie in Stud.IP aktiviert haben.<br>
+Diese Einstellungen können Sie auch in der App verändern, unter "Stud.IP Benachrichtigungseinstellungen".<br>
 Mit dem Document Provider können Sie auf die Stud.IP-Dateien zugreifen, wie auf alle anderen Dateien auf Ihrem Gerät.<br>
-Nachdem Sie sich angemeldet und Ihre Kurse abgerufen haben, können sie in den Einstellungen festlegen, welche Kurse so bereitgestellt werden sollen.<br><br>
+Nachdem Sie sich angemeldet und Ihre Kurse abgerufen haben, können sie in den Einstellungen festlegen, welche Kurse so bereitgestellt werden sollen.<br>
+Sie können außerdem festlegen, ob Vorschaubilder angezeigt werden sollen, wenn mobile Daten benutzt werden.<br><br>
+
 
 <h2>3. Startbildschirm</h2>
 Auf diesem Bildschirm wird Ihr Name, wie er in dem Stud.IP-System steht, angezeigt, und dazu die globalen Ankündigungen des Systems.<br><br>
@@ -157,6 +161,7 @@ Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br
     <string name="courses">Kurse</string>
     <string name="notification_settings_error">Benachrichtigungseinstellungen konnten nicht gesetzt werden</string>
     <string name="notification_settings_success">Benachrichtigungseinstellungen gespeichert</string>
+    <string name="channel_meetings">Meetings</string>
 
 
 </resources>

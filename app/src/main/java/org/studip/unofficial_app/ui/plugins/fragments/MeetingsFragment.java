@@ -9,6 +9,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,11 +29,15 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.model.APIProvider;
+import org.studip.unofficial_app.model.Notifications;
 import org.studip.unofficial_app.ui.plugins.MeetingsActivity;
 
 public class MeetingsFragment extends Fragment
@@ -55,14 +61,28 @@ public class MeetingsFragment extends Fragment
         url = a.url;
         
         conference = createWebView(null);
+    
+        notification(null);
+        
         
         l.addView(conference);
     }
     
+    public void notification(String title) {
+        NotificationCompat.Builder b = new NotificationCompat.Builder(requireActivity(), Notifications.CHANNEL_MEETINGS);
+        Notifications.setType(requireActivity(), b, Notifications.CHANNEL_MEETINGS);
+        b.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        b.setSmallIcon(R.drawable.chat_blue);
+        b.setOngoing(true);
+        b.setContentTitle(title);
+    
+        NotificationManagerCompat m = NotificationManagerCompat.from(requireActivity());
+        m.notify(Integer.MIN_VALUE, b.build());
+    }
     
     @SuppressLint("SetJavaScriptEnabled")
     private WebView createWebView(WebViewClient client) {
-        conference = new WebView(requireActivity());
+        conference = new WebView(requireActivity().getApplicationContext());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             conference.setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, false);
         }
@@ -76,6 +96,12 @@ public class MeetingsFragment extends Fragment
             public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
                 //System.out.println(consoleMessage.message());
                 return true;
+            }
+    
+            @Override
+            public void onReceivedTitle(WebView view, String title) {
+                super.onReceivedTitle(view, title);
+                notification(title);
             }
     
             @Override
@@ -143,6 +169,41 @@ public class MeetingsFragment extends Fragment
                 "if (! e.firstChild.className.includes(\"exit\")) e.click();", null);
     }
     
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        //System.out.println("destroy view");
+        if (requireActivity().isFinishing()) {
+            System.out.println("finishing");
+            NotificationManagerCompat m = NotificationManagerCompat.from(requireActivity());
+            System.out.println("destroyed by timeout");
+            conference.destroy();
+            conference = null;
+            m.cancel(Integer.MIN_VALUE);
+            /*
+            // try to log out normally
+            conference.evaluateJavascript("document.querySelector(\"i[class*=\\\"icon-bbb-logout\\\"]\").parentNode.click();", value -> {
+                l.removeAllViews();
+                if (conference != null) {
+                    System.out.println("destroyed after javascript");
+                    conference.destroy();
+                    conference = null;
+                    m.cancel(Integer.MIN_VALUE);
+                }
+            });
+            // if the logout javascript doesn't complete in time, destroy the WebView after 2 seconds
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                l.removeAllViews();
+                if (conference != null) {
+                    System.out.println("destroyed by timeout");
+                    conference.destroy();
+                    conference = null;
+                    m.cancel(Integer.MIN_VALUE);
+                }
+            }, 2000);
+             */
+        }
+    }
     
     @Nullable
     @Override
@@ -152,16 +213,9 @@ public class MeetingsFragment extends Fragment
     }
     
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        //System.out.println("attach");
-    }
-    
-    @Override
     public void onDetach() {
         //System.out.println("detach");
         super.onDetach();
-        
     }
     
     private class MeetingsWebViewClient extends WebViewClient {

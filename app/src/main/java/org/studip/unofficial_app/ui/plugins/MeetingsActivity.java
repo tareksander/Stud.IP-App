@@ -5,6 +5,7 @@ import android.app.RemoteAction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -51,7 +52,13 @@ public class MeetingsActivity extends AppCompatActivity
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        
+        String action = intent.getStringExtra("action");
+        if (action == null) {
+            finish();
+            startActivity(intent);
+        } else {
+            System.out.println(action);
+        }
         
     }
     
@@ -96,6 +103,7 @@ public class MeetingsActivity extends AppCompatActivity
             
         }
     }
+    
     
     @Override
     protected void onResume() {

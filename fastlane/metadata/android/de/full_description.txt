@@ -10,6 +10,7 @@ Mit dem Benachrichtigungsservice können Stud.IP-Benachrichtigungen auf dem Ger�
 
 Für Hilfe: Einstellungen->Hilfe anzeigen
 
+
 Erklärung der Berechtigungen:
 
 Netzwerkstatus abrufen: Wird benötigt, damit keine Bilder über mobile Daten heruntergeladen werden, weil das viel Datenvolumen verbrauchen könnte.

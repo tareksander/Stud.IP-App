@@ -401,8 +401,31 @@ public class CoursewareDialog extends DialogFragment
             }
         }
         
+        private void clearHolderWebView(@NonNull BlockHolder holder) {
+            FrameLayout f = (FrameLayout) holder.itemView;
+            View child = f.getChildAt(0);
+            if (child instanceof WebView) {
+                f.removeAllViews();
+                //System.out.println("WebView destroyed while recycling");
+                ((WebView) child).destroy();
+            }
+        }
+        
+        @Override
+        public boolean onFailedToRecycleView(@NonNull BlockHolder holder) {
+            clearHolderWebView(holder);
+            return false;
+        }
+    
+        @Override
+        public void onViewRecycled(@NonNull BlockHolder holder) {
+            clearHolderWebView(holder);
+            super.onViewRecycled(holder);
+        }
+    
         public WebView createWebView(CoursewareHTMLBlock html) {
-            WebView web = new WebView(requireActivity());
+            // TODO using the application context can cause crashes in some circumstances, but prevents a memory leak
+            WebView web = new WebView(requireActivity().getApplicationContext());
             web.setBackgroundColor(Color.TRANSPARENT);
             if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
                 if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
@@ -417,7 +440,7 @@ public class CoursewareDialog extends DialogFragment
                 if ((getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
                     web.setBackgroundColor(Color.WHITE);
                 }
-                System.out.println("dark mode not supported for WebView");
+                //System.out.println("dark mode not supported for WebView");
             }
             web.loadData(Base64.encodeToString(html.content.getBytes(), Base64.NO_PADDING), "text/html; charset=utf-8","base64");
             return web;
@@ -585,7 +608,25 @@ public class CoursewareDialog extends DialogFragment
         }
     }
     
-    
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        int children = binding.coursewareBlocks.getChildCount();
+        WebView[] views = new WebView[children];
+        for (int i = 0;i<children;i++) {
+            View v = binding.coursewareBlocks.getChildAt(i);
+            if (v instanceof FrameLayout && ((FrameLayout)v).getChildAt(0) instanceof WebView) {
+                views[i] = (WebView) ((FrameLayout)v).getChildAt(0);
+            }
+        }
+        binding.coursewareBlocks.removeAllViews();
+        for (int i = 0;i<children;i++) {
+            if (views[i] != null) {
+                //System.out.println("destroying WebView");
+                views[i].destroy();
+            }
+        }
+    }
     
     private static class SpacingDecorator extends RecyclerView.ItemDecoration {
         boolean horizontal;

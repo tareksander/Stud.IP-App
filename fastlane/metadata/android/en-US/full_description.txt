@@ -7,7 +7,8 @@ With the document provider you can access your Stud.IP files like all other file
 
 You can enable the notification service to get your Stu.IP notification as notification on the device.
 
-For Help: Settings:view help
+For Help: Settings->view help
+
 
 Permission description:
 
@@ -21,4 +22,4 @@ Not used anymore for Android 10 or later.
 
 Record audio, change audio settings, use camera, prevent phone from sleeping: Used for the BigBlueButton video conferences.
 
-foreground services, start ad boot: used for the Notification service.
+foreground services, start at boot: used for the Notification service.
