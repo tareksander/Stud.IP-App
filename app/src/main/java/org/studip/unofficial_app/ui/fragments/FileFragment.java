@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.api.rest.StudipFolder;
+import org.studip.unofficial_app.databinding.DialogFileEntryBinding;
+import org.studip.unofficial_app.databinding.DialogForumEntryBinding;
 import org.studip.unofficial_app.databinding.FragmentFileBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.viewmodels.FileViewModel;
@@ -264,7 +266,8 @@ public class FileFragment extends SwipeRefreshFragment
             if (convertView instanceof TextView) {
                 v = (TextView) convertView;
             } else {
-                v = new TextView(requireActivity());
+                DialogFileEntryBinding b = DialogFileEntryBinding.inflate(getLayoutInflater());
+                v = b.t;
             }
             if (position ==  0) {
                 v.setText("..");

@@ -15,8 +15,14 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:gravity="center"
             android:orientation="vertical">
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="8dp" />
 
             <Button
                 android:id="@+id/settings_help"
@@ -27,12 +33,7 @@
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="40dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/settings_main" />
+                android:layout_height="30dp" />
 
             <Button
                 android:id="@+id/clear_credentials"
@@ -49,7 +50,7 @@
             <RadioGroup
                 android:id="@+id/theme_group"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+                android:layout_height="match_parent">
 
                 <RadioButton
                     android:id="@+id/theme_dark"
@@ -140,11 +141,19 @@
                     android:text="@string/notification_secret" />
             </RadioGroup>
 
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
+
             <Button
                 android:id="@+id/settings_notification_channels"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/settings_system_notification" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
 
             <Button
                 android:id="@+id/settings_app_settings"
@@ -314,39 +323,39 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/settings_experimental" />
-
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/enable_documents_provider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:text="@string/document_provider" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/enable_doc_thumbnails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:text="@string/document_provider_thumbnails" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/load_images_on_mobile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:text="@string/load_on_mobile" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/enable_doc_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:text="@string/document_provider_search" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/enable_doc_recents"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:text="@string/document_provider_recents" />
 
             <Space
@@ -363,11 +372,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"></LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/settings_developer" />
 
         </LinearLayout>
     </ScrollView>

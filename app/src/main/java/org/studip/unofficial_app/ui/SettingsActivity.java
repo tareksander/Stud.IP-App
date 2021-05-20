@@ -9,9 +9,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridLayout;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
@@ -316,7 +318,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
                     r.enabled = c.isChecked();
                     docs.documents().updateInsertAsync(r).subscribeOn(Schedulers.io()).subscribe();
                 });
-                binding.documentsProviderCourses.addView(c);
+                LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                p.bottomMargin = 8;
+                binding.documentsProviderCourses.addView(c, p);
             }
         });
         

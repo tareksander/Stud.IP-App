@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -37,6 +38,7 @@ public class MessageDialogFragment extends DialogFragment
         StudipMessage m = (StudipMessage) args.getSerializable(ARG_MESSAGE_ID);
         
         TextView title = new TextView(requireActivity());
+        title.setPadding((int) (8*getResources().getDisplayMetrics().density),(int) (8*getResources().getDisplayMetrics().density),(int) (8*getResources().getDisplayMetrics().density), 0);
         b.setCustomTitle(title);
         title.setText(m.subject);
         title.setTextSize(TypedValue.COMPLEX_UNIT_DIP,26);

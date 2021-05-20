@@ -8,6 +8,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +32,7 @@ import org.studip.unofficial_app.api.rest.StudipForumCategoryWithEntries;
 import org.studip.unofficial_app.api.rest.StudipForumEntry;
 import org.studip.unofficial_app.api.rest.StudipForumEntryWithChildren;
 import org.studip.unofficial_app.databinding.DialogForumBinding;
+import org.studip.unofficial_app.databinding.DialogForumEntryBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.ForumResource;
 import org.studip.unofficial_app.model.viewmodels.ForumViewModel;
@@ -94,39 +96,35 @@ public class CourseForumDialogFragment extends DialogFragment
         
         m.f.refresh(requireActivity());
         
-        d.setOnKeyListener(new DialogInterface.OnKeyListener()
-        {
-            @Override
-            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
-                {
-                    switch (m.f.getSelectedEntry().getType()) {
-                        case COURSE:
-                            return false;
-                        case CATEGORY:
-                            m.f.setEntry(requireActivity(),null);
-                            return true;
-                        case ENTRY:
-                            //System.out.println("entry");
-                            Object o = ad.o;
-                            if (o instanceof StudipForumEntryWithChildren) {
-                                StudipForumEntryWithChildren ents = (StudipForumEntryWithChildren) o;
-                                //System.out.println("parent: "+ents.entry.parent_id);
-                                if (ents.entry.depth.equals("1")) {
-                                    m.f.setEntry(requireActivity(),new ForumResource.ForumEntry(ents.entry.parent_id, ForumResource.ForumEntry.Type.CATEGORY));
-                                    //System.out.println("category");
-                                } else {
-                                    m.f.setEntry(requireActivity(),new ForumResource.ForumEntry(ents.entry.parent_id, ForumResource.ForumEntry.Type.ENTRY));
-                                    //System.out.println("entry");
-                                }
+        d.setOnKeyListener((dialog, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
+            {
+                switch (m.f.getSelectedEntry().getType()) {
+                    case COURSE:
+                        return false;
+                    case CATEGORY:
+                        m.f.setEntry(requireActivity(),null);
+                        return true;
+                    case ENTRY:
+                        //System.out.println("entry");
+                        Object o = ad.o;
+                        if (o instanceof StudipForumEntryWithChildren) {
+                            StudipForumEntryWithChildren ents = (StudipForumEntryWithChildren) o;
+                            //System.out.println("parent: "+ents.entry.parent_id);
+                            if (ents.entry.depth.equals("1")) {
+                                m.f.setEntry(requireActivity(),new ForumResource.ForumEntry(ents.entry.parent_id, ForumResource.ForumEntry.Type.CATEGORY));
+                                //System.out.println("category");
                             } else {
-                                //System.out.println("not loaded yet");
+                                m.f.setEntry(requireActivity(),new ForumResource.ForumEntry(ents.entry.parent_id, ForumResource.ForumEntry.Type.ENTRY));
+                                //System.out.println("entry");
                             }
-                            return true;
-                    }
+                        } else {
+                            //System.out.println("not loaded yet");
+                        }
+                        return true;
                 }
-                return false;
             }
+            return false;
         });
         
         
@@ -310,7 +308,8 @@ public class CourseForumDialogFragment extends DialogFragment
             if (convertView instanceof TextView) {
                 t = (TextView) convertView;
             } else {
-                t = new TextView(requireActivity());
+                DialogForumEntryBinding b = DialogForumEntryBinding.inflate(getLayoutInflater());
+                t = b.t;
             }
             t.setText("");
             t.setOnClickListener(null);

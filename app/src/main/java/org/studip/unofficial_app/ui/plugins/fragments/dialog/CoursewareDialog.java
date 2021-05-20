@@ -208,6 +208,7 @@ public class CoursewareDialog extends DialogFragment
                 if (sub != null) {
                     for (CoursewareSubchapter s : sub) {
                         TextView t = new TextView(requireActivity());
+                        t.setPadding(0,0,0, (int) (8*getResources().getDisplayMetrics().density));
                         t.setText(s.name);
                         t.setOnClickListener(v1 -> {
                             m.selectedChapter = chapters[position].id;

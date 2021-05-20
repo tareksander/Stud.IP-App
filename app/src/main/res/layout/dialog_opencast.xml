@@ -8,6 +8,7 @@
         android:id="@+id/opencast_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
         android:divider="@color/list_divider"
         android:dividerHeight="32dp" />
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
