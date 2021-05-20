@@ -134,6 +134,7 @@ public class MeetingsActivity extends AppCompatActivity
         if (isFinishing()) {
             instance = null;
         }
+        f = null;
     }
     
     @Override

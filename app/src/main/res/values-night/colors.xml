@@ -10,10 +10,10 @@
     <color name="studip_background_darkmode">#181a1b</color>
     <color name="studip_dark_darkmode">#203a63</color>
     <color name="studip_light_darkmode">#899ab9</color>
-    <color name="background">#222222</color>
-    <color name="list_divider">#404040</color>
+    <color name="background">#0B0B0B</color>
+    <color name="list_divider">#272727</color>
 
     <color name="icon_blue">#2660CA</color>
     <color name="icon_gray">#BDBDBD</color>
-    
+    <color name="app_icon">#325CA8</color>
 </resources>

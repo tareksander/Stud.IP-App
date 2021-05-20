@@ -6,9 +6,9 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:buttonStyle">@style/Button</item>
-        <item name="android:textColor">#ffffff</item>
+        <item name="android:textColor">#CCCCCC</item>
         <item name="android:textSize">18sp</item>
-        <item name="backgroundColor">@color/background</item>
+        <item name="android:colorBackground">@color/background</item>
         <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>
     </style>
 </resources>

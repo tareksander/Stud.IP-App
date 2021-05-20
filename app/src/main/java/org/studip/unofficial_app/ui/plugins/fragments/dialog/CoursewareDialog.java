@@ -34,7 +34,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
 import androidx.webkit.WebSettingsCompat;
-import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import org.jetbrains.annotations.NotNull;
@@ -165,8 +164,6 @@ public class CoursewareDialog extends DialogFragment
         
         return binding.getRoot();
     }
-    
-  
     
     @NonNull
     @Override

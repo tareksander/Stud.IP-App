@@ -5,7 +5,6 @@
     <string name="username_field">username</string>
     <string name="password_field">password</string>
     <string name="login_error_title">Error</string>
-    <string name="login_error_message">Either the hostname, username or password is wrong. If you are sure everything is right, your Stud.IP-admin hasn\'t enabled the API.</string>
     <string name="restore_error_message">An error has occurred while trying to reconnect. Check you network connectivity or try to log in again.</string>
     <string name="menu_home">Home</string>
     <string name="menu_event">Courses</string>
@@ -182,6 +181,9 @@ The PiP-window also has a button to toggle the microphone.<br>
     <string name="toggle_mic">toggle microphone</string>
     <string name="mic_on">microphone on</string>
     <string name="mic_off">microphone off</string>
+    <string name="login_error_message">Error while connecting to the server. Are you connected to the internet?</string>
+    <string name="login_error_auth">The username or password is wrong.</string>
+    <string name="login_error_no_api"><![CDATA["The Stud.IP API is not enabled for the server. Contact your system administrator and tell them to enable the REST API. If they ask what routes need to be enabled, <a href="https://github.com/tareksander/Stud.IP-App">send them a link to the Github Readme</a>"]]></string>
 
 
 </resources>

@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.studip.unofficial_app.R;
+
 public class HelpActivity extends AppCompatActivity
 {
     public static Spanned fromHTML(@NonNull String html) {
@@ -28,4 +29,5 @@ public class HelpActivity extends AppCompatActivity
         TextView v = findViewById(R.id.help_view);
         v.setText(fromHTML(getString(R.string.help_content)));
     }
+    
 }

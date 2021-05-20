@@ -53,4 +53,10 @@ public class MkdirDialogFragment extends DialogFragment
         
         return b.create();
     }
+    
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ed = null;
+    }
 }

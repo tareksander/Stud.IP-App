@@ -4,7 +4,6 @@
     <string name="username_field">Benutzername</string>
     <string name="password_field">Passwort</string>
     <string name="login_error_title">Fehler</string>
-    <string name="login_error_message">Es ist entweder der Hostname, der Benutzername oder das Passwort falsch. Wenn sie sich sicher sind, dass alles richtig ist, hat ihr Stud.IP Admin das API nicht freigeschaltet.</string>
     <string name="restore_error_message">Es ist ein Fehler beim Wiederherstellen der Verbindung aufgetreten. Überprüfen sie ihre Netzwerkverbindung oder versuchen sie, sich erneut anzumelden.</string>
     <string name="menu_home">Home</string>
     <string name="menu_event">Veranstaltungen</string>
@@ -186,6 +185,9 @@ Das PiP-Fenster hat auch einen Button, um das Mikrofon umzuschalten.<br>
     <string name="toggle_mic">Mikrofon umschalten</string>
     <string name="mic_on">Mikrofon an</string>
     <string name="mic_off">Mikrofon aus</string>
+    <string name="login_error_message">Fehler beim Verbinden mit dem Server. Haben Sie eine Internetverbindung?</string>
+    <string name="login_error_auth">Der Benutzername oder das Passwort ist falsch.</string>
+    <string name="login_error_no_api"><![CDATA["Die Stud.IP API ist für den Server nicht aktiviert. Kontaktieren Sie Ihren Administrator und bitten sie ihn, die REST API anzuschalten. Wenn der Adminstrator fragt, welche Routen angeschaltet werden sollen, <a href="https://github.com/tareksander/Stud.IP-App">senden Sie einen Link zu der Readme auf Github</a>"]]></string>
 
 
 </resources>

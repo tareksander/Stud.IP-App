@@ -64,4 +64,5 @@ public class DeepLinkActivity extends AppCompatActivity
             finish();
         }
     }
+    
 }

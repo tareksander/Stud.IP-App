@@ -24,13 +24,22 @@
     
     Roadmap:
         1.0.0:
-            [ ] deep links improvements
+            [ ] memory leak when closing the meetings activity?
+            [ ] memory management
                 [ ] 
+            [ ] deep links improvements
+                [ ] support for more link types, for courseware, opencast and meetings links
+                [ ] for messages, load the message if it isn't already, and view it
+                [ ] link to the course info and member screens
+                [ ] link to the planner
+                [ ] open unknown link patterns in the WebView for the server
             [ ] delete data which is not in a server response, but still in the database
             [ ] better updating of messages, so not every message is downloaded on update, only the ones until a saved one is found
                 [ ] don't care about deleting messages deleted from the server, the user can just also delete them locally
                 [ ] when a message is deleted, don't sync with the server, just send a delete and delete it from the database
+            [ ] add the course info dialog
             [ ] add the course members dialog
+            [ ] add the user info dialog
             [ ] support for the planner
             [ ] app widget for the planner
             [ ] support for changing all Stud.IP settings in a dedicated fragment, by sending requests.
@@ -39,11 +48,12 @@
                 [ ] redirect page loads for pages not on the server to the browser
                 [ ] allow javascript
             [ ] API detection:
-                [ ] better error message when login fails
+                [x] better error message when login fails
                 [ ] if api.php/user failed, try discovery to see if the API is even enabled
                     [ ] if yes, but api.php/user is not enabled, tell the user
                 [ ] see what routes are needed for what features, tell user on login which features are unavailable
                 [ ] fail without message for features where the routes are disabled
+                [ ] put the used routes in the Github Readme
             [ ] rework UI
                 [x] remove the "Experimental Features" text from the settings, the features work quite reliably
                 [x] remove the "developer settings" not used anyways
@@ -66,7 +76,7 @@
                     [ ] some features might have to be disabled, or only supported via the new JSONAPI, or require the user to log in in the app
             [ ] blubber
                 [ ] support for personal chats via blubber
-                [ ] option to check for blubber messages more frequently than normal notifications
+                [ ] option to check for blubber messages more frequently than normal notifications, and to only enable this when connected to wifi
                 [ ] support for course blubbers
                 [ ] if you invite people to a personal blubber, does it become a group chat?
                 [ ] whatsapp-like list for chats, try to emulate a messenger app with blubber
@@ -79,6 +89,8 @@
             [ ] make more specific rules for proguard, so unused code can be removed
             [ ] bump version
         1.3.0:
+            [ ] option to input the file size limit of the Stud.IP system, to let the documents provider automatically break up and recombine
+                files above the limit, to support arbitrarily large files
             [ ] plugins:
                 [ ] vips
                 [ ] etherpad

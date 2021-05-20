@@ -298,4 +298,9 @@ public class MessageWriteDialogFragment extends DialogFragment
         }
     }
     
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        b = null;
+    }
 }

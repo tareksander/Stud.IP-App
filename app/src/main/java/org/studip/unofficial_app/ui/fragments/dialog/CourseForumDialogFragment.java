@@ -376,8 +376,11 @@ public class CourseForumDialogFragment extends DialogFragment
         }
     }
     
-    
-    
-    
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        d = null;
+        binding = null;
+    }
     
 }
