@@ -44,7 +44,7 @@
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />
 
-        <activity android:name=".ui.HelpActivity" />
+        <activity android:name=".ui.HelpActivity" android:exported="false" />
         <activity android:name=".ui.CrashActivity" android:exported="false" />
         <activity android:name=".ui.SettingsActivity" android:exported="false" />
         <activity android:name=".ui.LoginActivity" android:exported="false" />
@@ -59,7 +59,8 @@
             tools:ignore="UnusedAttribute" />
         <activity
             android:name=".ui.HomeActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -70,7 +71,8 @@
             android:label="@string/app_name"
             android:launchMode="singleInstance"
             android:taskAffinity=""
-            android:theme="@android:style/Theme.NoDisplay">
+            android:theme="@android:style/Theme.NoDisplay"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
