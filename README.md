@@ -85,7 +85,7 @@ Blubber:
 /blubber/comment/:blubber_id (DELETE, GET, PUT)  
 /blubber/posting/:blubber_id (DELETE, GET, PUT)  
 /blubber/posting/:blubber_id/comments (GET, POST)  
-/blubber/postings
+/blubber/postings  
 /blubber/stream/:stream_id
 </br>
 </br>
