@@ -68,6 +68,7 @@ Messages screen:
 Home screen:  
   
 /studip/news  
+/news/:news_id  
 </br>
 </br>
 Planner screen:  
