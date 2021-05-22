@@ -47,7 +47,6 @@ Files screen:
 Courses screen:
   
 /course/:course_id  
-/course/:course_id/forum_categories  
 /course/:course_id/members  
 /course/:course_id/news  
 /user/:user_id/courses  
@@ -69,6 +68,7 @@ Messages screen:
 Home screen:  
   
 /studip/news  
+/news/:news_id  
 </br>
 </br>
 Planner screen:  
@@ -85,12 +85,13 @@ Blubber:
 /blubber/comment/:blubber_id (DELETE, GET, PUT)  
 /blubber/posting/:blubber_id (DELETE, GET, PUT)  
 /blubber/posting/:blubber_id/comments (GET, POST)  
-/blubber/postings
+/blubber/postings  
 /blubber/stream/:stream_id
 </br>
 </br>
 Course forum:  
   
+/course/:course_id/forum_categories  
 /forum_category/:category_id  
 /forum_category/:category_id/areas (GET, POST)  
 /forum_entry/:entry_id (DELETE, GET, POST, PUT)  
