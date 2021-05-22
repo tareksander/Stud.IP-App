@@ -22,6 +22,7 @@ Requirement for the app to work at all:
   
 /discovery  
 /user  
+/user/:user_id  
 </br>
 </br>
 Files screen:  
