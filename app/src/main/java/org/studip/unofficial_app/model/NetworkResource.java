@@ -65,14 +65,14 @@ public abstract class NetworkResource<T>
                             refreshing.postValue(false);
                         }).start();
                     } else {
-                        System.out.println("no response");
+                        //System.out.println("no response");
                         refreshing.setValue(false);
                     }
                 }
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull Throwable t)
                 {
-                    System.out.println("newtwork call failed");
+                    //System.out.println("newtwork call failed");
                     t.printStackTrace();
                     refreshing.setValue(false);
                 }

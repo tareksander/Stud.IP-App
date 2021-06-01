@@ -216,6 +216,7 @@ public class MeetingsFragment extends Fragment
         if (requireActivity().isFinishing()) {
             //System.out.println("finishing");
             NotificationManagerCompat m = NotificationManagerCompat.from(requireActivity());
+            conference.clearCache(false);
             conference.destroy();
             conference = null;
             m.cancel(Integer.MIN_VALUE);

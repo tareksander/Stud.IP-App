@@ -1,5 +1,6 @@
 package org.studip.unofficial_app.ui;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
@@ -15,6 +16,8 @@ import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.SettingsProvider;
+import org.studip.unofficial_app.ui.fragments.dialog.DiscoveryErrorDialogFragment;
+import org.studip.unofficial_app.ui.fragments.dialog.LoginErrorDialogFragment;
 
 
 public class LoginActivity extends AppCompatActivity
@@ -26,7 +29,7 @@ public class LoginActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         API api = APIProvider.getAPI(this);
-        if (APIProvider.getAPI(this) == null) {
+        if (api == null) {
             Intent intent = new Intent(this, ServerSelectActivity.class);
             startActivity(intent);
             finish();
@@ -71,6 +74,12 @@ public class LoginActivity extends AppCompatActivity
         finish();
     }
     
+    private void toHome() {
+        Intent intent = new Intent(this, HomeActivity.class);
+        startActivity(intent);
+        finish();
+    }
+    
     public void onLogin(View v)
     {
         TextView username = findViewById(R.id.username);
@@ -79,45 +88,44 @@ public class LoginActivity extends AppCompatActivity
         {
             login_running = true;
             final AppCompatActivity c = this;
-            LiveData<Integer> l = APIProvider.getAPI(this).login(this, username.getText().toString(), password.getText().toString(), SettingsProvider.getSettings(this).authentication_method);
+            API api = APIProvider.getAPI(this);
+            if (api == null) {
+                return;
+            }
+            LiveData<Integer> l = api.login(this, username.getText().toString(), password.getText().toString(), SettingsProvider.getSettings(this).authentication_method);
             l.observe(this, code ->
             {
                 if (code != -1)
                 {
                     if (code == 200)
                     {
-                        Intent intent = new Intent(c, HomeActivity.class);
-                        startActivity(intent);
-                        finish();
-                        APIProvider.getAPI(c).save(APIProvider.getPrefs(c));
-                        login_running = false;
-                        //System.out.println("logged in");
-                        l.removeObservers(c);
+                        LiveData<Integer> f = api.discover();
+                        f.observe(this, code2 -> {
+                            if (code2 == -1) {
+                                return;
+                            }
+                            EncryptedSharedPreferences p = APIProvider.getPrefs(c);
+                            if (p != null) {
+                                api.save(p);
+                            }
+                            login_running = false;
+                            l.removeObservers(c);
+                            DiscoveryErrorDialogFragment e = new DiscoveryErrorDialogFragment();
+                            Bundle args = new Bundle();
+                            args.putInt(DiscoveryErrorDialogFragment.CODE, code2);
+                            e.setArguments(args);
+                            e.show(getSupportFragmentManager(), "discovery_error");
+                        });
                     }
                     else
                     {
                         l.removeObservers(c);
                         login_running = false;
-                        int msg;
-                        switch (code) {
-                            case 401:
-                                msg = R.string.login_error_auth;
-                                break;
-                            case 403:
-                            case 404:
-                            case 405:
-                                msg = R.string.login_error_no_api;
-                                break;
-                            default:
-                                msg = R.string.login_error_message;
-                        }
-                        AlertDialog d = new AlertDialog.Builder(c).setTitle(R.string.login_error_title).setMessage(HelpActivity.fromHTML(getString(msg))).show();
-                        try {
-                            TextView t = d.findViewById(android.R.id.message);
-                            if (t != null) {
-                                t.setMovementMethod(LinkMovementMethod.getInstance());
-                            }
-                        } catch (Exception ignored) {}
+                        LoginErrorDialogFragment f = new LoginErrorDialogFragment();
+                        Bundle args = new Bundle();
+                        args.putInt(LoginErrorDialogFragment.ERROR_CODE, code);
+                        f.setArguments(args);
+                        f.show(getSupportFragmentManager(), "login_error");
                     }
                 }
             });

@@ -620,10 +620,14 @@ public class CoursewareDialog extends DialogFragment
         binding.coursewareBlocks.removeAllViews();
         for (int i = 0;i<children;i++) {
             if (views[i] != null) {
+                if (i == children-1) {
+                    views[i].clearCache(false);
+                }
                 //System.out.println("destroying WebView");
                 views[i].destroy();
             }
         }
+        
     }
     
     private static class SpacingDecorator extends RecyclerView.ItemDecoration {

@@ -8,6 +8,6 @@ import retrofit2.http.GET;
 public interface Discovery
 {
     @GET("api.php/discovery")
-    public Call<HashMap<String, HashMap<String,String>>> discovery();
+    Call<HashMap<String, HashMap<String,String>>> discovery();
     
 }

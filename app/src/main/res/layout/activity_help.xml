@@ -8,6 +8,7 @@
     tools:viewBindingIgnore="true">
 
     <ScrollView
+        android:id="@+id/help_scroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"

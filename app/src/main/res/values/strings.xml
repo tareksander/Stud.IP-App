@@ -184,6 +184,24 @@ The PiP-window also has a button to toggle the microphone.<br>
     <string name="login_error_message">Error while connecting to the server. Are you connected to the internet?</string>
     <string name="login_error_auth">The username or password is wrong.</string>
     <string name="login_error_no_api"><![CDATA["The Stud.IP API is not enabled for the server. Contact your system administrator and tell them to enable the REST API. If they ask what routes need to be enabled, <a href="https://github.com/tareksander/Stud.IP-App">send them a link to the Github Readme</a>"]]></string>
+    <string name="discovery_error">Could not discover available features. Assuming all Features are enabled. Some Features might not work. You can re-scan for available features in the settings screen.</string>
+    <string name="discovery_title">Disabled features</string>
+    <string name="feature_global_news">Global news</string>
+    <string name="feature_files">File screen</string>
+    <string name="feature_user_files">View user files</string>
+    <string name="feature_course_files">View course files</string>
+    <string name="feature_forum">Use course forums</string>
+    <string name="feature_messages">Messages screen</string>
+    <string name="feature_courses">Courses screen</string>
+    <string name="feature_planner">Planner screen &amp; widget</string>
+    <string name="feature_blubber">Blubber</string>
+    <string name="discovery_msg"><![CDATA["
+%1$s<br>
+If you want to use these features, contact you administrator and send them a link to the <a href="https://github.com/tareksander/Stud.IP-App">Github Readme</a>, so they can enable the features.
+"]]></string>
+    <string name="scan_features">re-scan features</string>
+    <string name="ignore_missing_features">ignore missing features</string>
+    <string name="ignore_missing_features_msg">Missing features might partially work if a part of the API has been enabled, but not all that is required for a feature to fully function. The missing features might work fine, or not at all. Correct function cannot be guaranteed.</string>
 
 
 </resources>

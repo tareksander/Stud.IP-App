@@ -22,7 +22,7 @@
         android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -38,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="24dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="16dp"
                 android:visibility="visible"
                 app:srcCompat="@drawable/info_grey" />
 
@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="24dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="16dp"
                 android:visibility="invisible"
                 app:srcCompat="@drawable/forum_grey" />
 
@@ -56,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="24dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="16dp"
                 android:visibility="visible"
                 app:srcCompat="@drawable/persons_grey" />
 
@@ -65,7 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="24dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="16dp"
                 android:clickable="true"
                 android:visibility="invisible"
                 app:srcCompat="@drawable/file_grey" />
@@ -74,7 +74,7 @@
                 android:id="@+id/course_news"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="16dp"
                 android:visibility="visible"
                 app:srcCompat="@drawable/news_grey" />
 

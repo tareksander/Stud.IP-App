@@ -29,9 +29,9 @@ import org.studip.unofficial_app.api.routes.File;
 import org.studip.unofficial_app.api.routes.Folder;
 import org.studip.unofficial_app.api.routes.Forum;
 import org.studip.unofficial_app.api.routes.Message;
+import org.studip.unofficial_app.api.routes.OAuth;
 import org.studip.unofficial_app.api.routes.Semester;
 import org.studip.unofficial_app.api.routes.Studip;
-import org.studip.unofficial_app.api.routes.TestRoutes;
 import org.studip.unofficial_app.api.routes.User;
 import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.GsonProvider;
@@ -41,8 +41,11 @@ import org.studip.unofficial_app.model.room.UserDao;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -74,9 +77,13 @@ public class API
     private static final String PASSWORD_KEY = "password";
     private static final String AUTH_METHOD_KEY = "method";
     //private static final String USER_FOLDER_KEY = "user_top_folder";
+    private static final String DISABLED_FEATURES_KEY = "disabled features";
+    
     
     
     public static final String HTTPS = "https://";
+    
+    
     
     
     public final Discovery discovery;
@@ -89,6 +96,7 @@ public class API
     public final User user;
     public final Semester semester;
     public final Dispatch dispatch;
+    public final OAuth oauth;
     
     
     public final Opencast opencast;
@@ -106,6 +114,12 @@ public class API
     private String userID = null;
     private String username = null;
     private String password = null;
+    
+    private String oauth_token = null;
+    private String oauth_token_secret = null;
+    
+    private Set<String> disabled_features = new HashSet<>();
+    
     
     public API(String hostname) {
         this.hostname = hostname;
@@ -168,11 +182,16 @@ public class API
                     if (response.request().header("Authorization") != null) {
                         return null;
                     }
-                    if (route != null && route.address().url().isHttps() && route.address().url().host().equals(hostname.split("/")[0]) && password != null && auth_method == Settings.AUTHENTICATION_BASIC) {
-                        //System.out.println("Basic Authentication used for "+route.address().url().toString());
-                        return response.request().newBuilder().header("Authorization",Credentials.basic(username,password)).build();
+                    if (route != null && route.address().url().isHttps() && route.address().url().host().equals(hostname.split("/")[0])) {
+                        if (password != null && auth_method == Settings.AUTHENTICATION_BASIC) {
+                            //System.out.println("Basic Authentication used for "+route.address().url().toString());
+                            return response.request().newBuilder().header("Authorization", Credentials.basic(username, password)).build();
+                        }
+                        if (oauth_token != null && oauth_token_secret != null && auth_method == Settings.AUTHENTICATION_OAUTH) {
+                            //System.out.println("OAuth Authentication used for "+route.address().url().toString());
+                        }
                     } else {
-                        //System.out.println("basic auth denied for: "+route.address().url().toString());
+                        //System.out.println("auth denied for: "+route.address().url().toString());
                     }
                     return null;
                 }).build())
@@ -187,12 +206,17 @@ public class API
         user = retrofit.create(User.class);
         semester = retrofit.create(Semester.class);
         dispatch = retrofit.create(Dispatch.class);
-    
+        oauth = retrofit.create(OAuth.class);
+        
         //tests = retrofit.create(TestRoutes.class);
         
         opencast = new Opencast(retrofit);
         courseware = new Courseware(retrofit);
         meetings = new Meetings(retrofit);
+    }
+    
+    public boolean isFeatureEnabled(String feature) {
+        return ! disabled_features.contains(feature);
     }
     
     public void downloadFile(@NonNull Context con, @NonNull String fid, String filename, boolean url) {
@@ -233,7 +257,8 @@ public class API
             
             
             boolean authed = false;
-
+            
+            // TODO add OAuth
             if (auth_method == Settings.AUTHENTICATION_BASIC && ! url)
             {
                 r.addRequestHeader("Authorization", Credentials.basic(username, password));
@@ -281,6 +306,8 @@ public class API
         }
         return null;
     }
+    
+    
     
     
     
@@ -343,6 +370,38 @@ public class API
         return login_call(con, c, DBProvider.getDB(con).userDao());
     }
     
+    public LiveData<Integer> discover() {
+        MutableLiveData<Integer> d = new MutableLiveData<>(-1);
+        discovery.discovery().enqueue(new Callback<HashMap<String, HashMap<String, String>>>()
+        {
+            @Override
+            public void onResponse(@NotNull Call<HashMap<String, HashMap<String, String>>> call,
+                                   @NotNull Response<HashMap<String, HashMap<String, String>>> response) {
+                HashMap<String, HashMap<String, String>> res = response.body();
+                if (res != null) {
+                    disabled_features.clear();
+                    Features.featureGlobalNews(disabled_features, res);
+                    Features.featureFiles(disabled_features, res);
+                    Features.featureUserFiles(disabled_features, res);
+                    Features.featureCourseFiles(disabled_features, res);
+                    Features.featureForum(disabled_features, res);
+                    Features.featureMessages(disabled_features, res);
+                    Features.featureCourses(disabled_features, res);
+                    Features.featurePlanner(disabled_features, res);
+                    Features.featureBlubber(disabled_features, res);
+                }
+                d.setValue(response.code());
+            }
+    
+            @Override
+            public void onFailure(@NotNull Call<HashMap<String, HashMap<String, String>>> call, @NotNull Throwable t) {
+                d.setValue(0);
+            }
+        });
+        
+        return d;
+    }
+    
     
     private LiveData<Integer> login_call(Context con, Call<StudipUser> c, UserDao user) {
         Context appcon = con.getApplicationContext();
@@ -371,7 +430,7 @@ public class API
                         }
                     },throwable -> d.postValue(0));
                 } else {
-                    d.postValue(0);
+                    d.postValue(code);
                 }
             }
             @Override
@@ -415,6 +474,7 @@ public class API
             edit.putString(PASSWORD_KEY,password);
         }
         
+        edit.putStringSet(DISABLED_FEATURES_KEY, disabled_features);
         //edit.putString(USER_FOLDER_KEY,folder_id);
         
         edit.apply();
@@ -450,10 +510,18 @@ public class API
             api.auth_method = Settings.AUTHENTICATION_BASIC;
         }
         
+        api.disabled_features = prefs.getStringSet(DISABLED_FEATURES_KEY, new HashSet<>());
+        
+        
         return api;
     }
     
+    public String getDisabledFeatures(Context c) {
+        return Features.listUnavailableFeatures(disabled_features, c);
+    }
     
-    
+    public void ignoreDisabledFeatures() {
+        disabled_features.clear();
+    }
     
 }

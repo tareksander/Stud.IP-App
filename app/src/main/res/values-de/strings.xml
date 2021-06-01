@@ -188,6 +188,24 @@ Das PiP-Fenster hat auch einen Button, um das Mikrofon umzuschalten.<br>
     <string name="login_error_message">Fehler beim Verbinden mit dem Server. Haben Sie eine Internetverbindung?</string>
     <string name="login_error_auth">Der Benutzername oder das Passwort ist falsch.</string>
     <string name="login_error_no_api"><![CDATA["Die Stud.IP API ist für den Server nicht aktiviert. Kontaktieren Sie Ihren Administrator und bitten sie ihn, die REST API anzuschalten. Wenn der Adminstrator fragt, welche Routen angeschaltet werden sollen, <a href="https://github.com/tareksander/Stud.IP-App">senden Sie einen Link zu der Readme auf Github</a>"]]></string>
+    <string name="discovery_error">Konnte nicht herausfinden, welche Funktionen aktiviert sind. Alle Funktionen werden als aktiviert angenommen. Manche Funktionieren funktionieren vielleicht nicht. Sie können in den Einstellungen noch einmal aktivierte Funktionen überprüfen lassen.</string>
+    <string name="discovery_title">Deaktivierte Funktionen</string>
+    <string name="feature_global_news">Systemankündigungen</string>
+    <string name="feature_files">Dateibildschirm</string>
+    <string name="feature_user_files">Eigene Dateien anschauen</string>
+    <string name="feature_course_files">Kursdateien anschauen</string>
+    <string name="feature_forum">Foren benutzen</string>
+    <string name="feature_messages">Nachrichtenbildschirm</string>
+    <string name="feature_courses">Kursbildschirm</string>
+    <string name="feature_planner">Planer</string>
+    <string name="feature_blubber">Blubber</string>
+    <string name="discovery_msg"><![CDATA["
+%1$s<br>
+Wenn Sie die Funktionen verwenden wollen,  kontaktieren Sie Ihren Administrator und schicken Sie ihm den Link zur <a href="https://github.com/tareksander/Stud.IP-App">Github Readme</a>, damit er die Funktionen aktivieren kann.
+"]]></string>
+    <string name="scan_features">Funktionen erneut testen</string>
+    <string name="ignore_missing_features">Fehlende Funktionen ignorieren</string>
+    <string name="ignore_missing_features_msg">Fehlende Funktionen können teilweise funktionieren, wenn Teile des API angeschaltet sind, aber nicht alles, was für die volle Funktion benötigt wird. Fehlende funktionen funktionieren vielleicht notmal, oder auch gar nicht. Korrekte Funktion kann nicht garantiert werden.</string>
 
 
 </resources>

@@ -5,12 +5,15 @@ import org.studip.unofficial_app.api.rest.StudipSearchUser;
 
 import java.util.Map;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -35,6 +38,12 @@ public interface Dispatch
     Call<StudipSearchUser[]> searchAddresses(@Query("s") String search);
     
     
+    
+    // MultipartBody.Part.createFormData("filename",filename , RequestBody.create(data));
+    // MultipartBody.Part.createFormData("name","message_id" , RequestBody.create(message_id));
+    @POST("dispatch.php/messages/upload_attachment")
+    @Multipart
+    Call<Void> uploadAttachment(@Part MultipartBody.Part body, @Part MultipartBody.Part message);
     
     
     // The token is in a script of the parent forum website. parse that with Jsoup, extract the token

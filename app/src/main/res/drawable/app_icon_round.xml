@@ -7,9 +7,9 @@
     <path
         android:pathData="M8,8m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0"
         android:strokeWidth="0.04233333"
-        android:fillColor="@color/background"/>
+        android:fillColor="#EEEEEE"/>
     <path
         android:pathData="M7.975,1.052A6.978,6.978 0,0 0,1 8.022h2.077a4.9,4.9 0,0 1,4.897 -4.896,4.9 4.9,0 0,1 4.899,4.897 4.9,4.9 0,0 1,-4.898 4.9L7.975,15a6.977,6.977 0,0 0,6.973 -6.977,6.973 6.973,0 0,0 -6.973,-6.971zM10.595,8.023a2.62,2.62 0,0 0,-2.621 -2.617,2.618 2.618,0 0,0 0,5.239 2.623,2.623 0,0 0,2.621 -2.622z"
-        android:fillColor="@color/app_icon"/>
+        android:fillColor="#24437c"/>
   </group>
 </vector>

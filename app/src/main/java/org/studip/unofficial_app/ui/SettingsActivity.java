@@ -2,6 +2,8 @@ package org.studip.unofficial_app.ui;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -22,11 +24,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.security.crypto.EncryptedSharedPreferences;
@@ -48,6 +53,7 @@ import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.NotificationWorker;
 import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
+import org.studip.unofficial_app.ui.fragments.dialog.DiscoveryErrorDialogFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -113,6 +119,8 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         outState.putSerializable(NOTIFICATION_LAYOUT+"values", notification_layout_values);
         outState.putSerializable(NOTIFICATION_LAYOUT+"names", notification_names);
         outState.putSerializable(NOTIFICATION_LAYOUT+"values2", notification_values);
+        
+        
     }
     
     @SuppressLint("CheckResult")
@@ -600,7 +608,56 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             });
         }
     }
-
+    
+    public void onScanFeatures(View v) {
+        API api = APIProvider.getAPI(this);
+        if (api != null && api.getUserID() != null) {
+            LiveData<Integer> f = api.discover();
+            f.observe(this, code2 -> {
+                if (code2 == -1) {
+                    return;
+                }
+                EncryptedSharedPreferences p = APIProvider.getPrefs(this);
+                if (p != null) {
+                    api.save(p);
+                }
+                f.removeObservers(this);
+                DiscoveryErrorDialogFragment e = new DiscoveryErrorDialogFragment();
+                Bundle args = new Bundle();
+                args.putBoolean(DiscoveryErrorDialogFragment.LOGIN, false);
+                args.putInt(DiscoveryErrorDialogFragment.CODE, code2);
+                e.setArguments(args);
+                e.show(getSupportFragmentManager(), "discovery_error");
+            });
+        }
+    }
+    
+    public static class IgnoreFeaturesDialog extends DialogFragment {
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        AlertDialog.Builder b = new AlertDialog.Builder(requireActivity());
+        b.setTitle(R.string.ignore_missing_features);
+        b.setMessage(R.string.ignore_missing_features_msg);
+        b.setPositiveButton(R.string.ok, (DialogInterface.OnClickListener) (dialog, which) -> {
+            API api = APIProvider.getAPI(requireActivity());
+            if (api != null) {
+                api.ignoreDisabledFeatures();
+            }
+            dismiss();
+        });
+        return b.create();
+    }
+}
+    
+    public void onIgnoreFeatures(View v) {
+        API api = APIProvider.getAPI(this);
+        if (api != null) {
+            new IgnoreFeaturesDialog().show(getSupportFragmentManager(), "ignore_features_dialog");
+            api.ignoreDisabledFeatures();
+        }
+    }
+    
     @Override
     protected void onStop()
     {

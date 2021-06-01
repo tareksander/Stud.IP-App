@@ -24,9 +24,6 @@
     
     Roadmap:
         1.0.0:
-            [ ] memory leak when closing the meetings activity?
-            [ ] memory management
-                [ ] 
             [ ] deep links improvements
                 [ ] support for more link types, for courseware, opencast and meetings links
                 [ ] for messages, load the message if it isn't already, and view it
@@ -42,36 +39,64 @@
             [ ] add the user info dialog
             [ ] support for the planner
             [ ] app widget for the planner
-            [ ] support for changing all Stud.IP settings in a dedicated fragment, by sending requests.
             [ ] option to browse the web version in an activity with a fullscreen WebView
                 [ ] set user agent to mobile
                 [ ] redirect page loads for pages not on the server to the browser
                 [ ] allow javascript
+            [ ] messages
+                [ ] add support for viewing the outbox
+                [ ] add the ability to upload attachments after a message was send, via the dispatch route
+                    [ ] strangely seems to work for all messages, even send ones, may not be stable, because it isn't in the API
+                    [ ] the email is send without the attachment if it is attached later
             [ ] API detection:
                 [x] better error message when login fails
-                [ ] if api.php/user failed, try discovery to see if the API is even enabled
-                    [ ] if yes, but api.php/user is not enabled, tell the user
-                [ ] see what routes are needed for what features, tell user on login which features are unavailable
-                [ ] fail without message for features where the routes are disabled
-                [ ] put the used routes in the Github Readme
-            [ ] rework UI
+                [x] see what routes are needed for what features, tell user on login which features are unavailable
+                [ ] disable functions according to disabled features
+                [x] option to ignore unavailable features, features may partly work if some routes are enabled
+                [x] add the option to res-scan for features in the settings screen
+                [x] fail without message for features where the routes are disabled
+                [x] put the used routes in the Github Readme
+            [ ] fully save UI state
+                [ ] save the scrolling position in ScrollViews? Giving the ScrollViews an ID makes it safe itself automatically
+                [ ] save the selected semester in the courses screen
+                [ ] SavedStateModule for all ViewModels for special data not from the database
+                    All objects have to be serializable correctly for this.
+                    The limit is 1mb, the CoursewareViewModel could exceed that. In that case, write the data to a file in the cache folder in a lifecycle method
+                    , make sure the document provider doesn't delete it on startup, and delete it when it is read.
+                    [ ] maybe store the opencast und courseware data in the database?
+                    [ ] MeetingsRoomsViewModel
+                    [ ] OpencastViewModel
+                    [ ] CoursewareViewModel
+                    [ ] FileViewModel
+                    [ ] ForumViewModel: current parent entry
+                    [ ] selected semester for courses screen
+                    [ ] measure the performance after these changes, check if re-creation from an configuration change is still fast
+                        https://medium.com/androiddevelopers/testing-app-startup-performance-36169c27ee55
+            [x] rework UI
                 [x] remove the "Experimental Features" text from the settings, the features work quite reliably
                 [x] remove the "developer settings" not used anyways
-                [ ] try to find nicer colors for dark mode
+                [x] try to find nicer colors for dark mode
                 [x] space everything more out in general
                 [x] courses screen
                     [x] space the icons wider out, make them into 2 rows for each course
                 [x] courseware
                     [x] fix the bug that causes the buttons for opencast videos to display incorrectly when in landscape mode
-            [ ] bump version
+            [x] bump version
             [ ] update help text
+            [ ] come up with an actual name, check if it is taken
+            [ ] new & more screenshots, with UI improvements
             [ ] update description
         1.1.0:
             [ ] support for OAuth1 for authentication
-                [ ] test the OAuth flow and requests in a browser first
-                [ ] make a class with the hostnames and OAuth data for supported servers
+                https://oauth1.wp-api.org/docs/basics/Auth-Flow.html
+                https://stackoverflow.com/questions/2665796/android-handle-oauth-callback-using-intent-filter
+                [x] make a class with the hostnames and OAuth data for supported servers
                 [ ] extra error message when OAuth isn't supported for the app by a server, tell the user to send a predefined message to the admin,
                     to enable OAuth support for the Stud.IP installation.
+                [ ] The callback uri doesn't seem to work, the browser doesn't redirect to it
+                [ ] authorize the token via an intent to the browser
+                [ ] add OAuth authentication to the downloads
+                [ ] add an authentication interceptor for oauth authentication, save the token in the API shared preferences
                 [ ] check: do things which require a session cookie work with OAuth? Do you get a session cookie when using OAuth?
                     [ ] some features might have to be disabled, or only supported via the new JSONAPI, or require the user to log in in the app
             [ ] blubber
@@ -82,6 +107,9 @@
                 [ ] whatsapp-like list for chats, try to emulate a messenger app with blubber
         1.2.0:
             [ ] add support for JSONAPI (probably requires abstracting away the api routes a bit more)
+                https://stackoverflow.com/questions/35502079/custom-converter-for-retrofit-2
+                [ ] JSONAPI is enabled on demo.studip.de, use that to test the implementation
+                [ ] JSONAPI has a route to get all files/folders for a course, use that for the search function
                 [ ] database and everything should still use the data classes, let the JSONAPI format be translated to that
                 [ ] JSONAPI to POJO library?
                 [ ] use JSONAPI if possible
@@ -115,8 +143,6 @@ TODO
     
     
     
-    
-TODO: supply database migrations for every database change once the app is on f-droid
     
     
 TODO: open issue with predefined content: https://docs.github.com/en/github/managing-your-work-on-github/about-automation-for-issues-and-pull-requests-with-query-parameters
@@ -179,7 +205,7 @@ TODO: intent filter for sending a message to someone
     
     
 TODO: JSONAPI: https://jsonapi.org/format
-    getting only specific fields to save mobilde data: https://jsonapi.org/format/#fetching-sparse-fieldsets
+    getting only specific fields to save mobile data: https://jsonapi.org/format/#fetching-sparse-fieldsets
     
     
 
@@ -229,23 +255,6 @@ https://developer.android.com/guide/topics/graphics/drawables#nine-patch
         https://github.com/virtUOS/studip-meeting/issues
         https://github.com/elan-ev/studip-opencast-plugin/issues
         
-        courseware:
-            to get the courseware html for a course: /plugins.php/courseware/courseware?cid=
-            cid is the course-id
-            
-        meetings:
-            url: /plugins.php/meetingplugin/index?cid=
-            BigBlueButton is already made for mobile use, so a WebView with the session cookie should be enough.
-            
-            TODO A WebView reloads when the parent is destroyed because of a configuration change. That would result in someone being temporarily kicked out of a meeting when the device is turned.
-                 Make the meetings plugin its own activity and disable configuration changes in it.
-                
-                use android:keepScreenOn in the layout of the activity
-            
-            
-            
-            Enable PiP-Mode when a meeting is displayed and add custom controls to toggle audio, microphone, camera, screen share.
-            
             
         vips:
             url: /plugins.php/vipsplugin/sheets?cid=
