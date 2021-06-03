@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModelProvider;
 import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
+import org.studip.unofficial_app.api.Features;
 import org.studip.unofficial_app.api.rest.StudipFolder;
 import org.studip.unofficial_app.databinding.DialogFileEntryBinding;
 import org.studip.unofficial_app.databinding.DialogForumEntryBinding;
@@ -61,77 +62,85 @@ public class FileFragment extends SwipeRefreshFragment
         m = new ViewModelProvider(requireActivity()).get(FileViewModel.class);
         
         setSwipeRefreshLayout(binding.fileRefresh);
-        
-        final FileAdapter ad = new FileAdapter(requireContext(),ArrayAdapter.IGNORE_ITEM_VIEW_TYPE);
-        binding.fileList.setAdapter(ad);
-        
-        m.getStatus().observe(getViewLifecycleOwner(), status -> HomeActivity.onStatusReturn(requireActivity(),status));
-        m.isRefreshing().observe(getViewLifecycleOwner(), ref -> binding.fileRefresh.setRefreshing(ref));
-        
-        binding.fileRefresh.setOnRefreshListener( () -> m.refresh(requireActivity()));
-        
-        if (h.filesCourse.getValue() == null) {
-            binding.filesCourseName.setText(R.string.my_documents);
-        }
-        
-        h.filesCourse.observe(getViewLifecycleOwner(), (course) -> {
-            if (course != null) {
-                binding.filesCourseName.setText(course.title);
-                m.setFolder(requireActivity(),course.course_id,true);
-            } else {
+    
+        API api2 = APIProvider.getAPI(requireActivity());
+        if (api2 != null && api2.isFeatureEnabled(Features.FEATURE_FILES)
+                &&  ( api2.isFeatureEnabled(Features.FEATURE_USER_FILES) || api2.isFeatureEnabled(Features.FEATURE_COURSE_FILES))) {
+            final FileAdapter ad = new FileAdapter(requireContext(), ArrayAdapter.IGNORE_ITEM_VIEW_TYPE);
+            binding.fileList.setAdapter(ad);
+    
+            m.getStatus().observe(getViewLifecycleOwner(), status -> HomeActivity.onStatusReturn(requireActivity(), status));
+            m.isRefreshing().observe(getViewLifecycleOwner(), ref -> binding.fileRefresh.setRefreshing(ref));
+    
+            binding.fileRefresh.setOnRefreshListener(() -> m.refresh(requireActivity()));
+    
+            if (h.filesCourse.getValue() == null) {
                 binding.filesCourseName.setText(R.string.my_documents);
             }
-        });
-        
-        
-        m.get().observe(getViewLifecycleOwner(), folder -> {
-            if (folder != null)
-            {
-                //System.out.println(folder.subfolders);
-                //System.out.println(folder.file_refs);
-                ad.clear();
-                ad.addAll((Object[]) folder.subfolders);
-                ad.addAll((Object[]) folder.file_refs);
-                binding.fileList.setAdapter(ad); // when the fragment is first shown, the data will not be visible without this
-            }
-        });
-        
-        if (m.getStatus().getValue() == -1) {
-            //System.out.println("refresh");
-            m.refresh(requireActivity());
-        }
-        
-        
-        binding.buttonMkdir.setOnClickListener(this::onMkdir);
-        binding.buttonUpload.setOnClickListener(this::onUpload);
-
-
-        MkdirDialogViewModel mkdirm = new ViewModelProvider(requireActivity()).get(MkdirDialogViewModel.class);
-        mkdirm.dirName.observe(getViewLifecycleOwner(),(dirname) -> {
-            if (dirname != null)
-            {
-                mkdirm.dirName.setValue(null);
-                API api = APIProvider.getAPI(requireActivity());
-                StudipFolder folder = m.get().getValue();
-                if (api != null && folder != null && folder.id != null)
-                {
-                    api.folder.createFolder(folder.id,dirname,null).enqueue(new Callback<StudipFolder>()
-                    {
-                        @Override
-                        public void onResponse(Call<StudipFolder> call, Response<StudipFolder> response)
-                        {
-                            if (response.code() == 200)
-                            {
-                                m.refresh(requireActivity());
-                            }
-                        }
-                        @Override
-                        public void onFailure(Call<StudipFolder> call, Throwable t) {}
-                    });
+    
+            h.filesCourse.observe(getViewLifecycleOwner(), (course) -> {
+                if (course != null) {
+                    binding.filesCourseName.setText(course.title);
+                    m.setFolder(requireActivity(), course.course_id, true);
                 }
+                else {
+                    binding.filesCourseName.setText(R.string.my_documents);
+                }
+            });
+    
+            m.get().observe(getViewLifecycleOwner(), folder -> {
+                if (folder != null) {
+                    //System.out.println(folder.subfolders);
+                    //System.out.println(folder.file_refs);
+                    ad.clear();
+                    ad.addAll((Object[]) folder.subfolders);
+                    ad.addAll((Object[]) folder.file_refs);
+                    binding.fileList.setAdapter(ad); // when the fragment is first shown, the data will not be visible without this
+                }
+                else {
+                    API api = APIProvider.getAPI(requireActivity());
+                    if (api != null && ! api.isFeatureEnabled(Features.FEATURE_USER_FILES)) {
+                        ad.clear();
+                    }
+                }
+            });
+    
+            if (m.getStatus().getValue() == -1) {
+                //System.out.println("refresh");
+                m.refresh(requireActivity());
             }
-        });
-        
+    
+    
+            binding.buttonMkdir.setOnClickListener(this::onMkdir);
+            binding.buttonUpload.setOnClickListener(this::onUpload);
+    
+    
+            MkdirDialogViewModel mkdirm = new ViewModelProvider(requireActivity()).get(MkdirDialogViewModel.class);
+            mkdirm.dirName.observe(getViewLifecycleOwner(), (dirname) -> {
+                if (dirname != null) {
+                    mkdirm.dirName.setValue(null);
+                    API api = APIProvider.getAPI(requireActivity());
+                    StudipFolder folder = m.get().getValue();
+                    if (api != null && folder != null && folder.id != null) {
+                        api.folder.createFolder(folder.id, dirname, null).enqueue(new Callback<StudipFolder>()
+                        {
+                            @Override
+                            public void onResponse(Call<StudipFolder> call, Response<StudipFolder> response) {
+                                if (response.code() == 200) {
+                                    m.refresh(requireActivity());
+                                }
+                            }
+                    
+                            @Override
+                            public void onFailure(Call<StudipFolder> call, Throwable t) {
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            binding.fileRefresh.setOnRefreshListener(() -> binding.fileRefresh.setRefreshing(false));
+        }
         
         return binding.getRoot();
     }
@@ -227,6 +236,10 @@ public class FileFragment extends SwipeRefreshFragment
     }
 
     public void onUpload(View v) {
+        API api = APIProvider.getAPI(requireActivity());
+        if (api != null && ! api.isFeatureEnabled(Features.FEATURE_USER_FILES) && h.filesCourse.getValue() == null) {
+            return;
+        }
         Intent intent = new Intent().setType("*/*").setAction(Intent.ACTION_OPEN_DOCUMENT);
         if (intent.resolveActivity(requireActivity().getPackageManager()) != null)
         {
@@ -236,6 +249,9 @@ public class FileFragment extends SwipeRefreshFragment
     
     public void onMkdir(View v) {
         API api = APIProvider.getAPI(requireActivity());
+        if (api != null && ! api.isFeatureEnabled(Features.FEATURE_USER_FILES) && h.filesCourse.getValue() == null) {
+            return;
+        }
         StudipFolder folder = m.get().getValue();
         if (api != null && folder != null)
         {
@@ -255,6 +271,10 @@ public class FileFragment extends SwipeRefreshFragment
         @Override
         public int getCount()
         {
+            API api = APIProvider.getAPI(requireActivity());
+            if (api != null && ! api.isFeatureEnabled(Features.FEATURE_USER_FILES) && h.filesCourse.getValue() == null) {
+                return 0;
+            }
             return super.getCount()+1;
         }
 

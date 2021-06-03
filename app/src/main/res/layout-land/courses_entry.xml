@@ -66,7 +66,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="24dp"
                 android:layout_marginBottom="16dp"
-                android:clickable="true"
                 android:visibility="invisible"
                 app:srcCompat="@drawable/file_grey" />
 
@@ -114,8 +113,16 @@
                 android:id="@+id/course_meetings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
                 android:visibility="visible"
                 app:srcCompat="@drawable/chat_grey" />
+
+            <ImageView
+                android:id="@+id/course_blubber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:srcCompat="@drawable/blubber_grey" />
 
         </LinearLayout>
 

@@ -217,6 +217,7 @@
             </LinearLayout>
 
             <HorizontalScrollView
+                android:id="@+id/studip_notification_scroll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 

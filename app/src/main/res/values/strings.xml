@@ -67,7 +67,7 @@
     <string name="auth_basic_desc">With HTTP Basic Authentication the username and password is send with every request.\nTo secure your password, unencrypted connections are refused.\nThe username and password have to be saved on the device. They are encrypted in a file, which only the app can access, but if the operating system itself is hacked (or you rooted your device), another app could get the key from the operating system and decrypt the username and password.\nBut for normal use it should be safe enough.\nThe advantage over a session cookie is that a session cookie eventually expires and you have to log in again. Because with HTTP Basic Authentication the username and password are stored on the device, you only have to log in once (as log as you don\'t change the password).</string>
     <string name="auth_cookie">session cookie</string>
     <string name="auth_cookie_desc">This is the method browsers use. Username and password are used to fetch a session cookie, after that the password is deleted.\nOnly the cookie is saved on the device, with the same security as the password with HTTP Basic Authentication. If the cookie is leaked, someone can impersonate you for as long as the cookie lasts, but they cannot change your password.\nThe downside is that the cookie eventually expires and you have to log in again.</string>
-    <string name="auth_oauth">OAuth 2</string>
+    <string name="auth_oauth">OAuth</string>
     <string name="auth_oauth_desc">Not implemented yet. The safest method: It works like a session cookie, but instead of entering the username and password in the app, you are redirected to the Stud.IP-Server and have to log in there.\nThe app only gets the authentication token afterwards, which works like a session cookie.</string>
     <string name="settings_developer">Developer settings:\nThese settings could make the app unstable or lower the security. Use at your own risk.</string>
     <string name="semester_select">select semester</string>
@@ -202,6 +202,25 @@ If you want to use these features, contact you administrator and send them a lin
     <string name="scan_features">re-scan features</string>
     <string name="ignore_missing_features">ignore missing features</string>
     <string name="ignore_missing_features_msg">Missing features might partially work if a part of the API has been enabled, but not all that is required for a feature to fully function. The missing features might work fine, or not at all. Correct function cannot be guaranteed.</string>
+    <string name="oauth_disabled_msg"><![CDATA[" This app is not registered as an OAuth application for your Stud.IP installation.<br> Please ask you administrator to add this app.<br> Click the button below to open your mail app with a template text to send to your administator.<br> If all goes well after that, OAuth support for this Stud.IP installation should come with the next update. "]]></string>
+    <string name="oauth_disabled_title">OAuth not registered</string>
+    <string name="oauth_mail_template"><![CDATA["
+Dear ,<br>
+I use this app to access Stud.IP:<br>
+https://f-droid.org/packages/org.studip.unofficial_app<br>
+<br>
+Could you please enable OAuth for the app?<br>
+Here is the necessary information:<br>
+App information: https://f-droid.org/de/packages/org.studip.unofficial_app/<br>
+Contact person: Tarek Sander, unofficial_studip_app_bugs@web.de<br>
+Callback URL: studip_app://unofficial_app/oauth_callback<br>
+<br>
+Please send possible questions and the OAuth consumer key and secret to unofficial_studip_app_bugs@web.de.<br>
+Yours faithfully,<br>
+%1$s
+"]]></string>
+    <string name="oauth_template_button">Open mail app with template text</string>
+    <string name="oauth_mail_template_subject">Enable OAuth for app</string>
 
 
 </resources>

@@ -71,7 +71,7 @@
     <string name="auth_cookie_desc">Dies ist die Methode, die auch ein Browser verwendet. Mit dem Benutzernamen und Passwort wird ein Session Cookie vom Server angefragt, danach wird das Passwort gelöscht.
     Es wird nur der Cookie auf dem Gerät gespeichert, mit der Gleichen Sicherheit wie das Passwort bei Basic Authentication. Wenn der Cookie von anderen Programmen genommen wird, könnten sich diese als Sie ausgeben, aber nicht ihr Passwort ändern.
     Der Nachteil ist, dass die Sitzung irgendwann abläuft und man sich wieder anmelden muss.</string>
-    <string name="auth_oauth">OAuth 2</string>
+    <string name="auth_oauth">OAuth</string>
     <string name="auth_oauth_desc">Noch nicht implementiert. Die sicherste Methode: Sie funktioniert ähnlich wie der Session Cookies, aber anstatt das die App den Benutzernamen und das Passwort abfragt, werden sie zu der Seite ihrer Institution weitergeleitet und müssen sich bei ihr anmelden.
     Die App bekommt dann nur am Ende das Authenticaton Token, das im prinzip wie der Session Cookie funktioniert</string>
     <string name="settings_developer">Entwicklereinstellungen:\nDiese Einstellungen können die App instabil machen oder die Sicherheit herabsetzen. Benutzen auf eigene Gefahr.</string>
@@ -206,6 +206,30 @@ Wenn Sie die Funktionen verwenden wollen,  kontaktieren Sie Ihren Administrator 
     <string name="scan_features">Funktionen erneut testen</string>
     <string name="ignore_missing_features">Fehlende Funktionen ignorieren</string>
     <string name="ignore_missing_features_msg">Fehlende Funktionen können teilweise funktionieren, wenn Teile des API angeschaltet sind, aber nicht alles, was für die volle Funktion benötigt wird. Fehlende funktionen funktionieren vielleicht notmal, oder auch gar nicht. Korrekte Funktion kann nicht garantiert werden.</string>
+    <string name="oauth_disabled_title">OAuth nicht registriert</string>
+    <string name="oauth_disabled_msg"><![CDATA["
+Diese App ist nicht als OAuth-Applikation bei Ihrem Stud.IP-System registriert.<br>
+Bitten Sie Ihren Administrator, diese App hinzuzufügen.<br>
+Tippen sie auf den Button unten, um Ihre Mail-App mit einem Vorlagetext zu öffnen, den Sie Ihrem Administrator schicken können.<br>
+Wenn dannach alles gut geht, sollte mit dem nächten Update OAuth-Support für dieses Stud.IP-System kommen.
+"]]></string>
+    <string name="oauth_template_button">Mail-App mit Vorlagetext öffnen</string>
+    <string name="oauth_mail_template_subject">OAuth für App aktivieren</string>
+    <string name="oauth_mail_template"><![CDATA["
+Sehr geehrte/r Herr/Frau ,<br>
+Ich benutze diese App, um auf Stud.IP zuzugreifen:<br>
+https://f-droid.org/packages/org.studip.unofficial_app<br>
+<br>
+Ich bitte Sie, diese App für OAuth freizuschalten. <br>
+Hier sind die dazu notwendigen Daten: <br>
+Informationen zu der App: https://f-droid.org/de/packages/org.studip.unofficial_app/<br>
+Kontaktperson: Tarek Sander, unofficial_studip_app_bugs@web.de<br>
+Callback URL: studip_app://unofficial_app/oauth_callback<br>
+<br>
+Bitte schicken Sie eventuelle Fragen und den Consumer Key und das Consumer Secret an: unofficial_studip_app_bugs@web.de<br>
+Mit freundlichen Grüßen<br>
+%1$s
+"]]></string>
 
 
 </resources>

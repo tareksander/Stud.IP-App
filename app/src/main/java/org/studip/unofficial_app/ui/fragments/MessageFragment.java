@@ -21,6 +21,8 @@ import androidx.work.WorkManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.R;
+import org.studip.unofficial_app.api.API;
+import org.studip.unofficial_app.api.Features;
 import org.studip.unofficial_app.api.rest.StudipMessage;
 import org.studip.unofficial_app.databinding.FragmentMessagesBinding;
 import org.studip.unofficial_app.databinding.MessageEntryBinding;
@@ -57,40 +59,43 @@ public class MessageFragment extends SwipeRefreshFragment
         //System.out.println("messages fragment");
         
         setSwipeRefreshLayout(binding.messagesRefresh);
-        
-        m.mes.getStatus().observe(getViewLifecycleOwner(), status -> HomeActivity.onStatusReturn(requireActivity(),status));
-        m.mes.isRefreshing().observe(getViewLifecycleOwner(), ref -> binding.messagesRefresh.setRefreshing(ref));
-        
-        //ad = new MessageAdapter(requireActivity(),ArrayAdapter.IGNORE_ITEM_VIEW_TYPE);
-        ad = new MessageAdapter();
-        binding.messagesList.setAdapter(ad);
     
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL);
-        binding.messagesList.addItemDecoration(dividerItemDecoration);
-        
-        m.mes.get().observe(getViewLifecycleOwner(), (messages) -> {
-            //System.out.println("messages");
-            if (messages.length == 0 && m.mes.getStatus().getValue() == -1) {
-                //System.out.println("refreshing");
-                binding.messagesRefresh.setRefreshing(true);
-                m.mes.refresh(requireActivity());
-            }
-            
+        API api = APIProvider.getAPI(requireActivity());
+        if (api != null && api.isFeatureEnabled(Features.FEATURE_MESSAGES)) {
+            m.mes.getStatus().observe(getViewLifecycleOwner(), status -> HomeActivity.onStatusReturn(requireActivity(), status));
+            m.mes.isRefreshing().observe(getViewLifecycleOwner(), ref -> binding.messagesRefresh.setRefreshing(ref));
+    
+            //ad = new MessageAdapter(requireActivity(),ArrayAdapter.IGNORE_ITEM_VIEW_TYPE);
+            ad = new MessageAdapter();
             binding.messagesList.setAdapter(ad);
-        });
+    
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL);
+            binding.messagesList.addItemDecoration(dividerItemDecoration);
+    
+            m.mes.get().observe(getViewLifecycleOwner(), (messages) -> {
+                //System.out.println("messages");
+                if (messages.length == 0 && m.mes.getStatus().getValue() == -1) {
+                    //System.out.println("refreshing");
+                    binding.messagesRefresh.setRefreshing(true);
+                    m.mes.refresh(requireActivity());
+                }
         
-        
-        PagedList.Config conf = new PagedList.Config.Builder().setEnablePlaceholders(true).setPageSize(10).build();
-        
-        new LivePagedListBuilder<>(DBProvider.getDB(requireActivity()).messagesDao().getPagedList(), conf).build().observe(getViewLifecycleOwner(), (l) -> ad.submitList(l));
-        
-        
-        binding.messageWrite.setOnClickListener((v) -> new MessageWriteDialogFragment().show(getParentFragmentManager(),"message_write"));
-        
-        
-        
-        binding.messagesRefresh.setOnRefreshListener(() -> m.mes.refresh(requireActivity()));
-
+                binding.messagesList.setAdapter(ad);
+            });
+    
+    
+            PagedList.Config conf = new PagedList.Config.Builder().setEnablePlaceholders(true).setPageSize(10).build();
+    
+            new LivePagedListBuilder<>(DBProvider.getDB(requireActivity()).messagesDao().getPagedList(), conf).build().observe(getViewLifecycleOwner(), (l) -> ad.submitList(l));
+    
+    
+            binding.messageWrite.setOnClickListener((v) -> new MessageWriteDialogFragment().show(getParentFragmentManager(), "message_write"));
+    
+    
+            binding.messagesRefresh.setOnRefreshListener(() -> m.mes.refresh(requireActivity()));
+        } else {
+            binding.messagesRefresh.setOnRefreshListener(() -> binding.messagesRefresh.setRefreshing(false));
+        }
         
         
         return binding.getRoot();

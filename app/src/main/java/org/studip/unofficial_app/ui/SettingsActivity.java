@@ -44,6 +44,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
+import org.studip.unofficial_app.api.OAuthUtils;
 import org.studip.unofficial_app.databinding.ActivitySettingsBinding;
 import org.studip.unofficial_app.documentsprovider.DocumentRoot;
 import org.studip.unofficial_app.documentsprovider.DocumentsDB;
@@ -54,6 +55,7 @@ import org.studip.unofficial_app.model.NotificationWorker;
 import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.ui.fragments.dialog.DiscoveryErrorDialogFragment;
+import org.studip.unofficial_app.ui.fragments.dialog.OAuthDisabledDialogFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -347,11 +349,6 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             binding.settingsSaveNotificationSettings.setVisibility(View.GONE);
         } else {
             if (savedInstanceState != null) {
-                /*
-                outState.putStringArray(NOTIFICATION_LAYOUT+"titles", notification_layout_titles);
-                outState.putStringArray(NOTIFICATION_LAYOUT+"courses", notification_layout_courses);
-                outState.putSerializable(NOTIFICATION_LAYOUT+"values", notification_layout_values);
-                 */
                 notification_layout_titles = savedInstanceState.getStringArray(NOTIFICATION_LAYOUT+"titles");
                 notification_layout_courses = savedInstanceState.getStringArray(NOTIFICATION_LAYOUT+"courses");
                 try {
@@ -633,22 +630,26 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     }
     
     public static class IgnoreFeaturesDialog extends DialogFragment {
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        AlertDialog.Builder b = new AlertDialog.Builder(requireActivity());
-        b.setTitle(R.string.ignore_missing_features);
-        b.setMessage(R.string.ignore_missing_features_msg);
-        b.setPositiveButton(R.string.ok, (DialogInterface.OnClickListener) (dialog, which) -> {
-            API api = APIProvider.getAPI(requireActivity());
-            if (api != null) {
-                api.ignoreDisabledFeatures();
-            }
-            dismiss();
-        });
-        return b.create();
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+            AlertDialog.Builder b = new AlertDialog.Builder(requireActivity());
+            b.setTitle(R.string.ignore_missing_features);
+            b.setMessage(R.string.ignore_missing_features_msg);
+            b.setPositiveButton(R.string.ok, (DialogInterface.OnClickListener) (dialog, which) -> {
+                API api = APIProvider.getAPI(requireActivity());
+                if (api != null) {
+                    api.ignoreDisabledFeatures();
+                }
+                dismiss();
+                requireActivity().finish();
+                Intent i = new Intent(requireActivity(), HomeActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
+            });
+            return b.create();
+        }
     }
-}
     
     public void onIgnoreFeatures(View v) {
         API api = APIProvider.getAPI(this);
@@ -738,6 +739,16 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         }
         if (v.equals(binding.authOauth))
         {
+            API api = APIProvider.getAPI(this);
+            if (true) {
+                new OAuthDisabledDialogFragment().show(getSupportFragmentManager(), "oauth_disabled");
+                return;
+            }
+            
+            if (api != null && api.getHostname() != null && ! OAuthUtils.hosts.containsKey(api.getHostname())) {
+                
+                return;
+            }
             if (settings.authentication_method != Settings.AUTHENTICATION_OAUTH) {
                 changeAuthentication();
             }

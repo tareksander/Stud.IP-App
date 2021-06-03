@@ -2,17 +2,11 @@ package org.studip.unofficial_app.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.ComponentCallbacks2;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
-import android.os.Process;
-import android.os.StrictMode;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,7 +26,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
-import org.studip.unofficial_app.api.OAuth;
+import org.studip.unofficial_app.api.OAuthUtils;
 import org.studip.unofficial_app.api.rest.StudipCourse;
 import org.studip.unofficial_app.databinding.ActivityHomeBinding;
 import org.studip.unofficial_app.documentsprovider.DocumentsDB;
@@ -52,7 +46,6 @@ import org.studip.unofficial_app.ui.fragments.FileFragment;
 import org.studip.unofficial_app.ui.fragments.HomeFragment;
 import org.studip.unofficial_app.ui.fragments.MessageFragment;
 
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -142,39 +135,6 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
         }
         
         Activity a = this;
-    
-        OAuth.requestToken(api).enqueue(new Callback<String>()
-        {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                //System.out.println("code: "+response.code());
-                //System.out.println(response.body());
-                String body = response.body();
-                if ( body != null && response.code() == 200) {
-                    String[] fields = body.split("&");
-                    for (String f : fields) {
-                        String[] parts = f.split("=");
-                        if (parts.length == 2 && "oauth_token".equals(parts[0])) {
-                            //System.out.println(f);
-                            Intent i = new Intent(Intent.ACTION_VIEW);
-                            //System.out.println(API.HTTPS+api.getHostname()+OAuth.authorize_url+"?oauth_token="+parts[1]);
-                            i.setData(Uri.parse(API.HTTPS+api.getHostname()+OAuth.authorize_url+"?oauth_token="+parts[1]));
-                            startActivity(i);
-                            return;
-                        }
-                    }
-                }
-                try {
-                    System.out.println(response.errorBody().string());
-                } catch (Exception ignored) {}
-            }
-        
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
-        
         
         binding.tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
         {

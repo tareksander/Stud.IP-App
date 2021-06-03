@@ -33,7 +33,7 @@ public class DiscoveryErrorDialogFragment extends DialogFragment
     
         Bundle args = getArguments();
         if (args == null || args.getInt(CODE, -100) == -100) {
-            System.out.println("no code");
+            //System.out.println("no code");
             dismiss();
             return b.create();
         }
@@ -49,11 +49,11 @@ public class DiscoveryErrorDialogFragment extends DialogFragment
                 if (! disabled.equals("")) {
                     b.setTitle(R.string.discovery_title).setMessage(HelpActivity.fromHTML(disabled)).setPositiveButton(R.string.ok, (dialog, which) -> dismiss());
                 } else {
-                    System.out.println("nothing disabled");
+                    //System.out.println("nothing disabled");
                     dismiss();
                 }
             } else {
-                System.out.println("no api");
+                //System.out.println("no api");
                 dismiss();
             }
         }
@@ -66,12 +66,13 @@ public class DiscoveryErrorDialogFragment extends DialogFragment
     
     @Override
     public void dismiss() {
-        if (login) {
-            FragmentActivity a = requireActivity();
-            Intent intent = new Intent(a, HomeActivity.class);
-            startActivity(intent);
-            a.finish();
+        FragmentActivity a = requireActivity();
+        Intent intent = new Intent(a, HomeActivity.class);
+        if (! login) {
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
+        startActivity(intent);
+        a.finish();
         super.dismiss();
     }
     

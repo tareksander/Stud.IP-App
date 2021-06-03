@@ -9,8 +9,11 @@ import android.widget.ArrayAdapter;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.jetbrains.annotations.NotNull;
+import org.studip.unofficial_app.api.API;
+import org.studip.unofficial_app.api.Features;
 import org.studip.unofficial_app.api.rest.StudipNews;
 import org.studip.unofficial_app.databinding.FragmentHomeBinding;
+import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.viewmodels.HomeViewModel;
 import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.NewsAdapter;
@@ -33,16 +36,23 @@ public class HomeFragment extends SwipeRefreshFragment
         binding.setM(m);
         
         setSwipeRefreshLayout(binding.homeRefresh);
+    
+        API api = APIProvider.getAPI(requireActivity());
+        if (api != null && api.isFeatureEnabled(Features.FEATURE_GLOBAL_NEWS)) {
+            m.news.isRefreshing().observe(getViewLifecycleOwner(), binding.homeRefresh::setRefreshing);
+            binding.homeRefresh.setOnRefreshListener(() -> m.news.refresh(requireActivity()));
+            m.news.get().observe(getViewLifecycleOwner(), studipNews ->
+            {
+                if (studipNews.size() == 0) {
+                    m.news.refresh(requireContext());
+                }
+                binding.getAdapter().setNews(studipNews.toArray(new StudipNews[0]));
+            });
+            m.news.getStatus().observe(getViewLifecycleOwner(), status -> HomeActivity.onStatusReturn(requireActivity(), status));
+        } else {
+            binding.homeRefresh.setOnRefreshListener(() -> binding.homeRefresh.setRefreshing(false));
+        }
         
-        m.news.isRefreshing().observe(getViewLifecycleOwner(), binding.homeRefresh::setRefreshing);
-        m.news.get().observe(getViewLifecycleOwner(), studipNews ->
-        {
-            if (studipNews.size() == 0) {
-                m.news.refresh(requireContext());
-            }
-            binding.getAdapter().setNews(studipNews.toArray(new StudipNews[0]));
-        });
-        m.news.getStatus().observe(getViewLifecycleOwner(), status -> HomeActivity.onStatusReturn(requireActivity(),status));
         
         return binding.getRoot();
     }

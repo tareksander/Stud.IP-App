@@ -87,12 +87,14 @@ public class Features
     }
     
     public static void featureCourseFiles(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
+        disabled.add(FEATURE_COURSE_FILES);
         if (unavailable(f, "/course/:course_id/top_folder", true, false, false, false)) {
             disabled.add(FEATURE_COURSE_FILES);
         }
     }
     
     public static void featureForum(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
+        disabled.add(FEATURE_FORUM);
         if (unavailable(f, "/course/:course_id/forum_categories", true, false, false, false)) {
             disabled.add(FEATURE_FORUM);
             return;
@@ -111,6 +113,7 @@ public class Features
     }
     
     public static void featureMessages(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
+        disabled.add(FEATURE_MESSAGES);
         if (unavailable(f, "/message/:message_id", true,true, false, true)) {
             disabled.add(FEATURE_MESSAGES);
             return;
@@ -137,6 +140,7 @@ public class Features
     }
     
     public static void featureCourses(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
+        //disabled.add(FEATURE_COURSES);
         if (unavailable(f, "/course/:course_id", true, false, false, false)) {
             disabled.add(FEATURE_COURSES);
             return;
@@ -167,6 +171,7 @@ public class Features
     }
     
     public static void featurePlanner(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
+        disabled.add(FEATURE_PLANNER);
         if (unavailable(f, "/course/:course_id/events", true, false, false, false)) {
             disabled.add(FEATURE_PLANNER);
             return;
@@ -185,6 +190,7 @@ public class Features
     }
     
     public static void featureBlubber(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
+        disabled.add(FEATURE_BLUBBER);
         if (unavailable(f, "/course/:course_id/blubber", true, false, true, false)) {
             disabled.add(FEATURE_BLUBBER);
             return;

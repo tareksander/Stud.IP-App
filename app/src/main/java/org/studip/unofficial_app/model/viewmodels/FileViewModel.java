@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import org.jetbrains.annotations.NotNull;
+import org.studip.unofficial_app.api.API;
+import org.studip.unofficial_app.api.Features;
 import org.studip.unofficial_app.api.rest.StudipFolder;
 import org.studip.unofficial_app.model.APIProvider;
 
@@ -47,7 +49,7 @@ public class FileViewModel extends ViewModel
         Context c = con.getApplicationContext();
         if (! refreshing.getValue()) {
             refreshing.setValue(true);
-            Call<StudipFolder> call;
+            Call<StudipFolder> call = null;
             if (folderID != null) {
                 if (courseID)
                 {
@@ -56,30 +58,35 @@ public class FileViewModel extends ViewModel
                     call = APIProvider.getAPI(c).folder.get(folderID);
                 }
             } else {
-                call = APIProvider.getAPI(c).user.userFolder(APIProvider.getAPI(c).getUserID());
+                API api = APIProvider.getAPI(c);
+                if (api.isFeatureEnabled(Features.FEATURE_USER_FILES)) {
+                    call = APIProvider.getAPI(c).user.userFolder(APIProvider.getAPI(c).getUserID());
+                }
             }
-            call.enqueue(new Callback<StudipFolder>()
-            {
-                @Override
-                public void onResponse(@NotNull Call<StudipFolder> call, @NotNull Response<StudipFolder> response)
+            if (call != null) {
+                call.enqueue(new Callback<StudipFolder>()
                 {
-                    StudipFolder res = response.body();
-                    status.setValue(response.code());
-                    if (res != null) {
-                        folder.setValue(res);
-                    } else {
-                        System.out.println("no response");
+                    @Override
+                    public void onResponse(@NotNull Call<StudipFolder> call, @NotNull Response<StudipFolder> response) {
+                        StudipFolder res = response.body();
+                        status.setValue(response.code());
+                        if (res != null) {
+                            folder.setValue(res);
+                        }
+                        refreshing.setValue(false);
                     }
-                    refreshing.setValue(false);
-                }
-                @Override
-                public void onFailure(@NotNull Call<StudipFolder> call, @NotNull Throwable t)
-                {
-                    System.out.println("newtwork call failed");
-                    t.printStackTrace();
-                    refreshing.setValue(false);
-                }
-            });
+        
+                    @Override
+                    public void onFailure(@NotNull Call<StudipFolder> call, @NotNull Throwable t) {
+                        t.printStackTrace();
+                        refreshing.setValue(false);
+                    }
+                });
+            } else {
+                status.setValue(200);
+                folder.setValue(null);
+                refreshing.setValue(false);
+            }
         }
     }
     

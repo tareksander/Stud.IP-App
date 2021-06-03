@@ -3,10 +3,11 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity(tableName = "semesters")
-public class StudipSemester
+public class StudipSemester implements Serializable
 {
     @NonNull
     @PrimaryKey

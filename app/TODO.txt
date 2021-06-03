@@ -45,9 +45,6 @@
                 [ ] allow javascript
             [ ] messages
                 [ ] add support for viewing the outbox
-                [ ] add the ability to upload attachments after a message was send, via the dispatch route
-                    [ ] strangely seems to work for all messages, even send ones, may not be stable, because it isn't in the API
-                    [ ] the email is send without the attachment if it is attached later
             [ ] API detection:
                 [x] better error message when login fails
                 [x] see what routes are needed for what features, tell user on login which features are unavailable
@@ -57,8 +54,8 @@
                 [x] fail without message for features where the routes are disabled
                 [x] put the used routes in the Github Readme
             [ ] fully save UI state
-                [ ] save the scrolling position in ScrollViews? Giving the ScrollViews an ID makes it safe itself automatically
-                [ ] save the selected semester in the courses screen
+                [x] save the scrolling position in ScrollViews? Giving the ScrollViews an ID makes it safe itself automatically
+                [x] save the selected semester in the courses screen
                 [ ] SavedStateModule for all ViewModels for special data not from the database
                     All objects have to be serializable correctly for this.
                     The limit is 1mb, the CoursewareViewModel could exceed that. In that case, write the data to a file in the cache folder in a lifecycle method
@@ -81,17 +78,11 @@
                     [x] space the icons wider out, make them into 2 rows for each course
                 [x] courseware
                     [x] fix the bug that causes the buttons for opencast videos to display incorrectly when in landscape mode
-            [x] bump version
-            [ ] update help text
-            [ ] come up with an actual name, check if it is taken
-            [ ] new & more screenshots, with UI improvements
-            [ ] update description
-        1.1.0:
             [ ] support for OAuth1 for authentication
                 https://oauth1.wp-api.org/docs/basics/Auth-Flow.html
                 https://stackoverflow.com/questions/2665796/android-handle-oauth-callback-using-intent-filter
                 [x] make a class with the hostnames and OAuth data for supported servers
-                [ ] extra error message when OAuth isn't supported for the app by a server, tell the user to send a predefined message to the admin,
+                [x] extra error message when OAuth isn't supported for the app by a server, tell the user to send a predefined message to the admin,
                     to enable OAuth support for the Stud.IP installation.
                 [ ] The callback uri doesn't seem to work, the browser doesn't redirect to it
                 [ ] authorize the token via an intent to the browser
@@ -99,6 +90,14 @@
                 [ ] add an authentication interceptor for oauth authentication, save the token in the API shared preferences
                 [ ] check: do things which require a session cookie work with OAuth? Do you get a session cookie when using OAuth?
                     [ ] some features might have to be disabled, or only supported via the new JSONAPI, or require the user to log in in the app
+            [x] bump version
+            [ ] update help text
+            [ ] new & more screenshots, with UI improvements
+            [ ] update description
+        1.1.0:
+            [ ] OAuth
+                [ ] add the option for the user to provide a OAuth consumer key and consumer secret, so private installations can enable OAuth
+                    for app users without having to integrate the OAuth data into the sourcecode.
             [ ] blubber
                 [ ] support for personal chats via blubber
                 [ ] option to check for blubber messages more frequently than normal notifications, and to only enable this when connected to wifi

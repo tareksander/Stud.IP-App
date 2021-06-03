@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.studip.unofficial_app.api.rest.StudipNews;
@@ -17,9 +18,11 @@ import org.studip.unofficial_app.model.viewmodels.StringViewModelFactory;
 import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.NewsAdapter;
 
+import java.util.List;
+
 public class CourseNewsDialogFragment extends DialogFragment
 {
-
+    
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState)
@@ -36,15 +39,22 @@ public class CourseNewsDialogFragment extends DialogFragment
             final NewsAdapter ad = new NewsAdapter(requireContext(), ArrayAdapter.NO_SELECTION);
             binding.courseNewsList.setAdapter(ad);
             m.news.get().observe(this, (news) -> {
-                //System.out.println(news);
-                if (news.size() == 0 && m.news.getStatus().getValue() == 200) {
-                    dismiss();
-                } else {
+                if (news.size() != 0) {
                     ad.setNews(news.toArray(new StudipNews[0]));
                 }
             });
             
+            m.news.isRefreshing().observe(this, ref -> {
+                if (! ref) {
+                    List<StudipNews> l = m.news.get().getValue();
+                    if (l != null && l.size() == 0) {
+                        dismiss();
+                    }
+                }
+            });
+            
             m.news.getStatus().observe(this, (status) -> {
+                //System.out.println(status);
                 if (status != 200 && status != -1)
                 {
                     dismiss();

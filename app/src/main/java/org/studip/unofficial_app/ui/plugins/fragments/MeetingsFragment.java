@@ -277,7 +277,7 @@ public class MeetingsFragment extends Fragment
                 handler.cancel();
                 return;
             }
-            if (! api.authWebView(view, handler, host)) {
+            if (! api.authWebView(handler, host)) {
                 requireActivity().finish();
             }
         }

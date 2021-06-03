@@ -3,6 +3,7 @@ package org.studip.unofficial_app.api;
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
@@ -10,7 +11,6 @@ import android.webkit.CookieManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
-import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -75,10 +75,9 @@ public class API
     private static final String USERID_KEY = "user_id";
     private static final String USERNAME_KEY = "username";
     private static final String PASSWORD_KEY = "password";
-    private static final String AUTH_METHOD_KEY = "method";
-    //private static final String USER_FOLDER_KEY = "user_top_folder";
     private static final String DISABLED_FEATURES_KEY = "disabled features";
-    
+    private static final String OAUTH_TOKEN_KEY = "oauth_token";
+    private static final String OAUTH_TOKEN_SECRET_KEY = "oauth_token_secret";
     
     
     public static final String HTTPS = "https://";
@@ -115,8 +114,7 @@ public class API
     private String username = null;
     private String password = null;
     
-    private String oauth_token = null;
-    private String oauth_token_secret = null;
+    private OAuthUtils.OAuthToken oauth_token;
     
     private Set<String> disabled_features = new HashSet<>();
     
@@ -187,10 +185,10 @@ public class API
                             //System.out.println("Basic Authentication used for "+route.address().url().toString());
                             return response.request().newBuilder().header("Authorization", Credentials.basic(username, password)).build();
                         }
-                        if (oauth_token != null && oauth_token_secret != null && auth_method == Settings.AUTHENTICATION_OAUTH) {
-                            //System.out.println("OAuth Authentication used for "+route.address().url().toString());
+                        if (oauth_token != null && ! oauth_token.isTemp && auth_method == Settings.AUTHENTICATION_OAUTH) {
+                            System.out.println("OAuth Authentication used for "+route.address().url().toString());
                         }
-                    } else {
+                    //} else {
                         //System.out.println("auth denied for: "+route.address().url().toString());
                     }
                     return null;
@@ -311,7 +309,7 @@ public class API
     
     
     
-    public boolean authWebView(WebView v, HttpAuthHandler handler, String host) {
+    public boolean authWebView(HttpAuthHandler handler, String host) {
         if (! handler.useHttpAuthUsernamePassword()) {
             handler.cancel();
             return false;
@@ -332,6 +330,13 @@ public class API
         return false;
     }
     
+    public void authToken(Context c) {
+        if (oauth_token != null && oauth_token.isTemp) {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(API.HTTPS+hostname+ OAuthUtils.authorize_url+"?oauth_token="+oauth_token.oauth_token));
+            c.startActivity(i);
+        }
+    }
     
     
     public String getHostname() {
@@ -358,8 +363,13 @@ public class API
         }
     }
     
+    
+    // -2 = error parsing the response
+    // 0 = IOException or timeout
+    // 200 = success
+    // 401 = unauthorized, OAUth not enabled for the installation
     public LiveData<Integer> login(Context con, String username, String password, int auth_method) {
-        Call<StudipUser> c = user.login(Credentials.basic(username,password));
+        Call<StudipUser> ca = user.login(Credentials.basic(username,password));
         this.auth_method = auth_method;
         this.username = username;
         if (auth_method == Settings.AUTHENTICATION_BASIC) {
@@ -367,7 +377,42 @@ public class API
         } else {
             this.password = null;
         }
-        return login_call(con, c, DBProvider.getDB(con).userDao());
+        if (auth_method == Settings.AUTHENTICATION_BASIC || auth_method == Settings.AUTHENTICATION_COOKIE) {
+            return login_call(con, ca, DBProvider.getDB(con).userDao());
+        } else {
+            MutableLiveData<Integer> d = new MutableLiveData<>(-1);
+            Call<String> c = OAuthUtils.requestToken(this);
+            if (c == null) {
+                d.setValue(0);
+                return d;
+            }
+            c.enqueue(new Callback<String>()
+            {
+                @Override
+                public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                    if (response.code() != 200) {
+                        d.setValue(response.code());
+                        return;
+                    }
+                    String body = response.body();
+                    if (body != null) {
+                        oauth_token = OAuthUtils.getTokenFromResponse(body, true);
+                        if (oauth_token == null) {
+                            d.setValue(-2);
+                        } else {
+                            d.setValue(200);
+                        }
+                    } else {
+                        d.setValue(-2);
+                    }
+                }
+                @Override
+                public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+                    d.setValue(0);
+                }
+            });
+            return d;
+        }
     }
     
     public LiveData<Integer> discover() {
@@ -456,15 +501,9 @@ public class API
         
         edit.putString(HOSTNAME_KEY,hostname);
         String auth = "";
-        List<Cookie> l = cookies.get(hostname);
-        if (l != null) {
-            for (Cookie c : l) {
-                if (c.name().equals(AUTH_COOKIE_NAME)) {
-                    auth = c.value();
-                    //System.out.println("auth cookie saved");
-                    break;
-                }
-            }
+        Cookie c = getSessionCookie();
+        if (c != null) {
+            auth = c.value();
         }
         edit.putString(AUTH_COOKIE_KEY,auth);
         edit.putString(USERID_KEY,userID);
@@ -475,7 +514,11 @@ public class API
         }
         
         edit.putStringSet(DISABLED_FEATURES_KEY, disabled_features);
-        //edit.putString(USER_FOLDER_KEY,folder_id);
+        
+        if (oauth_token != null && ! oauth_token.isTemp) {
+            edit.putString(OAUTH_TOKEN_KEY, oauth_token.oauth_token);
+            edit.putString(OAUTH_TOKEN_SECRET_KEY, oauth_token.oauth_token_secret);
+        }
         
         edit.apply();
     }
@@ -485,7 +528,6 @@ public class API
         if (hostname == null) {
             return null;
         }
-        //System.out.println("Hostname: "+hostname);
         
         
         API api = new API(hostname);
@@ -497,7 +539,6 @@ public class API
             l.add(new Cookie.Builder().name(AUTH_COOKIE_NAME).hostOnlyDomain(hostname.split("/")[0]).value(auth).secure().build());
             api.cookies.put(hostname, l);
             api.userID = prefs.getString(USERID_KEY,null);
-            //System.out.println("cookie found: "+l.toString());
         }
         
         String username = prefs.getString(USERNAME_KEY,null);

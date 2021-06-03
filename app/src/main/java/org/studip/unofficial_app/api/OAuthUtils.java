@@ -1,5 +1,7 @@
 package org.studip.unofficial_app.api;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Base64;
 
 import java.io.UnsupportedEncodingException;
@@ -19,7 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
 import okhttp3.HttpUrl;
 import retrofit2.Call;
 
-public class OAuth
+public class OAuthUtils
 {
     public static final String request_token_url = "/dispatch.php/api/oauth/request_token";
     public static final String access_token_url = "/dispatch.php/api/oauth/access_token";
@@ -138,6 +140,24 @@ public class OAuth
         return b.toString();
     }
     
+    public static OAuthToken getTokenFromResponse(String response, boolean temp) {
+        String[] fields = response.split("&");
+        String token = null, secret = null;
+        for (String f : fields) {
+            String[] parts = f.split("=");
+            if (parts.length == 2 && "oauth_token".equals(parts[0])) {
+                token = parts[1];
+            }
+            if (parts.length == 2 && "oauth_token_secret".equals(parts[0])) {
+                secret = parts[1];
+            }
+        }
+        if (token == null || secret == null) {
+            return null;
+        }
+        return new OAuthToken(token, secret, temp);
+    }
+    
     public static class OAuthData {
         public final String consumer_secret;
         public final String consumer_key;
@@ -150,9 +170,11 @@ public class OAuth
     public static class OAuthToken {
         public final String oauth_token;
         public final String oauth_token_secret;
-        public OAuthToken(String oauth_token, String oauth_token_secret) {
+        public final boolean isTemp;
+        public OAuthToken(String oauth_token, String oauth_token_secret, boolean isTemp) {
             this.oauth_token = oauth_token;
             this.oauth_token_secret = oauth_token_secret;
+            this.isTemp = isTemp;
         }
     }
 }

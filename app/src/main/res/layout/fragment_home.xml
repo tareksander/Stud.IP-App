@@ -34,7 +34,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/welcome_message"
-            app:onRefreshListener="@{() -> m.news.refresh(c)}"
             tools:context=".HomeFragment">
 
             <ListView
