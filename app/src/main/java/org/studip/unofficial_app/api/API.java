@@ -11,6 +11,7 @@ import android.webkit.CookieManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
+import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -39,6 +40,7 @@ import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.model.room.UserDao;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,6 +48,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -186,7 +189,19 @@ public class API
                             return response.request().newBuilder().header("Authorization", Credentials.basic(username, password)).build();
                         }
                         if (oauth_token != null && ! oauth_token.isTemp && auth_method == Settings.AUTHENTICATION_OAUTH) {
-                            System.out.println("OAuth Authentication used for "+route.address().url().toString());
+                            //System.out.println("OAuth Authentication used for "+route.address().url().toString());
+                            OAuthUtils.OAuthData o = OAuthUtils.hosts.get(hostname);
+                            if (o != null) {
+                                // OAuthUtils.getAuthHeader(this, o, oauth_token, uri)
+                                //System.out.println(response.request().url().toString());
+                                TreeMap<String, String> query = new TreeMap<>();
+                                for (String name : response.request().url().queryParameterNames()) {
+                                    query.put(name, response.request().url().queryParameter(name));
+                                }
+                                return response.request().newBuilder().header("Authorization",
+                                        OAuthUtils.getAuthHeader(this, o, oauth_token, response.request().url().encodedPath(),
+                                                response.request().method(), query)).build();
+                            }
                         }
                     //} else {
                         //System.out.println("auth denied for: "+route.address().url().toString());
@@ -256,11 +271,24 @@ public class API
             
             boolean authed = false;
             
-            // TODO add OAuth
-            if (auth_method == Settings.AUTHENTICATION_BASIC && ! url)
+            
+            if (auth_method != Settings.AUTHENTICATION_COOKIE && ! url)
             {
-                r.addRequestHeader("Authorization", Credentials.basic(username, password));
-                authed = true;
+                if (auth_method == Settings.AUTHENTICATION_BASIC) {
+                    r.addRequestHeader("Authorization", Credentials.basic(username, password));
+                    authed = true;
+                } else {
+                    OAuthUtils.OAuthData o = OAuthUtils.hosts.get(hostname);
+                    if (o != null && oauth_token != null) {
+                        TreeMap<String, String> query = new TreeMap<>();
+                        Uri u = Uri.parse(uri);
+                        for (String name : u.getQueryParameterNames()) {
+                            query.put(name, u.getQueryParameter(name));
+                        }
+                        r.addRequestHeader("Authorization", OAuthUtils.getAuthHeader(this, o, oauth_token, u.getPath(), "GET", query));
+                        authed = true;
+                    }
+                }
                 //System.out.println("authed basic");
             }
             else
@@ -314,6 +342,7 @@ public class API
             handler.cancel();
             return false;
         }
+        
         // only authenticate for the Stud.IP server
         if (hostname.equals(host)) {
             if (auth_method == Settings.AUTHENTICATION_BASIC) {
@@ -329,6 +358,17 @@ public class API
         handler.cancel();
         return false;
     }
+    
+    public void autofillLoginForm(WebView v) {
+        if (username != null && password != null) {
+            v.evaluateJavascript("" +
+                    "var e = document.getElementById(\"loginname\");\n" +
+                    "if (e != null) e.value = \"" + username + "\";" +
+                    "e = document.getElementById(\"password\");\n" +
+                    "if (e != null) e.value = \"" + password + "\";", null);
+        }
+    }
+    
     
     public void authToken(Context c) {
         if (oauth_token != null && oauth_token.isTemp) {
@@ -363,13 +403,15 @@ public class API
         }
     }
     
+    public void setToken(OAuthUtils.OAuthToken tok) {
+        oauth_token = tok;
+    }
     
     // -2 = error parsing the response
     // 0 = IOException or timeout
     // 200 = success
     // 401 = unauthorized, OAUth not enabled for the installation
     public LiveData<Integer> login(Context con, String username, String password, int auth_method) {
-        Call<StudipUser> ca = user.login(Credentials.basic(username,password));
         this.auth_method = auth_method;
         this.username = username;
         if (auth_method == Settings.AUTHENTICATION_BASIC) {
@@ -378,14 +420,18 @@ public class API
             this.password = null;
         }
         if (auth_method == Settings.AUTHENTICATION_BASIC || auth_method == Settings.AUTHENTICATION_COOKIE) {
+            Call<StudipUser> ca = user.login(Credentials.basic(username,password));
             return login_call(con, ca, DBProvider.getDB(con).userDao());
         } else {
             MutableLiveData<Integer> d = new MutableLiveData<>(-1);
-            Call<String> c = OAuthUtils.requestToken(this);
+            Call<String> c = OAuthUtils.accessToken(this, oauth_token);
             if (c == null) {
                 d.setValue(0);
                 return d;
             }
+            UserDao user = DBProvider.getDB(con).userDao();
+            final API api = this;
+            Context appcon = con.getApplicationContext();
             c.enqueue(new Callback<String>()
             {
                 @Override
@@ -396,11 +442,41 @@ public class API
                     }
                     String body = response.body();
                     if (body != null) {
-                        oauth_token = OAuthUtils.getTokenFromResponse(body, true);
+                        oauth_token = OAuthUtils.getTokenFromResponse(body, false);
                         if (oauth_token == null) {
                             d.setValue(-2);
                         } else {
-                            d.setValue(200);
+                            api.user.user().enqueue(new Callback<StudipUser>()
+                            {
+                                @SuppressLint("CheckResult")
+                                @Override
+                                public void onResponse(@NonNull Call<StudipUser> call, @NonNull Response<StudipUser> response) {
+                                    StudipUser u = response.body();
+                                    if (u != null) {
+                                        boolean same = userID == null || userID.equals(u.user_id);
+                                        userID = u.user_id;
+                                        //noinspection ResultOfMethodCallIgnored
+                                        user.updateInsertAsync(response.body()).timeout(10,TimeUnit.SECONDS)
+                                                .subscribeOn(Schedulers.io()).subscribe(() -> {
+                                            d.postValue(200);
+                                            if (! same) { // if using another account, delete all present data
+                                                //System.out.println("another account used");
+                                                Settings settings = SettingsProvider.getSettings(appcon);
+                                                settings.logout = true;
+                                                settings.safe(SettingsProvider.getSettingsPreferences(appcon));
+                                                System.exit(0);
+                                            }
+                                        },throwable -> d.postValue(0));
+                                    } else {
+                                        d.setValue(response.code());
+                                    }
+                                }
+    
+                                @Override
+                                public void onFailure(@NonNull Call<StudipUser> call, @NonNull Throwable t) {
+                                    d.setValue(0);
+                                }
+                            });
                         }
                     } else {
                         d.setValue(-2);
@@ -553,6 +629,12 @@ public class API
         
         api.disabled_features = prefs.getStringSet(DISABLED_FEATURES_KEY, new HashSet<>());
         
+        String oauth_token = prefs.getString(OAUTH_TOKEN_KEY, null);
+        String oauth_secret = prefs.getString(OAUTH_TOKEN_SECRET_KEY, null);
+        if (oauth_secret != null && oauth_token != null) {
+            api.oauth_token = new OAuthUtils.OAuthToken(oauth_token, oauth_secret, false);
+            api.auth_method = Settings.AUTHENTICATION_OAUTH;
+        }
         
         return api;
     }

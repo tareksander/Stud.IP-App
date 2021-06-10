@@ -115,8 +115,7 @@ public class Courseware
                         throw new RuntimeException("Could not find ltidata for Courseware Opencast block");
                     }
                     //System.out.println(m.group(1));
-                    ltidata = GsonProvider.getGson().fromJson(m.group(1), JsonObject.class);
-                    c[i] = new CoursewareOpencastBlock(uri.getHost(), uri.getQueryParameter("id"), ltidata);
+                    c[i] = new CoursewareOpencastBlock(uri.getHost(), uri.getQueryParameter("id"), m.group(1));
                 } else if ("PdfBlock".equals(type)) {
                     Elements file = block.getElementsByAttributeValueContaining("class","cw-pdf-file-url");
                     if (file.size() == 0) {

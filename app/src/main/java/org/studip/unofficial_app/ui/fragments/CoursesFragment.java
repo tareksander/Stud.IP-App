@@ -44,12 +44,13 @@ public class CoursesFragment extends SwipeRefreshFragment
     private HomeActivityViewModel h;
     private FragmentCoursesBinding binding;
     
+    private static final String LIST_KEY = "list";
     
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("selected_semester", (Serializable) binding.semesterSelect.getSelectedItem());
-        
+        outState.putParcelable(LIST_KEY, binding.coursesList.onSaveInstanceState());
     }
     
     @Override
@@ -144,6 +145,10 @@ public class CoursesFragment extends SwipeRefreshFragment
                         //System.out.println("updated semester courses");
                         coursead.clear();
                         coursead.addAll(c);
+                        if (savedInstanceState != null && savedInstanceState.containsKey(LIST_KEY)) {
+                            binding.coursesList.onRestoreInstanceState(savedInstanceState.getParcelable(LIST_KEY));
+                            savedInstanceState.remove(LIST_KEY);
+                        }
                     });
                 }
         

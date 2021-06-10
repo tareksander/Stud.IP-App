@@ -1,5 +1,8 @@
 package org.studip.unofficial_app.api.plugins.meetings;
-public class MeetingsInfo
+
+import java.io.Serializable;
+
+public class MeetingsInfo  implements Serializable
 {
     
     

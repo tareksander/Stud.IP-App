@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.SavedStateHandle;
 
 import org.studip.unofficial_app.api.plugins.opencast.OpencastVideo;
 import org.studip.unofficial_app.model.APIProvider;
@@ -16,13 +17,16 @@ public class OpencastViewModel extends AndroidViewModel
 {
     private final MutableLiveData<Boolean> status = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> refreshing = new MutableLiveData<>(false);
-    private final MutableLiveData<OpencastVideo[]> data = new MutableLiveData<>();
+    private final MutableLiveData<OpencastVideo[]> data;
     private final String course;
     
-    public OpencastViewModel(@NonNull Application application, String course) {
+    public OpencastViewModel(@NonNull Application application, String course, SavedStateHandle h) {
         super(application);
         this.course = course;
-        refresh(application);
+        data = h.getLiveData("videos");
+        if (data.getValue() == null) {
+            refresh(application);
+        }
     }
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @SuppressLint("CheckResult")

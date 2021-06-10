@@ -42,6 +42,7 @@ public class NotificationWorker extends Worker
         API api = APIProvider.getAPI(getApplicationContext());
         Settings s = SettingsProvider.getSettings(getApplicationContext());
         if (api != null) {
+            //s.last_notification_id = 0;
             try {
                 StudipNotifications nots = api.dispatch.getNotifications().execute().body();
                 if (nots != null && nots.notifications != null) {

@@ -230,6 +230,15 @@ Bitte schicken Sie eventuelle Fragen und den Consumer Key und das Consumer Secre
 Mit freundlichen Grüßen<br>
 %1$s
 "]]></string>
+    <string name="oauth_login_explain"><![CDATA["
+OAuth:<br>
+Wenn Sie den linken Button drücken, werden Sie zu Ihrer Stud.IP-Seite in einer Browser-App weitergeleitet.<br>
+Falls noch nicht geschehen, loggen Sie sich dort ein.<br>
+Sie werden gefragt, ob die App auf Ihre Daten zugreifen darf.<br>
+Wenn Sie den Zugriff erlaubt haben, kehren Sie hierher zurück und drücken Sie auf weiter.
+"]]></string>
+    <string name="login">Einloggen</string>
+    <string name="cont">Weiter</string>
 
 
 </resources>

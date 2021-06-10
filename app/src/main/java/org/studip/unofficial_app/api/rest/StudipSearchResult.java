@@ -6,7 +6,7 @@ public class StudipSearchResult implements Serializable
 {
     public CourseResultList GlobalSearchMyCourses;
     public CourseResultList GlobalSearchCourses;
-    public static class CourseResultList
+    public static class CourseResultList implements Serializable
     {
         public String name;
         public String fullsearch;
@@ -14,7 +14,7 @@ public class StudipSearchResult implements Serializable
         public boolean more;
         public boolean plus;
     }
-    public static class CourseResult
+    public static class CourseResult implements Serializable
     {
         public String id;
         public String name;
@@ -24,7 +24,7 @@ public class StudipSearchResult implements Serializable
         public String img;
     }
     public ModuleResultList GlobalSearchModules;
-    public static class ModuleResultList
+    public static class ModuleResultList implements Serializable
     {
         public String name;
         public String fullsearch;
@@ -32,7 +32,7 @@ public class StudipSearchResult implements Serializable
         public boolean more;
         public boolean plus;
     }
-    public static class ModuleResult
+    public static class ModuleResult implements Serializable
     {
         public String name;
         public String url;
@@ -42,7 +42,7 @@ public class StudipSearchResult implements Serializable
         public String additional;
     }
     public UserResultList GlobalSearchUsers;
-    public static class UserResultList
+    public static class UserResultList implements Serializable
     {
         public String name;
         public String fullsearch;
@@ -50,7 +50,7 @@ public class StudipSearchResult implements Serializable
         public boolean more;
         public boolean plus;
     }
-    public static class UserResult
+    public static class UserResult implements Serializable
     {
         public String id;
         public String name;
@@ -60,7 +60,7 @@ public class StudipSearchResult implements Serializable
         public String img;
     }
     public InstituteResultList GlobalSearchInstitutes;
-    public static class InstituteResultList
+    public static class InstituteResultList implements Serializable
     {
         public String name;
         public String fullsearch;
@@ -68,7 +68,7 @@ public class StudipSearchResult implements Serializable
         public boolean more;
         public boolean plus;
     }
-    public static class InstituteResult
+    public static class InstituteResult implements Serializable
     {
         public String id;
         public String name;

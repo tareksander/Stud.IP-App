@@ -7,6 +7,8 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:buttonStyle">@style/Button</item>
         <item name="android:textColor">#CCCCCC</item>
+        <item name="android:textColorPrimary">#CCCCCC</item>
+        <item name="android:textColorPrimaryDisableOnly">#CCCCCC</item>
         <item name="android:textSize">18sp</item>
         <item name="android:colorBackground">@color/background</item>
         <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>

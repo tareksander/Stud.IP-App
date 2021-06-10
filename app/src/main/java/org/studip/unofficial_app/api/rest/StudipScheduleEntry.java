@@ -3,10 +3,11 @@ package org.studip.unofficial_app.api.rest;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity(tableName = "schedule_entry")
-public class StudipScheduleEntry
+public class StudipScheduleEntry implements Serializable
 {
     @PrimaryKey
     public int start;

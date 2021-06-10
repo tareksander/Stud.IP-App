@@ -1,11 +1,14 @@
 package org.studip.unofficial_app.api.rest;
 import com.google.gson.annotations.SerializedName;
-public class StudipNotifications
+
+import java.io.Serializable;
+
+public class StudipNotifications implements Serializable
 {
     public long server_timestamp;
     @SerializedName("PersonalNotifications.newNotifications")
     public Notification[] notifications;
-    public static class Notification {
+    public static class Notification implements Serializable {
         public long personal_notification_id;
         public String url;
         public String text;

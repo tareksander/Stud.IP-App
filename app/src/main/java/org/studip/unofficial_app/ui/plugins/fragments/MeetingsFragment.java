@@ -271,7 +271,6 @@ public class MeetingsFragment extends Fragment
         
         @Override
         public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
-            //System.out.println("auth request");
             API api = APIProvider.getAPI(requireActivity());
             if (api == null) {
                 handler.cancel();

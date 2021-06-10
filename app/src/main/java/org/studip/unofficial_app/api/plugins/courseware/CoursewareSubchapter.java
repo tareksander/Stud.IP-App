@@ -1,5 +1,6 @@
 package org.studip.unofficial_app.api.plugins.courseware;
-public class CoursewareSubchapter
+import java.io.Serializable;
+public class CoursewareSubchapter  implements Serializable
 {
     public String name;
     public String id; // for ?selected=

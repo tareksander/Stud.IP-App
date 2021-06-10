@@ -28,12 +28,17 @@ import org.studip.unofficial_app.databinding.DialogOpencastEntryBinding;
 import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.model.viewmodels.OpencastViewModel;
+import org.studip.unofficial_app.model.viewmodels.StringSavedStateViewModelFactory;
 import org.studip.unofficial_app.model.viewmodels.StringViewModelFactory;
 
 public class CourseOpencastDialog  extends DialogFragment
 {
     public static final String COURSE_ID_KEY = "cid";
+    private static final String LIST_KEY = "list";
+    
     private OpencastViewModel m;
+    private DialogOpencastBinding binding;
+    
     
     @NonNull
     @Override
@@ -44,11 +49,12 @@ public class CourseOpencastDialog  extends DialogFragment
             dismiss();
             return b.create();
         }
-        m = new ViewModelProvider(this,new StringViewModelFactory(requireActivity().getApplication(),args.getString(COURSE_ID_KEY))).get(OpencastViewModel.class);
+        m = new ViewModelProvider(this,new StringSavedStateViewModelFactory(this, null,
+                requireActivity().getApplication(),args.getString(COURSE_ID_KEY))).get(OpencastViewModel.class);
         
         b.setTitle("Opencast");
     
-        DialogOpencastBinding binding = DialogOpencastBinding.inflate(getLayoutInflater());
+        binding = DialogOpencastBinding.inflate(getLayoutInflater());
         b.setView(binding.getRoot());
         
         
@@ -62,6 +68,10 @@ public class CourseOpencastDialog  extends DialogFragment
             if (videos != null) {
                 ad.clear();
                 ad.addAll(videos);
+                if (savedInstanceState != null && savedInstanceState.containsKey(LIST_KEY)) {
+                    binding.opencastList.onRestoreInstanceState(savedInstanceState.getParcelable(LIST_KEY));
+                    savedInstanceState.remove(LIST_KEY);
+                }
             }
         });
         
@@ -77,6 +87,11 @@ public class CourseOpencastDialog  extends DialogFragment
         return d;
     }
     
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(LIST_KEY, binding.opencastList.onSaveInstanceState());
+    }
     
     public class OpencastAdapter extends ArrayAdapter<OpencastVideo> {
         public OpencastAdapter(@NonNull Context context, int resource) {

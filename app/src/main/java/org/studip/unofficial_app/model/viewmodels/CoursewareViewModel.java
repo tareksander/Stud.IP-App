@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.SavedStateHandle;
 
 import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.api.API;
@@ -18,9 +19,10 @@ import org.studip.unofficial_app.model.APIProvider;
 
 public class CoursewareViewModel extends AndroidViewModel
 {
+    
     private final MutableLiveData<Boolean> status = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> refreshing = new MutableLiveData<>(false);
-    private final MutableLiveData<CoursewareChapter[]> data = new MutableLiveData<>();
+    private final MutableLiveData<CoursewareChapter[]> data;
     private final String cid;
     
     public static final int TYPE_CHAPTERS = 0;
@@ -28,16 +30,25 @@ public class CoursewareViewModel extends AndroidViewModel
     public static final int TYPE_SUBCHAPTER = 2;
     public static final int TYPE_SECTION = 3;
     
-    public String selectedChapter = null;
-    public String selectedSubchapter = null;
-    public String selectedSection = null;
+    private final static String DATA_KEY = "data";
     
-    public CoursewareViewModel(@NonNull @NotNull Application application, String cid) {
+    public final MutableLiveData<String> selectedChapterData;
+    public final MutableLiveData<String> selectedSubchapterData;
+    public final MutableLiveData<String> selectedSectionData;
+    
+    public CoursewareViewModel(@NonNull @NotNull Application application, String cid, SavedStateHandle h) {
         super(application);
         this.cid = cid;
-        refresh(application, null, TYPE_CHAPTERS);
+        data = h.getLiveData(DATA_KEY);
+        selectedChapterData = h.getLiveData("chapter");
+        selectedSubchapterData = h.getLiveData("subchapter");
+        selectedSectionData = h.getLiveData("section");
+        if (data.getValue() == null) {
+            refresh(application, null, TYPE_CHAPTERS);
+        }
     }
     
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @SuppressLint("CheckResult")
     public void refresh(Context c, String id, int type) {
         API api = APIProvider.getAPI(c);
@@ -140,9 +151,9 @@ public class CoursewareViewModel extends AndroidViewModel
     
     public void reload(Context c) {
         data.setValue(null);
-        selectedChapter = null;
-        selectedSubchapter = null;
-        selectedSection = null;
+        selectedChapterData.setValue(null);
+        selectedSubchapterData.setValue(null);
+        selectedSectionData.setValue(null);
         refresh(c, null, TYPE_CHAPTERS);
     }
     

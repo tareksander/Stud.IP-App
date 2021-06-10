@@ -1,8 +1,10 @@
 package org.studip.unofficial_app.api.rest;
 import androidx.room.Embedded;
 import androidx.room.Relation;
+
+import java.io.Serializable;
 import java.util.List;
-public class StudipCourseWithForumCategories
+public class StudipCourseWithForumCategories implements Serializable
 {
     @Embedded
     public StudipCourse c;

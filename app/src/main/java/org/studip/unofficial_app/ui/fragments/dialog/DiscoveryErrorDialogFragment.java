@@ -45,9 +45,10 @@ public class DiscoveryErrorDialogFragment extends DialogFragment
         } else {
             API api = APIProvider.getAPI(requireActivity());
             if (api != null) {
-                String disabled = getString(R.string.discovery_msg, api.getDisabledFeatures(requireActivity()));
+                String disabled = api.getDisabledFeatures(requireActivity());
+                String msg = getString(R.string.discovery_msg, disabled);
                 if (! disabled.equals("")) {
-                    b.setTitle(R.string.discovery_title).setMessage(HelpActivity.fromHTML(disabled)).setPositiveButton(R.string.ok, (dialog, which) -> dismiss());
+                    b.setTitle(R.string.discovery_title).setMessage(HelpActivity.fromHTML(msg)).setPositiveButton(R.string.ok, (dialog, which) -> dismiss());
                 } else {
                     //System.out.println("nothing disabled");
                     dismiss();

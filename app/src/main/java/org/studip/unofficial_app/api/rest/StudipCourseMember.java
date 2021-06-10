@@ -5,10 +5,11 @@ import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity(tableName = "course_members")
-public class StudipCourseMember
+public class StudipCourseMember implements Serializable
 {
     @NonNull
     @PrimaryKey
@@ -17,7 +18,7 @@ public class StudipCourseMember
     public String href;
     @Embedded
     public Name name;
-    static class Name {
+    static class Name implements Serializable {
         public String username;
         public String formatted;
         public String family;

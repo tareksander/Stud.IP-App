@@ -2,13 +2,13 @@ package org.studip.unofficial_app.ui.fragments.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,9 +36,11 @@ import org.studip.unofficial_app.databinding.DialogForumEntryBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.ForumResource;
 import org.studip.unofficial_app.model.viewmodels.ForumViewModel;
-import org.studip.unofficial_app.model.viewmodels.StringViewModelFactory;
+import org.studip.unofficial_app.model.viewmodels.StringSavedStateViewModelFactory;
+import org.studip.unofficial_app.ui.HelpActivity;
 import org.studip.unofficial_app.ui.HomeActivity;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -51,11 +53,13 @@ import retrofit2.Response;
 public class CourseForumDialogFragment extends DialogFragment
 {
     public static final String COURSE_ID_KEY = "cid";
+    private static final String OBJECT_KEY = "obj";
     
-    ForumViewModel m;
-    DialogForumBinding binding;
-    AlertDialog d;
-    String cid;
+    private ForumViewModel m;
+    private DialogForumBinding binding;
+    private AlertDialog d;
+    private String cid;
+    private Object currentObject = null;
     
     @NonNull
     @Override
@@ -69,9 +73,12 @@ public class CourseForumDialogFragment extends DialogFragment
             return b.create();
         }
         cid = args.getString(COURSE_ID_KEY);
-        m = new ViewModelProvider(this,new StringViewModelFactory(requireActivity().getApplication(),cid)).get(ForumViewModel.class);
-    
+        m = new ViewModelProvider(this,new StringSavedStateViewModelFactory(this, null, 
+                requireActivity().getApplication(),cid)).get(ForumViewModel.class);
+        
+        
         binding = DialogForumBinding.inflate(getLayoutInflater());
+        
         b.setView(binding.getRoot());
         
         b.setTitle("");
@@ -90,11 +97,20 @@ public class CourseForumDialogFragment extends DialogFragment
         });
         
         ForumAdapter ad = new ForumAdapter(requireActivity(),ArrayAdapter.IGNORE_ITEM_VIEW_TYPE);
+        if (savedInstanceState != null) {
+            ad.setObject(savedInstanceState.getSerializable(OBJECT_KEY));
+        }
         binding.forumList.setAdapter(ad);
         
-        m.f.get().observe(this, ad::setObject);
+        m.f.get().observe(this, (fs) -> {
+            ad.setObject(fs);
+            currentObject = fs;
+        });
+        if (savedInstanceState == null) {
+            m.f.refresh(requireActivity());
+        }
+    
         
-        m.f.refresh(requireActivity());
         
         d.setOnKeyListener((dialog, keyCode, event) -> {
             if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
@@ -229,7 +245,13 @@ public class CourseForumDialogFragment extends DialogFragment
         return d;
     }
     
-    
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (currentObject instanceof Serializable) {
+            outState.putSerializable(OBJECT_KEY, (Serializable) currentObject);
+        }
+    }
     
     public class ForumAdapter extends ArrayAdapter<Object> {
         private Object o;
@@ -359,7 +381,8 @@ public class CourseForumDialogFragment extends DialogFragment
                     if (position != 0) {
                         e = children.toArray(new StudipForumEntry[0])[position - 1];
                     }
-                    t.setText(Jsoup.parse(e.content).wholeText());
+                    t.setMovementMethod(LinkMovementMethod.getInstance());
+                    t.setText(HelpActivity.fromHTML(e.content));
                 } else {
                     Collections.sort(children);
                     e = children.toArray(new StudipForumEntry[0])[position];

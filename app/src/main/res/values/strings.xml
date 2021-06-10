@@ -221,6 +221,15 @@ Yours faithfully,<br>
 "]]></string>
     <string name="oauth_template_button">Open mail app with template text</string>
     <string name="oauth_mail_template_subject">Enable OAuth for app</string>
+    <string name="oauth_login_explain"><![CDATA["
+OAuth:<br>
+If you click the left button, you will be redirected to your Stud.IP site in a browser app. If not logged in already, log in.<br>
+You will be asked if you want the app to access your data. <br>
+After you accept, return here and click continue.
+"]]></string>
+    <string name="login">Login</string>
+    <string name="cont">Continue</string>
+    <string name="message_time_template" translatable="false">%1$d.%2$d.%3$d  %4$d:%5$d</string>
 
 
 </resources>

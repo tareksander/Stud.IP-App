@@ -1,10 +1,13 @@
 package org.studip.unofficial_app.model;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.SavedStateHandle;
 
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.api.rest.StudipCollection;
@@ -17,17 +20,48 @@ import retrofit2.Call;
 public class ForumResource extends NetworkResource<Object>
 {
     private final String courseID;
+    public static final String CURRENT_KEY = "current";
     
-    public static class ForumEntry {
+    public static class ForumEntry implements Parcelable
+    {
+        public enum Type {
+            COURSE, CATEGORY, ENTRY
+        }
+        private final Type type;
         private final String id;
+        protected ForumEntry(Parcel in) {
+            id = in.readString();
+            type = Type.values()[in.readInt()];
+        }
+    
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(id);
+            dest.writeInt(type.ordinal());
+        }
+    
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+    
+        public static final Creator<ForumEntry> CREATOR = new Creator<ForumEntry>()
+        {
+            @Override
+            public ForumEntry createFromParcel(Parcel in) {
+                return new ForumEntry(in);
+            }
+            
+            @Override
+            public ForumEntry[] newArray(int size) {
+                return new ForumEntry[size];
+            }
+        };
+    
         public String getId()
         {
             return id;
         }
-        public enum Type {
-            COURSE, CATEGORY, ENTRY
-        };
-        private Type type;
         public Type getType()
         {
             return type;
@@ -37,25 +71,29 @@ public class ForumResource extends NetworkResource<Object>
             this.id = id;
             this.type = type;
         }
+        
     }
     
-    @NonNull
-    private ForumEntry current = null;
+    
+    
+    private final LiveData<ForumEntry> currentEntry;
+    
     private final MediatorLiveData<Object> data = new MediatorLiveData<>();
     private LiveData source;
+    private final SavedStateHandle h;
     
-    public ForumResource(Context c, String course)
+    public ForumResource(Context c, String course, SavedStateHandle h)
     {
         super(c);
         this.courseID = course;
-        current = new ForumEntry(courseID, ForumEntry.Type.COURSE);
-        DB db = DBProvider.getDB(c);
-        source = db.courseDao().observeWithCategories(current.getId());
-        data.addSource(source, data::setValue);
+        this.h = h;
+        currentEntry = h.getLiveData(CURRENT_KEY, new ForumEntry(courseID, ForumEntry.Type.COURSE));
+        // to run the code to determine the database query
+        setEntry(c, currentEntry.getValue());
     }
     
     public ForumEntry getSelectedEntry() {
-        return current;
+        return currentEntry.getValue();
     }
     
     public void setEntry(Context c, ForumEntry e) {
@@ -63,23 +101,23 @@ public class ForumResource extends NetworkResource<Object>
         if (isRefreshing().getValue()) {
             return;
         }
-        current = e;
         if (e == null) {
-            current = new ForumEntry(courseID, ForumEntry.Type.COURSE);
+            e = new ForumEntry(courseID, ForumEntry.Type.COURSE);
         }
+        h.set(CURRENT_KEY, e);
         if (source != null) {
             data.removeSource(source);
         }
         DB db = DBProvider.getDB(c);
-        switch (current.getType()) {
+        switch (currentEntry.getValue().getType()) {
             case CATEGORY:
-                source = db.forumCategoryDao().observeCategoryWithEntries(current.getId());
+                source = db.forumCategoryDao().observeCategoryWithEntries(currentEntry.getValue().getId());
                 break;
             case ENTRY:
-                source = db.forumEntryDao().observeThread(current.getId());
+                source = db.forumEntryDao().observeThread(currentEntry.getValue().getId());
                 break;
             case COURSE:
-                source = db.courseDao().observeWithCategories(current.getId());
+                source = db.courseDao().observeWithCategories(currentEntry.getValue().getId());
         }
         data.addSource(source, data::setValue);
         refresh(c);
@@ -95,14 +133,14 @@ public class ForumResource extends NetworkResource<Object>
     protected Call getCall(Context c)
     {
         API api = APIProvider.getAPI(c);
-        switch (current.getType()) {
+        switch (currentEntry.getValue().getType()) {
             case CATEGORY:
-                return api.forum.areas(current.getId(),0,1000);
+                return api.forum.areas(currentEntry.getValue().getId(),0,1000);
             case ENTRY:
-                return api.forum.getEntry(current.getId());
+                return api.forum.getEntry(currentEntry.getValue().getId());
             case COURSE:
             default:
-                return api.course.forumCategories(current.getId(),0,1000);
+                return api.course.forumCategories(currentEntry.getValue().getId(),0,1000);
         }
     }
 
@@ -124,12 +162,12 @@ public class ForumResource extends NetworkResource<Object>
                 for (StudipForumEntry e : col.collection.values()) {
                     e.user = lastPathSegment(e.user);
                     e.course = lastPathSegment(e.course);
-                    e.parent_id = current.getId();
+                    e.parent_id = currentEntry.getValue().getId();
                     //System.out.println(e.parent_id);
                     //System.out.println("Entry: "+e.subject);
                     //db.forumEntryDao().updateInsert(e);
                 }
-                db.forumEntryDao().updateSyncChildren(current.getId(),col.collection.values().toArray(new StudipForumEntry[0]));
+                db.forumEntryDao().updateSyncChildren(currentEntry.getValue().getId(),col.collection.values().toArray(new StudipForumEntry[0]));
             }
         } else {
             StudipForumEntry e = (StudipForumEntry) res;
@@ -140,7 +178,7 @@ public class ForumResource extends NetworkResource<Object>
                 //System.out.println("Child: "+child.subject);
                 //db.forumEntryDao().updateInsert(child);
             }
-            db.forumEntryDao().updateSyncChildren(current.getId(),e.children);
+            db.forumEntryDao().updateSyncChildren(currentEntry.getValue().getId(),e.children);
         }
     }
 }

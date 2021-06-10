@@ -27,7 +27,7 @@ public class DeepLinkActivity extends AppCompatActivity
             Uri data = in.getData();
             if (! Intent.ACTION_VIEW.equals(action) || data == null)
             {
-                finish();
+                finishAndRemoveTask();
                 return;
             }
             long notification = in.getLongExtra(getApplicationContext().getPackageName()+".notification_id",-1);
@@ -44,6 +44,7 @@ public class DeepLinkActivity extends AppCompatActivity
                 if (api.getHostname().equals(data.getHost()))
                 {
                     Intent i = new Intent(this, HomeActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     i.setData(data);
                     startActivity(i);
                 }
@@ -61,7 +62,7 @@ public class DeepLinkActivity extends AppCompatActivity
         {
             onNewIntent(getIntent());
         } else {
-            finish();
+            finishAndRemoveTask();
         }
     }
     

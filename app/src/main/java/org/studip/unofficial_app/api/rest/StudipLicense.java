@@ -4,10 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity(tableName = "licenses")
-public class StudipLicense
+public class StudipLicense implements Serializable
 {
     @NonNull
     @PrimaryKey

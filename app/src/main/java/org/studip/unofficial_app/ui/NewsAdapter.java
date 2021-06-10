@@ -41,8 +41,7 @@ public class NewsAdapter extends ArrayAdapter
         TextView title = v.findViewById(R.id.news_title);
         TextView content = v.findViewById(R.id.news_content);
         title.setText(news[position].topic);
-        Document d = Jsoup.parse(news[position].body_html);
-        content.setText(d.wholeText());
+        content.setText(HelpActivity.fromHTML(news[position].body_html));
         return v;
     }
     @Override

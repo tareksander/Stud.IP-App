@@ -1,6 +1,8 @@
 package org.studip.unofficial_app.api.plugins.opencast;
 
-public class OpencastVideo
+import java.io.Serializable;
+
+public class OpencastVideo implements Serializable
 {
     public String preview_url;
     public String watch_opencast;
@@ -12,7 +14,7 @@ public class OpencastVideo
     
     public VideoVersion[] versions;
     
-    public static class VideoVersion {
+    public static class VideoVersion  implements Serializable {
         public String resolution;
         public String download;
     }

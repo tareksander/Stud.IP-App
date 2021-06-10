@@ -5,11 +5,12 @@ import androidx.room.PrimaryKey;
 
 import com.google.gson.JsonElement;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
 @Entity(tableName = "folders")
-public class StudipFolder
+public class StudipFolder implements Serializable
 {
     @PrimaryKey
     public String id;
@@ -30,7 +31,7 @@ public class StudipFolder
     // in Room you can use a query with the parent id to search for the children, so saving this isn't necessary
     @Ignore
     public SubFolder[] subfolders;
-    public static class SubFolder
+    public static class SubFolder implements Serializable
     {
         public String id;
         public String user_id;
@@ -83,7 +84,7 @@ public class StudipFolder
     // in Room you can use a query with the parent id to search for the children, so saving this isn't necessary
     @Ignore
     public FileRef[] file_refs;
-    public static class FileRef
+    public static class FileRef implements Serializable
     {
         public String id;
         public String file_id;

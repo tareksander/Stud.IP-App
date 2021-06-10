@@ -8,6 +8,7 @@ import androidx.lifecycle.Transformations;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

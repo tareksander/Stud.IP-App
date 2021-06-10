@@ -1,12 +1,9 @@
 package org.studip.unofficial_app.api;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.util.Base64;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -18,7 +15,6 @@ import java.util.TreeMap;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import okhttp3.HttpUrl;
 import retrofit2.Call;
 
 public class OAuthUtils
@@ -31,7 +27,6 @@ public class OAuthUtils
     public static final Map<String, OAuthData> hosts;
     static {
         HashMap<String, OAuthData> h = new HashMap<>();
-        // TODO add supported hosts here
         h.put("studip.uni-osnabrueck.de", 
                 new OAuthData("2a45f0453b48d7424e342ead5314ee80", "f73e979bb772707c4d4627458fb1ed89060b3cb64"));
         
@@ -46,22 +41,25 @@ public class OAuthUtils
         if (o == null) {
             return null;
         }
-        return api.oauth.requestToken(getAuthHeader(api, o, null));
+        return api.oauth.requestToken(getAuthHeader(api, o, null, request_token_url, "POST", null));
     }
     
-    public static Call<String> accessToken(API api) {
+    public static Call<String> accessToken(API api, OAuthToken tmp) {
         OAuthData o = hosts.get(api.getHostname());
         if (o == null) {
             return null;
         }
-        return api.oauth.accessToken(getAuthHeader(api, o, null));
+        return api.oauth.accessToken(getAuthHeader(api, o, tmp, access_token_url, "POST", null));
     }
     
-    public static String getAuthHeader(API api, OAuthData o, OAuthToken t) {
+    public static String getAuthHeader(API api, OAuthData o, OAuthToken t, String url, String method, TreeMap<String, String> query_params) {
         String timestamp = String.valueOf(System.currentTimeMillis()/1000);
         String nonce = getNonce(30);
     
         TreeMap<String, String> fields = new TreeMap<>();
+        if (query_params != null) {
+            fields.putAll(query_params);
+        }
         fields.put("OAuth realm", "Stud.IP");
         fields.put("oauth_consumer_key", o.consumer_key);
         if (t != null) {
@@ -72,10 +70,10 @@ public class OAuthUtils
         fields.put("oauth_timestamp", timestamp);
         fields.put("oauth_nonce", nonce);
         fields.put("oath_version", "1.0");
-        fields.put("oauth_signature", Base64.encodeToString(getSignature(api, o, fields, t), Base64.DEFAULT));
+        fields.put("oauth_signature", Base64.encodeToString(getSignature(api, o, fields, t, url, method), Base64.DEFAULT));
         
         
-        System.out.println(fieldsToString(fields));
+        //System.out.println(fieldsToString(fields));
         
         return fieldsToString(fields);
     }
@@ -96,7 +94,7 @@ public class OAuthUtils
         }
     }
     
-    public static byte[] getSignature(API api, OAuthData o, TreeMap<String, String> fields, OAuthToken t) {
+    public static byte[] getSignature(API api, OAuthData o, TreeMap<String, String> fields, OAuthToken t, String url, String method) {
         try {
             Mac mac = Mac.getInstance("HMAC-SHA1");
             String key = URLEncoder.encode(o.consumer_secret, "UTF-8") + "&";
@@ -107,8 +105,9 @@ public class OAuthUtils
             
             StringBuilder text = new StringBuilder();
             
-            text.append("POST&");
-            text.append(URLEncoder.encode("https://" + api.getHostname() + request_token_url, "UTF-8"));
+            text.append(method);
+            text.append("&");
+            text.append(URLEncoder.encode("https://" + api.getHostname() + url, "UTF-8"));
             text.append("&");
             
             
@@ -125,6 +124,7 @@ public class OAuthUtils
             params.deleteCharAt(params.length() - 1);
             
             text.append(URLEncoder.encode(params.toString(), "UTF-8"));
+            //System.out.println("Signature base: "+text);
             return mac.doFinal(text.toString().getBytes());
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException | InvalidKeyException e) {
             return null;

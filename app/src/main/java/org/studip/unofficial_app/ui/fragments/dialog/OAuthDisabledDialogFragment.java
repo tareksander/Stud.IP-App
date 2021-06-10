@@ -59,5 +59,4 @@ public class OAuthDisabledDialogFragment extends DialogFragment
         return b.create();
     }
     
-    
 }

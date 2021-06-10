@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.jetbrains.annotations.NotNull;
@@ -23,12 +24,16 @@ public class HomeFragment extends SwipeRefreshFragment
 {
     private HomeViewModel m;
     private FragmentHomeBinding binding;
+    
+    private static final String LIST_KEY = "list";
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
         m = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
+        
+        
         binding = FragmentHomeBinding.inflate(inflater);
         binding.setLifecycleOwner(this);
         binding.setC(requireContext());
@@ -47,6 +52,10 @@ public class HomeFragment extends SwipeRefreshFragment
                     m.news.refresh(requireContext());
                 }
                 binding.getAdapter().setNews(studipNews.toArray(new StudipNews[0]));
+                if (savedInstanceState != null && savedInstanceState.containsKey(LIST_KEY)) {
+                    binding.homeList.onRestoreInstanceState(savedInstanceState.getParcelable(LIST_KEY));
+                    savedInstanceState.remove(LIST_KEY);
+                }
             });
             m.news.getStatus().observe(getViewLifecycleOwner(), status -> HomeActivity.onStatusReturn(requireActivity(), status));
         } else {
@@ -57,5 +66,9 @@ public class HomeFragment extends SwipeRefreshFragment
         return binding.getRoot();
     }
     
-    
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(LIST_KEY,binding.homeList.onSaveInstanceState());
+    }
 }

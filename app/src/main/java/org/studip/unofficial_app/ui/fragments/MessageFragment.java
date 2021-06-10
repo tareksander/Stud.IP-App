@@ -1,5 +1,6 @@
 package org.studip.unofficial_app.ui.fragments;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,10 +68,12 @@ public class MessageFragment extends SwipeRefreshFragment
     
             //ad = new MessageAdapter(requireActivity(),ArrayAdapter.IGNORE_ITEM_VIEW_TYPE);
             ad = new MessageAdapter();
+            ad.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
             binding.messagesList.setAdapter(ad);
     
             DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL);
             binding.messagesList.addItemDecoration(dividerItemDecoration);
+    
     
             m.mes.get().observe(getViewLifecycleOwner(), (messages) -> {
                 //System.out.println("messages");
@@ -79,19 +82,18 @@ public class MessageFragment extends SwipeRefreshFragment
                     binding.messagesRefresh.setRefreshing(true);
                     m.mes.refresh(requireActivity());
                 }
-        
                 binding.messagesList.setAdapter(ad);
             });
-    
+            
     
             PagedList.Config conf = new PagedList.Config.Builder().setEnablePlaceholders(true).setPageSize(10).build();
     
-            new LivePagedListBuilder<>(DBProvider.getDB(requireActivity()).messagesDao().getPagedList(), conf).build().observe(getViewLifecycleOwner(), (l) -> ad.submitList(l));
-    
+            new LivePagedListBuilder<>(DBProvider.getDB(requireActivity()).messagesDao().getPagedList(), conf).build().observe(getViewLifecycleOwner(),
+                    (l) -> ad.submitList(l));
+            
     
             binding.messageWrite.setOnClickListener((v) -> new MessageWriteDialogFragment().show(getParentFragmentManager(), "message_write"));
-    
-    
+            
             binding.messagesRefresh.setOnRefreshListener(() -> m.mes.refresh(requireActivity()));
         } else {
             binding.messagesRefresh.setOnRefreshListener(() -> binding.messagesRefresh.setRefreshing(false));
@@ -100,7 +102,6 @@ public class MessageFragment extends SwipeRefreshFragment
         
         return binding.getRoot();
     }
-    
     
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         public MessageViewHolder(@NonNull View itemView)
@@ -155,7 +156,6 @@ public class MessageFragment extends SwipeRefreshFragment
                 return;
             }
             View layout = b.getRoot();
-            // TODO onClick and onLongClick for layout
 
             layout.setOnClickListener((v) -> {
                 MessageDialogFragment d = new MessageDialogFragment();
@@ -192,7 +192,8 @@ public class MessageFragment extends SwipeRefreshFragment
                         b.messageSender.setText(user.name.formatted);
                     }
                 } else {
-                    WorkManager.getInstance(requireActivity()).enqueueUniqueWork(GetMessageUsersWork.WORK_NAME, ExistingWorkPolicy.KEEP, OneTimeWorkRequest.from(GetMessageUsersWork.class));
+                    WorkManager.getInstance(requireActivity()).enqueueUniqueWork(GetMessageUsersWork.WORK_NAME, ExistingWorkPolicy.KEEP,
+                            OneTimeWorkRequest.from(GetMessageUsersWork.class));
                 }
             });
 
@@ -201,7 +202,8 @@ public class MessageFragment extends SwipeRefreshFragment
             Calendar c = Calendar.getInstance();
             c.setTimeInMillis(1000*Long.parseLong(m.mkdate));
 
-            b.messageTime.setText(c.get(Calendar.DATE)+"."+(c.get(Calendar.MONTH)+1)+"."+c.get(Calendar.YEAR)+" "+c.get(Calendar.HOUR_OF_DAY)+":"+c.get(Calendar.MINUTE));
+            b.messageTime.setText(getString(R.string.message_time_template, c.get(Calendar.DATE), (c.get(Calendar.MONTH)+1), c.get(Calendar.YEAR),
+                    c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE)));
 
 
             

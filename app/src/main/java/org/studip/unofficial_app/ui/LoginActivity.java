@@ -2,55 +2,119 @@ package org.studip.unofficial_app.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.LiveData;
 import androidx.security.crypto.EncryptedSharedPreferences;
 
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
+import org.studip.unofficial_app.api.OAuthUtils;
+import org.studip.unofficial_app.databinding.ActivityLoginBinding;
+import org.studip.unofficial_app.databinding.ActivityLoginOauthBinding;
 import org.studip.unofficial_app.model.APIProvider;
+import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.ui.fragments.dialog.DiscoveryErrorDialogFragment;
 import org.studip.unofficial_app.ui.fragments.dialog.LoginErrorDialogFragment;
+import org.studip.unofficial_app.ui.fragments.dialog.OAuthDisabledDialogFragment;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class LoginActivity extends AppCompatActivity
 {
+    private ActivityLoginOauthBinding oauthb;
+    private ActivityLoginBinding loginb;
     private boolean login_running = false;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        API api = APIProvider.getAPI(this);
-        if (api == null) {
+        final API api = APIProvider.getAPI(this);
+        if (api == null || api.getHostname() == null) {
             Intent intent = new Intent(this, ServerSelectActivity.class);
             startActivity(intent);
             finish();
             return;
         }
         
+        final AppCompatActivity a = this;
         
-        
-        /*
-        if (api != null && api.logged_in(this) == 200)
-        {
-            Intent intent = new Intent(this,HomeActivity.class);
-            startActivity(intent);
-            finish();
-            return;
+        Settings s = SettingsProvider.getSettings(this);
+        if (s.authentication_method == Settings.AUTHENTICATION_OAUTH) {
+            oauthb = ActivityLoginOauthBinding.inflate(getLayoutInflater());
+    
+            if (! OAuthUtils.hosts.containsKey(api.getHostname())) {
+                new OAuthDisabledDialogFragment().show(getSupportFragmentManager(), "oauth_disabled");
+                oauthb = null;
+                setContentView(new ConstraintLayout(this));
+            } else {
+                oauthb.oauthExplain.setText(HelpActivity.fromHTML(getString(R.string.oauth_login_explain)));
+                
+                oauthb.oauthRedirect.setOnClickListener(v1 -> {
+                    Call<String> tok = OAuthUtils.requestToken(api);
+                    if (tok == null) {
+                        new OAuthDisabledDialogFragment().show(getSupportFragmentManager(), "oauth_disabled");
+                    } else {
+                        tok.enqueue(new Callback<String>()
+                        {
+                            @Override
+                            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                                String body = response.body();
+                                if (body != null) {
+                                    OAuthUtils.OAuthToken temp = OAuthUtils.getTokenFromResponse(body, true);
+                                    if (temp == null) {
+                                        return;
+                                    }
+                                    api.setToken(temp);
+                                    api.authToken(a);
+                                    System.out.println(API.HTTPS+api.getHostname()+OAuthUtils.authorize_url+"?oauth_token="+temp.oauth_token);
+                                }
+                            }
+    
+                            @Override
+                            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+                                
+                            }
+                        });
+                    }
+                });
+                oauthb.oauthContinue.setOnClickListener(v1 -> {
+                    LiveData<Integer> d = api.login(this, null, null, Settings.AUTHENTICATION_OAUTH);
+                    d.observe(this, code -> {
+                        if (code == -1) {
+                            return;
+                        }
+                        d.removeObservers(this);
+                        //System.out.println(code);
+                        if (code == 200) {
+                            toHome();
+                        }
+                    });
+                });
+                setContentView(oauthb.getRoot());
+            }
+        } else {
+            loginb = ActivityLoginBinding.inflate(getLayoutInflater());
+            loginb.submitLogin.setOnClickListener(this::onLogin);
+            setContentView(loginb.getRoot());
         }
-         */
         
         
         
-        setContentView(R.layout.activity_login);
+        
     }
     
     
@@ -82,8 +146,8 @@ public class LoginActivity extends AppCompatActivity
     
     public void onLogin(View v)
     {
-        TextView username = findViewById(R.id.username);
-        TextView password = findViewById(R.id.password);
+        TextView username = loginb.username;
+        TextView password = loginb.password;
         if (! login_running)
         {
             login_running = true;

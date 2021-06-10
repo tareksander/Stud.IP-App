@@ -1,16 +1,17 @@
 package org.studip.unofficial_app.api.rest;
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
-public class StudipCollection<T>
+public class StudipCollection<T> implements Serializable
 {
     public LinkedHashMap<String,T> collection;
     public Pagination pagination;
-    static class Pagination {
+    static class Pagination implements Serializable {
         public int total;
         public int offset;
         public int limit;
         public Links links;
-        static class Links {
+        static class Links implements Serializable {
             public String first;
             public String previous;
             public String next;

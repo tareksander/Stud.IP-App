@@ -23,6 +23,8 @@ import java.util.List;
 public class CourseNewsDialogFragment extends DialogFragment
 {
     
+    private static final String LIST_KEY = "list";
+    private CourseNewsDialogBinding binding;
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState)
@@ -30,9 +32,13 @@ public class CourseNewsDialogFragment extends DialogFragment
         AlertDialog.Builder b = new AlertDialog.Builder(requireActivity());
 
 
-        CourseNewsDialogBinding binding = CourseNewsDialogBinding.inflate(getLayoutInflater());
-        
-        String cid = getArguments().getString("cid");
+        binding = CourseNewsDialogBinding.inflate(getLayoutInflater());
+        Bundle args = getArguments();
+        if (args == null) {
+            dismiss();
+            return  b.create();
+        }
+        String cid = args.getString("cid");
         if (cid != null) {
             NewsDialogViewModel m = new ViewModelProvider(this,new StringViewModelFactory(requireActivity().getApplication(),cid)).get(NewsDialogViewModel.class);
 
@@ -41,6 +47,10 @@ public class CourseNewsDialogFragment extends DialogFragment
             m.news.get().observe(this, (news) -> {
                 if (news.size() != 0) {
                     ad.setNews(news.toArray(new StudipNews[0]));
+                }
+                if (savedInstanceState != null && savedInstanceState.containsKey(LIST_KEY)) {
+                    binding.courseNewsList.onRestoreInstanceState(savedInstanceState.getParcelable(LIST_KEY));
+                    savedInstanceState.remove(LIST_KEY);
                 }
             });
             
@@ -68,5 +78,11 @@ public class CourseNewsDialogFragment extends DialogFragment
         
         b.setView(binding.getRoot());
         return b.create();
+    }
+    
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(LIST_KEY, binding.courseNewsList.onSaveInstanceState());
     }
 }

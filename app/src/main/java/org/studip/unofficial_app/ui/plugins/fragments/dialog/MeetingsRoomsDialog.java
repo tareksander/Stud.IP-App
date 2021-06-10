@@ -16,6 +16,7 @@ import org.studip.unofficial_app.api.plugins.meetings.MeetingsRoom;
 import org.studip.unofficial_app.databinding.DialogMeetingsRoomsBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.viewmodels.MeetingsRoomsViewModel;
+import org.studip.unofficial_app.model.viewmodels.StringSavedStateViewModelFactory;
 import org.studip.unofficial_app.model.viewmodels.StringViewModelFactory;
 import org.studip.unofficial_app.ui.plugins.MeetingsActivity;
 
@@ -37,7 +38,8 @@ public class MeetingsRoomsDialog extends DialogFragment
         }
         
         binding = DialogMeetingsRoomsBinding.inflate(getLayoutInflater());
-        MeetingsRoomsViewModel m = new ViewModelProvider(this,new StringViewModelFactory(requireActivity().getApplication(),args.getString(COURSE_ID_KEY))).get(MeetingsRoomsViewModel.class);
+        MeetingsRoomsViewModel m = new ViewModelProvider(this,new StringSavedStateViewModelFactory(this, null,
+                requireActivity().getApplication(),args.getString(COURSE_ID_KEY))).get(MeetingsRoomsViewModel.class);
         
         m.getRooms().observe(this, rooms -> {
             if (rooms != null) {

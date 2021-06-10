@@ -1,2 +1,3 @@
 package org.studip.unofficial_app.api.plugins.courseware;
-public abstract class CoursewareBlock {}
+import java.io.Serializable;
+public abstract class CoursewareBlock  implements Serializable {}

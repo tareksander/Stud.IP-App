@@ -740,13 +740,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         if (v.equals(binding.authOauth))
         {
             API api = APIProvider.getAPI(this);
-            if (true) {
-                new OAuthDisabledDialogFragment().show(getSupportFragmentManager(), "oauth_disabled");
-                return;
-            }
             
             if (api != null && api.getHostname() != null && ! OAuthUtils.hosts.containsKey(api.getHostname())) {
-                
+                new OAuthDisabledDialogFragment().show(getSupportFragmentManager(), "oauth_disabled");
                 return;
             }
             if (settings.authentication_method != Settings.AUTHENTICATION_OAUTH) {

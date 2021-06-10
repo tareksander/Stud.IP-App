@@ -10,6 +10,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.studip.unofficial_app.api.API;
+import org.studip.unofficial_app.model.GsonProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -97,9 +98,10 @@ public class Opencast
         return routes.queryVideo(API.HTTPS+hostname+"/search/episode.json?id="+id, jsessionid);
     }
     
-    public Call<Void> lti(@NonNull String hostname, @NonNull JsonObject ltidata) {
+    public Call<Void> lti(@NonNull String hostname, @NonNull String ltidata) {
         HashMap<String, String> map = new HashMap<>();
-        for (Map.Entry<String, JsonElement> e: ltidata.entrySet()) {
+        JsonObject o = GsonProvider.getGson().fromJson(ltidata, JsonObject.class);
+        for (Map.Entry<String, JsonElement> e: o.entrySet()) {
             //System.out.println(e.getKey()+" "+e.getValue().getAsString());
             map.put(e.getKey(),e.getValue().getAsString());
         }

@@ -23,53 +23,29 @@
     
     
     Roadmap:
-        1.0.0:
-            [ ] deep links improvements
-                [ ] support for more link types, for courseware, opencast and meetings links
-                [ ] for messages, load the message if it isn't already, and view it
-                [ ] link to the course info and member screens
-                [ ] link to the planner
-                [ ] open unknown link patterns in the WebView for the server
-            [ ] delete data which is not in a server response, but still in the database
-            [ ] better updating of messages, so not every message is downloaded on update, only the ones until a saved one is found
-                [ ] don't care about deleting messages deleted from the server, the user can just also delete them locally
-                [ ] when a message is deleted, don't sync with the server, just send a delete and delete it from the database
-            [ ] add the course info dialog
-            [ ] add the course members dialog
-            [ ] add the user info dialog
-            [ ] support for the planner
-            [ ] app widget for the planner
-            [ ] option to browse the web version in an activity with a fullscreen WebView
-                [ ] set user agent to mobile
-                [ ] redirect page loads for pages not on the server to the browser
-                [ ] allow javascript
-            [ ] messages
-                [ ] add support for viewing the outbox
-            [ ] API detection:
+        0.5.0:
+            [x] option to browse the web version in an activity with a fullscreen WebView
+                [x] set user agent to mobile
+                [x] redirect page loads for pages not on the server to the browser
+                [x] allow javascript
+                [x] autofill for login form
+                [x] back button goes back in history, finishes activity if no history left
+                [x] intercept logout, finish activity instead
+                [x] add swipe-to-refresh
+                [x] for cookie auth, the session cookie is shared
+                [x] handle the configuration change for the orientation change myself? no need to reload then, and no white flash while loading
+            [x] Forum
+                [x] clickable links in posts
+            [x] API detection:
                 [x] better error message when login fails
                 [x] see what routes are needed for what features, tell user on login which features are unavailable
-                [ ] disable functions according to disabled features
+                [x] disable functions according to disabled features
                 [x] option to ignore unavailable features, features may partly work if some routes are enabled
                 [x] add the option to res-scan for features in the settings screen
                 [x] fail without message for features where the routes are disabled
                 [x] put the used routes in the Github Readme
-            [ ] fully save UI state
-                [x] save the scrolling position in ScrollViews? Giving the ScrollViews an ID makes it safe itself automatically
-                [x] save the selected semester in the courses screen
-                [ ] SavedStateModule for all ViewModels for special data not from the database
-                    All objects have to be serializable correctly for this.
-                    The limit is 1mb, the CoursewareViewModel could exceed that. In that case, write the data to a file in the cache folder in a lifecycle method
-                    , make sure the document provider doesn't delete it on startup, and delete it when it is read.
-                    [ ] maybe store the opencast und courseware data in the database?
-                    [ ] MeetingsRoomsViewModel
-                    [ ] OpencastViewModel
-                    [ ] CoursewareViewModel
-                    [ ] FileViewModel
-                    [ ] ForumViewModel: current parent entry
-                    [ ] selected semester for courses screen
-                    [ ] measure the performance after these changes, check if re-creation from an configuration change is still fast
-                        https://medium.com/androiddevelopers/testing-app-startup-performance-36169c27ee55
             [x] rework UI
+                [x] fix settings buttons text color for dark mode
                 [x] remove the "Experimental Features" text from the settings, the features work quite reliably
                 [x] remove the "developer settings" not used anyways
                 [x] try to find nicer colors for dark mode
@@ -84,16 +60,77 @@
                 [x] make a class with the hostnames and OAuth data for supported servers
                 [x] extra error message when OAuth isn't supported for the app by a server, tell the user to send a predefined message to the admin,
                     to enable OAuth support for the Stud.IP installation.
-                [ ] The callback uri doesn't seem to work, the browser doesn't redirect to it
-                [ ] authorize the token via an intent to the browser
-                [ ] add OAuth authentication to the downloads
-                [ ] add an authentication interceptor for oauth authentication, save the token in the API shared preferences
+                [x] The callback uri doesn't seem to work, the browser doesn't redirect to it. Probably a bug in Stud.IP
+                [x] authorize the token via an intent to the browser
+                [ ] add error dialogs for OAuth login
+                [x] add OAuth authentication to the downloads
+                [x] add an authentication interceptor for oauth authentication, save the token in the API shared preferences
                 [ ] check: do things which require a session cookie work with OAuth? Do you get a session cookie when using OAuth?
                     [ ] some features might have to be disabled, or only supported via the new JSONAPI, or require the user to log in in the app
+                        [ ] forum post
+                        [ ] search for addressees
+            [ ] fully save UI state
+                [x] save the scrolling position in ScrollViews
+                [ ] save state for WebViewActivity
+                    [ ] also save scrolling position
+                    [ ] is history saved by default for a WebView?
+                    [ ] is the cookie jar saved?
+                [x] save the selected semester in the courses screen
+                [x] SavedStateModule for all ViewModels for special data not from the database
+                    All objects have to be serializable correctly for this.
+                    The limit is 1mb, the CoursewareViewModel could exceed that. In that case, write the data to a file in the cache folder in a lifecycle method
+                    , make sure the document provider doesn't delete it on startup, and delete it when it is read.
+                    [x] maybe store the opencast und courseware data in the database?
+                    [x] MeetingsRoomsViewModel
+                    [x] OpencastViewModel
+                    [x] CoursewareViewModel
+                    [x] FileViewModel
+                    [x] ForumViewModel: current parent entry
+                    [x] selected semester for courses screen
+                    [x] measure the performance after these changes, check if re-creation from an configuration change is still fast
+                        https://medium.com/androiddevelopers/testing-app-startup-performance-36169c27ee55
             [x] bump version
             [ ] update help text
             [ ] new & more screenshots, with UI improvements
             [ ] update description
+            [ ] write changelog
+        1.0.0:
+            [ ] add shortcuts
+                [ ] they have to be dynamic shortcuts, because the intent data has to be changed for every Stud.IP server
+                [ ] own files
+                [ ] courses
+                [ ] course files
+                [ ] messages
+            [ ] deep links improvements
+                [ ] support for more link types, for courseware, opencast and meetings links
+                [ ] for messages, load the message if it isn't already, and view it
+                [ ] link to the course info and member screens
+                [ ] link to the planner
+                [x] open unknown link patterns in the WebView for the server
+            [ ] delete data which is not in a server response, but still in the database
+            [ ] better updating of messages, so not every message is downloaded on update, only the ones until a saved one is found
+                [ ] don't care about deleting messages deleted from the server, the user can just also delete them locally
+                [ ] when a message is deleted, don't sync with the server, just send a delete and delete it from the database
+            [ ] add the course info dialog
+            [ ] add the course members dialog
+            [ ] add the user info dialog
+            [ ] support for the planner
+            [ ] app widgets
+                [ ] planner
+                    [ ] updates automatically when the planner is updated in the app
+                [ ] messages
+                    [ ] button to check for new messages
+                    [ ] clicking a message opens it in the app
+                [ ] files
+                    [ ] save behaviour as the files screen
+                    [ ] configuration activity to configure what files will be displayed (own/course)
+            [ ] messages
+                [ ] add support for viewing the outbox
+            [ ] bump version
+            [ ] update help text
+            [ ] new & more screenshots, with UI improvements
+            [ ] update description
+            [ ] write changelog
         1.1.0:
             [ ] OAuth
                 [ ] add the option for the user to provide a OAuth consumer key and consumer secret, so private installations can enable OAuth
@@ -104,6 +141,10 @@
                 [ ] support for course blubbers
                 [ ] if you invite people to a personal blubber, does it become a group chat?
                 [ ] whatsapp-like list for chats, try to emulate a messenger app with blubber
+            [ ] bump version
+            [ ] update help text
+            [ ] update description
+            [ ] write changelog
         1.2.0:
             [ ] add support for JSONAPI (probably requires abstracting away the api routes a bit more)
                 https://stackoverflow.com/questions/35502079/custom-converter-for-retrofit-2
@@ -115,6 +156,9 @@
                 [ ] for features only available for JSONAPI, fail gracefully and inform the user, or hide the feature to begin with, or emulate the feature
             [ ] make more specific rules for proguard, so unused code can be removed
             [ ] bump version
+            [ ] update help text
+            [ ] update description
+            [ ] write changelog
         1.3.0:
             [ ] option to input the file size limit of the Stud.IP system, to let the documents provider automatically break up and recombine
                 files above the limit, to support arbitrarily large files
@@ -122,6 +166,9 @@
                 [ ] vips
                 [ ] etherpad
             [ ] bump version
+            [ ] update help text
+            [ ] update description
+            [ ] write changelog
             
         
         

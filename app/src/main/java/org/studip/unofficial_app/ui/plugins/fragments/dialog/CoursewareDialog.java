@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Base64;
@@ -53,7 +54,7 @@ import org.studip.unofficial_app.databinding.DialogCoursewareChapterBinding;
 import org.studip.unofficial_app.databinding.DialogOpencastCoursewareBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.viewmodels.CoursewareViewModel;
-import org.studip.unofficial_app.model.viewmodels.StringViewModelFactory;
+import org.studip.unofficial_app.model.viewmodels.StringSavedStateViewModelFactory;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -66,6 +67,8 @@ public class CoursewareDialog extends DialogFragment
     public static final String COURSE_ID_KEY = "cid";
     private CoursewareViewModel m;
     private DialogCoursewareBinding binding;
+    
+    private static final String LIST_KEY = "list";
     
     @Override
     public void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
@@ -87,9 +90,11 @@ public class CoursewareDialog extends DialogFragment
             dismiss();
             return binding.getRoot();
         }
-        m = new ViewModelProvider(this,new StringViewModelFactory(requireActivity().getApplication(),args.getString(COURSE_ID_KEY)))
-                .get(CoursewareViewModel.class);
+        m = new ViewModelProvider(this,new StringSavedStateViewModelFactory(this, null, requireActivity().getApplication()
+                ,args.getString(COURSE_ID_KEY))).get(CoursewareViewModel.class);
     
+    
+        
     
         binding.coursewareSections.addItemDecoration(new DividerItemDecoration(requireActivity(), RecyclerView.HORIZONTAL));
         binding.coursewareSections.addItemDecoration(new SpacingDecorator(true, 30));
@@ -102,51 +107,55 @@ public class CoursewareDialog extends DialogFragment
         
         m.isRefreshing().observe(this, binding.coursewareRefresh::setRefreshing);
         binding.coursewareRefresh.setOnRefreshListener(() -> m.reload(requireActivity()));
-    
+        
+        //System.out.println(m.getChapters().getValue());
     
         binding.coursewareChapters.setAdapter(new CoursewareChapterAdapter());
         binding.coursewareSections.setAdapter(new CoursewareSectionAdapter());
-        binding.coursewareBlocks.setAdapter(new CoursewareBlockAdapter());
-    
+        
+        CoursewareBlockAdapter bad = new CoursewareBlockAdapter();
+        bad.setStateRestorationPolicy(Adapter.StateRestorationPolicy.PREVENT);
+        binding.coursewareBlocks.setAdapter(bad);
+        
     
         m.getChapters().observe(this, (chapters) -> {
             if (chapters != null) {
-                if (m.selectedChapter != null) {
+                if (m.selectedChapterData.getValue() != null) {
                     for (CoursewareChapter c : chapters) {
-                        if (c.id.equals(m.selectedChapter)) {
+                        if (c.id.equals(m.selectedChapterData.getValue())) {
                             if (c.subchapters == null) {
                                 m.refresh(requireActivity(), c.id, CoursewareViewModel.TYPE_CHAPTER);
                             } else {
-                                if (m.selectedSection == null) {
+                                if (m.selectedSectionData.getValue() == null) {
                                     for (CoursewareSubchapter sub : c.subchapters) {
-                                        if (sub.id.equals(m.selectedSubchapter)) {
+                                        if (sub.id.equals(m.selectedSubchapterData.getValue())) {
                                             if (sub.sections == null) {
-                                                m.refresh(requireActivity(), m.selectedSubchapter, CoursewareViewModel.TYPE_SUBCHAPTER);
+                                                m.refresh(requireActivity(), m.selectedSubchapterData.getValue(), CoursewareViewModel.TYPE_SUBCHAPTER);
                                             } else {
                                                 if (sub.sections.length != 0) {
-                                                    m.selectedSection = sub.sections[0].id;
+                                                    m.selectedSectionData.setValue(sub.sections[0].id);
                                                     binding.coursewareSectionTitle.setText(sub.sections[0].name);
                                                     if (sub.sections[0].blocks == null) {
-                                                        m.refresh(requireActivity(), m.selectedSection, CoursewareViewModel.TYPE_SECTION);
+                                                        m.refresh(requireActivity(), m.selectedSectionData.getValue(), CoursewareViewModel.TYPE_SECTION);
                                                     }
                                                 }
                                             }
                                         }
                                     }
                                 }
-                                if (c.subchapters.length != 0 && m.selectedSubchapter == null) {
-                                    m.selectedSubchapter = c.subchapters[0].id;
+                                if (c.subchapters.length != 0 && m.selectedSubchapterData.getValue() == null) {
+                                    m.selectedSubchapterData.setValue(c.subchapters[0].id);
                                     if (c.subchapters[0].sections == null) {
-                                        m.refresh(requireActivity(), m.selectedSubchapter, CoursewareViewModel.TYPE_SUBCHAPTER);
+                                        m.refresh(requireActivity(), m.selectedSubchapterData.getValue(), CoursewareViewModel.TYPE_SUBCHAPTER);
                                     }
                                 }
                             }
                         }
                     }
                 }
-                if (m.selectedChapter == null && chapters.length != 0) {
-                    m.selectedChapter = chapters[0].id;
-                    m.refresh(requireActivity(), m.selectedChapter, CoursewareViewModel.TYPE_CHAPTER);
+                if (m.selectedChapterData.getValue() == null && chapters.length != 0) {
+                    m.selectedChapterData.setValue(chapters[0].id);
+                    m.refresh(requireActivity(), m.selectedChapterData.getValue(), CoursewareViewModel.TYPE_CHAPTER);
                 }
             }
             binding.coursewareChapters.getAdapter().notifyDataSetChanged();
@@ -154,6 +163,7 @@ public class CoursewareDialog extends DialogFragment
             binding.coursewareBlocks.getAdapter().notifyDataSetChanged();
         });
     
+        
     
     
         m.isError().observe(this, (error) -> {
@@ -208,14 +218,14 @@ public class CoursewareDialog extends DialogFragment
                         t.setPadding(0,0,0, (int) (8*getResources().getDisplayMetrics().density));
                         t.setText(s.name);
                         t.setOnClickListener(v1 -> {
-                            m.selectedChapter = chapters[position].id;
-                            m.selectedSubchapter = s.id;
-                            m.selectedSection = null;
+                            m.selectedChapterData.setValue(chapters[position].id);
+                            m.selectedSubchapterData.setValue(s.id);
+                            m.selectedSectionData.setValue(null);
                             if (s.sections == null) {
                                 m.refresh(requireActivity(), s.id, CoursewareViewModel.TYPE_SUBCHAPTER);
                             } else {
                                 if (s.sections.length != 0) {
-                                    m.selectedSection = s.sections[0].id;
+                                    m.selectedSectionData.setValue(s.sections[0].id);
                                     binding.coursewareSectionTitle.setText(s.sections[0].name);
                                 }
                             }
@@ -227,19 +237,19 @@ public class CoursewareDialog extends DialogFragment
                     }
                 }
                 b.chapterTitle.setOnClickListener(v1 -> {
-                    m.selectedChapter = chapters[position].id;
-                    m.selectedSubchapter = null;
-                    m.selectedSection = null;
+                    m.selectedChapterData.setValue(chapters[position].id);
+                    m.selectedSubchapterData.setValue(null);
+                    m.selectedSectionData.setValue(null);
                     if (chapters[position].subchapters == null) {
-                        m.refresh(requireActivity(), m.selectedChapter, CoursewareViewModel.TYPE_CHAPTER);
+                        m.refresh(requireActivity(), m.selectedChapterData.getValue(), CoursewareViewModel.TYPE_CHAPTER);
                     } else {
                         if (chapters[position].subchapters.length != 0) {
-                            m.selectedSubchapter = chapters[position].subchapters[0].id;
+                            m.selectedSubchapterData.setValue(chapters[position].subchapters[0].id);
                             if (chapters[position].subchapters[0].sections == null) {
-                                m.refresh(requireActivity(), m.selectedSubchapter, CoursewareViewModel.TYPE_SUBCHAPTER);
+                                m.refresh(requireActivity(), m.selectedSubchapterData.getValue(), CoursewareViewModel.TYPE_SUBCHAPTER);
                             } else {
                                 if (chapters[position].subchapters[0].sections.length != 0) {
-                                    m.selectedSection = chapters[position].subchapters[0].sections[0].id;
+                                    m.selectedSectionData.setValue(chapters[position].subchapters[0].sections[0].id);
                                     binding.coursewareSectionTitle.setText(chapters[position].subchapters[0].sections[0].name);
                                 }
                             }
@@ -285,18 +295,18 @@ public class CoursewareDialog extends DialogFragment
             v.setOnClickListener(null);
             CoursewareChapter[] chapters = m.getChapters().getValue();
             boolean found = false;
-            if (chapters != null && m.selectedChapter != null && m.selectedSubchapter != null) {
+            if (chapters != null && m.selectedChapterData.getValue() != null && m.selectedSubchapterData.getValue() != null) {
                 for (CoursewareChapter c : chapters) {
-                    if (c.id.equals(m.selectedChapter) && c.subchapters != null) {
+                    if (c.id.equals(m.selectedChapterData.getValue()) && c.subchapters != null) {
                         for (CoursewareSubchapter s : c.subchapters) {
-                            if (s.id.equals(m.selectedSubchapter)) {
+                            if (s.id.equals(m.selectedSubchapterData.getValue())) {
                                 found = true;
                                 if (s.sections != null && position < s.sections.length) {
                                     v.setOnClickListener(v1 -> {
-                                        m.selectedSection = s.sections[position].id;
+                                        m.selectedSectionData.setValue(s.sections[position].id);
                                         binding.coursewareSectionTitle.setText(s.sections[position].name);
                                         if (s.sections[position].blocks == null) {
-                                            m.refresh(requireActivity(), m.selectedSection, CoursewareViewModel.TYPE_SECTION);
+                                            m.refresh(requireActivity(), m.selectedSectionData.getValue(), CoursewareViewModel.TYPE_SECTION);
                                         }
                                         binding.coursewareBlocks.getAdapter().notifyDataSetChanged();
                                     });
@@ -313,11 +323,11 @@ public class CoursewareDialog extends DialogFragment
         @Override
         public int getItemCount() {
             CoursewareChapter[] chapters = m.getChapters().getValue();
-            if (chapters != null && m.selectedChapter != null && m.selectedSubchapter != null) {
+            if (chapters != null && m.selectedChapterData.getValue() != null && m.selectedSubchapterData.getValue() != null) {
                 for (CoursewareChapter c : chapters) {
-                    if (c.id.equals(m.selectedChapter) && c.subchapters != null) {
+                    if (c.id.equals(m.selectedChapterData.getValue()) && c.subchapters != null) {
                         for (CoursewareSubchapter s : c.subchapters) {
-                            if (s.id.equals(m.selectedSubchapter)) {
+                            if (s.id.equals(m.selectedSubchapterData.getValue())) {
                                 if (s.sections == null) {
                                     return 0;
                                 }
@@ -349,13 +359,13 @@ public class CoursewareDialog extends DialogFragment
             FrameLayout f = (FrameLayout) holder.itemView;
             f.removeAllViews();
             CoursewareChapter[] chapters = m.getChapters().getValue();
-            if (chapters != null && m.selectedChapter != null && m.selectedSubchapter != null && m.selectedSection != null) {
+            if (chapters != null && m.selectedChapterData.getValue() != null && m.selectedSubchapterData.getValue() != null && m.selectedSectionData.getValue() != null) {
                 for (CoursewareChapter c : chapters) {
-                    if (c.id.equals(m.selectedChapter) && c.subchapters != null) {
+                    if (c.id.equals(m.selectedChapterData.getValue()) && c.subchapters != null) {
                         for (CoursewareSubchapter s : c.subchapters) {
-                            if (s.id.equals(m.selectedSubchapter) && s.sections != null) {
+                            if (s.id.equals(m.selectedSubchapterData.getValue()) && s.sections != null) {
                                 for (CoursewareSection sect : s.sections) {
-                                    if (sect.id.equals(m.selectedSection)) {
+                                    if (sect.id.equals(m.selectedSectionData.getValue())) {
                                         if (sect.blocks != null && position < sect.blocks.length) {
                                             CoursewareBlock b = sect.blocks[position];
                                             if (b instanceof CoursewareHTMLBlock) {
@@ -363,6 +373,7 @@ public class CoursewareDialog extends DialogFragment
                                                 WebView web = createWebView(html);
                                                 web.setWebViewClient(new CoursewareWebViewClient(html, f));
                                                 f.addView(web);
+                                                setStateRestorationPolicy(StateRestorationPolicy.ALLOW);
                                                 return;
                                             }
                                             if (b instanceof CoursewareOpencastBlock) {
@@ -371,6 +382,7 @@ public class CoursewareDialog extends DialogFragment
                                                         f, true);
                                                 //System.out.println(opencast.hostname+"  "+opencast.id);
                                                 opencastBlock(opencast, entry);
+                                                setStateRestorationPolicy(StateRestorationPolicy.ALLOW);
                                                 return;
                                             }
                                             if (b instanceof CoursewarePDFBlock) {
@@ -386,6 +398,7 @@ public class CoursewareDialog extends DialogFragment
                                                 });
                                                 v.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
                                                 f.addView(v);
+                                                setStateRestorationPolicy(StateRestorationPolicy.ALLOW);
                                                 return;
                                             }
                                         }
@@ -420,7 +433,7 @@ public class CoursewareDialog extends DialogFragment
             clearHolderWebView(holder);
             super.onViewRecycled(holder);
         }
-    
+        
         public WebView createWebView(CoursewareHTMLBlock html) {
             // TODO using the application context can cause crashes in some circumstances, but prevents a memory leak
             WebView web = new WebView(requireActivity().getApplicationContext());
@@ -441,6 +454,12 @@ public class CoursewareDialog extends DialogFragment
                 //System.out.println("dark mode not supported for WebView");
             }
             web.loadData(Base64.encodeToString(html.content.getBytes(), Base64.NO_PADDING), "text/html; charset=utf-8","base64");
+            web.scrollTo(html.scrollx, 0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                web.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                    html.scrollx = scrollX;
+                });
+            }
             return web;
         }
         
@@ -483,13 +502,13 @@ public class CoursewareDialog extends DialogFragment
         @Override
         public int getItemCount() {
             CoursewareChapter[] chapters = m.getChapters().getValue();
-            if (chapters != null && m.selectedChapter != null && m.selectedSubchapter != null && m.selectedSection != null) {
+            if (chapters != null && m.selectedChapterData.getValue() != null && m.selectedSubchapterData.getValue() != null && m.selectedSectionData.getValue() != null) {
                 for (CoursewareChapter c : chapters) {
-                    if (c.id.equals(m.selectedChapter) && c.subchapters != null) {
+                    if (c.id.equals(m.selectedChapterData.getValue()) && c.subchapters != null) {
                         for (CoursewareSubchapter s : c.subchapters) {
-                            if (s.id.equals(m.selectedSubchapter) && s.sections != null) {
+                            if (s.id.equals(m.selectedSubchapterData.getValue()) && s.sections != null) {
                                 for (CoursewareSection sect : s.sections) {
-                                    if (sect.id.equals(m.selectedSection)) {
+                                    if (sect.id.equals(m.selectedSectionData.getValue())) {
                                         if (sect.blocks == null) {
                                             return 0;
                                         }
@@ -627,7 +646,7 @@ public class CoursewareDialog extends DialogFragment
                 views[i].destroy();
             }
         }
-        
+        //System.out.println("destroyed");
     }
     
     private static class SpacingDecorator extends RecyclerView.ItemDecoration {

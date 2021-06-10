@@ -22,7 +22,7 @@ public class Features
     
     
     public static void featureGlobalNews(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
-        disabled.add(FEATURE_GLOBAL_NEWS);
+        //disabled.add(FEATURE_GLOBAL_NEWS);
         if (unavailable(f, "/studip/news", true, false, false, false)) {
             disabled.add(FEATURE_GLOBAL_NEWS);
             return;
@@ -33,7 +33,7 @@ public class Features
     }
     
     public static void featureFiles(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
-        disabled.add(FEATURE_FILES);
+        //disabled.add(FEATURE_FILES);
         if (unavailable(f, "/file/:file_ref_id", true, true, false, true)) {
             disabled.add(FEATURE_FILES);
             return;
@@ -80,21 +80,21 @@ public class Features
     }
     
     public static void featureUserFiles(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
-        disabled.add(FEATURE_USER_FILES);
+        //disabled.add(FEATURE_USER_FILES);
         if (unavailable(f, "/user/:user_id/top_folder", true, false, false, false)) {
             disabled.add(FEATURE_USER_FILES);
         }
     }
     
     public static void featureCourseFiles(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
-        disabled.add(FEATURE_COURSE_FILES);
+        //disabled.add(FEATURE_COURSE_FILES);
         if (unavailable(f, "/course/:course_id/top_folder", true, false, false, false)) {
             disabled.add(FEATURE_COURSE_FILES);
         }
     }
     
     public static void featureForum(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
-        disabled.add(FEATURE_FORUM);
+        //disabled.add(FEATURE_FORUM);
         if (unavailable(f, "/course/:course_id/forum_categories", true, false, false, false)) {
             disabled.add(FEATURE_FORUM);
             return;
@@ -113,7 +113,7 @@ public class Features
     }
     
     public static void featureMessages(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
-        disabled.add(FEATURE_MESSAGES);
+        //disabled.add(FEATURE_MESSAGES);
         if (unavailable(f, "/message/:message_id", true,true, false, true)) {
             disabled.add(FEATURE_MESSAGES);
             return;
@@ -171,7 +171,7 @@ public class Features
     }
     
     public static void featurePlanner(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
-        disabled.add(FEATURE_PLANNER);
+        //disabled.add(FEATURE_PLANNER);
         if (unavailable(f, "/course/:course_id/events", true, false, false, false)) {
             disabled.add(FEATURE_PLANNER);
             return;
@@ -190,7 +190,7 @@ public class Features
     }
     
     public static void featureBlubber(Set<String> disabled, HashMap<String, HashMap<String, String>> f) {
-        disabled.add(FEATURE_BLUBBER);
+        //disabled.add(FEATURE_BLUBBER);
         if (unavailable(f, "/course/:course_id/blubber", true, false, true, false)) {
             disabled.add(FEATURE_BLUBBER);
             return;

@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.pm.ShortcutManagerCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -26,7 +27,6 @@ import com.google.android.material.tabs.TabLayout;
 
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
-import org.studip.unofficial_app.api.OAuthUtils;
 import org.studip.unofficial_app.api.rest.StudipCourse;
 import org.studip.unofficial_app.databinding.ActivityHomeBinding;
 import org.studip.unofficial_app.documentsprovider.DocumentsDB;
@@ -48,10 +48,6 @@ import org.studip.unofficial_app.ui.fragments.MessageFragment;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity implements ComponentCallbacks2
 {
@@ -87,18 +83,12 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
         AppCompatDelegate.setDefaultNightMode(SettingsProvider.getSettings(this).theme);
         if (s.logout) {
             s.logout = false;
-            System.out.println("clearing database");
+            //System.out.println("clearing database");
             s.safe(SettingsProvider.getSettingsPreferences(this));
             DB db = DBProvider.getDB(this);
-            db.getTransactionExecutor().execute(() -> {
-                db.clearAllTables();
-                System.out.println("database cleared");
-            });
+            db.getTransactionExecutor().execute(db::clearAllTables);
             DocumentsDB docdb = DocumentsDBProvider.getDB(this);
-            docdb.getTransactionExecutor().execute(() -> {
-                docdb.clearAllTables();
-                System.out.println("document database cleared");
-            });
+            docdb.getTransactionExecutor().execute(docdb::clearAllTables);
             if (s.notification_service_enabled) {
                 NotificationWorker.enqueue(this);
             }
@@ -106,32 +96,6 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
             startActivity(intent);
             finish();
             return;
-        }
-
-        Uri data = getIntent().getData();
-        
-        if (data != null && ! ("http".equals(data.getScheme()) || "https".equals(data.getScheme()))) {
-            finish();
-            return;
-        }
-        
-        API api = APIProvider.getAPI(this);
-        if (api == null)
-        {
-            if (data != null) {
-                Toast.makeText(this, R.string.not_logged_in, Toast.LENGTH_SHORT).show();
-                finish();
-                return;
-            }
-            Intent intent = new Intent(this,ServerSelectActivity.class);
-            startActivity(intent);
-            finish();
-            return;
-        } else {
-            if (data != null && ! api.getHostname().equals(data.getHost())) {
-                finish();
-                return;
-            }
         }
         
         Activity a = this;
@@ -151,6 +115,11 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
                 if (binding.tabs.getSelectedTabPosition() == binding.tabs.getTabCount()-1) {
                     tab.select();
                     Intent i = new Intent(a,SettingsActivity.class);
+                    startActivity(i);
+                }
+                if (binding.tabs.getSelectedTabPosition() == binding.tabs.getTabCount()-2) {
+                    tab.select();
+                    Intent i = new Intent(a,WebViewActivity.class);
                     startActivity(i);
                 }
             }
@@ -173,8 +142,44 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
         });
 
 
+        handleIntent();
+        
+        
+        
+        
+        setContentView(binding.getRoot());
+    }
+    
+    private void handleIntent() {
+        //System.out.println("handle intent");
+        Uri data = getIntent().getData();
+    
+        if (data != null && ! ("http".equals(data.getScheme()) || "https".equals(data.getScheme()))) {
+            finishAndRemoveTask();
+            return;
+        }
+    
+        API api = APIProvider.getAPI(this);
+        if (api == null)
+        {
+            if (data != null) {
+                Toast.makeText(this, R.string.not_logged_in, Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+            Intent intent = new Intent(this,ServerSelectActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        } else {
+            if (data != null && ! api.getHostname().equals(data.getHost())) {
+                finishAndRemoveTask();
+                return;
+            }
+        }
         if (data != null) {
             // TODO handle the studip links
+            boolean handled = false;
             String query = data.getQuery();
             String path = data.getPath();
             if (path == null) {
@@ -186,28 +191,35 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
             }
             if (path.equals("/dispatch.php/start")) {
                 binding.pager.setCurrentItem(0);
+                handled = true;
             }
             if (path.equals("/dispatch.php/my_courses")) {
                 binding.pager.setCurrentItem(1);
+                handled = true;
             }
             if (path.equals("/dispatch.php/files")) {
                 binding.pager.setCurrentItem(2);
+                handled = true;
             }
             if (path.equals("/dispatch.php/messages/overview")) {
                 binding.pager.setCurrentItem(3);
+                handled = true;
             }
             //System.out.println(path);
             Matcher matcher = courseFilesPattern.matcher(path);
             if (matcher.matches()) {
                 HomeActivityViewModel m = new ViewModelProvider(this).get(HomeActivityViewModel.class);
+                FileViewModel f = new ViewModelProvider(this).get(FileViewModel.class);
                 binding.pager.setCurrentItem(2);
                 LiveData<StudipCourse> l = DBProvider.getDB(this).courseDao().observe(matcher.group(2));
                 l.observe(this,(c) -> {
                     l.removeObservers(this);
                     if (c != null) {
                         m.setFilesCourse(c);
+                        f.refresh(this);
                     }
                 });
+                handled = true;
             }
             matcher = courseFilesPatternFolder.matcher(path);
             if (matcher.matches()) {
@@ -221,29 +233,39 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
                     if (c != null) {
                         m.setFilesCourse(c);
                         f.setFolder(this, finalMatcher.group(1),false);
+                        f.refresh(this);
                     }
                 });
+                handled = true;
             }
             matcher = messagePattern.matcher(path);
             if (matcher.matches()) {
                 new ViewModelProvider(this).get(MessagesViewModel.class).mes.refresh(this);
+                // TODO open the message
                 binding.pager.setCurrentItem(3);
+                handled = true;
             }
             
             
-            if (path.equals("/dispatch.php/settings/general") || path.equals("")) {
-                Intent i = new Intent(a,SettingsActivity.class);
+            
+        
+            if (path.equals("/dispatch.php/settings/general")) {
+                Intent i = new Intent(this,SettingsActivity.class);
+                startActivity(i);
+                handled = true;
+            }
+        
+        
+            if (! handled && "https".equals(data.getScheme())) {
+                Intent i = new Intent(this, WebViewActivity.class);
+                i.setAction(Intent.ACTION_VIEW);
+                i.setData(data);
                 startActivity(i);
             }
         }
-        
-        
-        
-        
-        setContentView(binding.getRoot());
     }
     
-    public static void onStatusReturn(FragmentActivity a,int status) {
+    public static void onStatusReturn(FragmentActivity a, int status) {
         HomeActivityViewModel homem = new ViewModelProvider(a).get(HomeActivityViewModel.class);
         if (homem.connectionLostDialogShown.getValue() != null && ! homem.connectionLostDialogShown.getValue()) {
             if (status != -1)

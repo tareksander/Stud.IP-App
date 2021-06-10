@@ -31,7 +31,7 @@ public class StudipCourse implements Serializable
     public transient JsonObject lecturers; // can't be easily represented in Java
     @Embedded
     public Members members;
-    public static class Members  implements Serializable
+    public static class Members implements Serializable
     {
         public String user;
         public int user_count;
@@ -77,7 +77,7 @@ public class StudipCourse implements Serializable
     @Expose(serialize = false, deserialize = false) // this shouldn't get serialized by Gson, modules already is
     @Embedded
     public transient Modules modules_object;
-    public static class Modules  implements Serializable
+    public static class Modules implements Serializable
     {
         public String forum;
         public String documents;

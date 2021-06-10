@@ -10,6 +10,10 @@ import org.studip.unofficial_app.api.rest.StudipCourse;
 public class HomeActivityViewModel extends ViewModel
 {
     private static final String FILES_COURSE_KEY = "files_course";
+    
+    public final LiveData<StudipCourse> filesCourse;
+    public final MutableLiveData<Boolean> connectionLostDialogShown = new MutableLiveData<>(false);
+    
     private final SavedStateHandle h;
     public HomeActivityViewModel(SavedStateHandle h) {
         this.h = h;
@@ -20,7 +24,5 @@ public class HomeActivityViewModel extends ViewModel
         h.set(FILES_COURSE_KEY,c);
     }
     
-    public final LiveData<StudipCourse> filesCourse;
-    public final MutableLiveData<Boolean> connectionLostDialogShown = new MutableLiveData<>(false);
     
 }

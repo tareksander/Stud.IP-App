@@ -53,6 +53,8 @@ public class FileFragment extends SwipeRefreshFragment
     private FragmentFileBinding binding;
     private FileViewModel m;
     
+    private static final String LIST_KEY = "list";
+    
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
@@ -93,9 +95,13 @@ public class FileFragment extends SwipeRefreshFragment
                     //System.out.println(folder.subfolders);
                     //System.out.println(folder.file_refs);
                     ad.clear();
-                    ad.addAll((Object[]) folder.subfolders);
-                    ad.addAll((Object[]) folder.file_refs);
+                    ad.addAll(folder.subfolders);
+                    ad.addAll(folder.file_refs);
                     binding.fileList.setAdapter(ad); // when the fragment is first shown, the data will not be visible without this
+                    if (savedInstanceState != null && savedInstanceState.containsKey(LIST_KEY)) {
+                        binding.fileList.onRestoreInstanceState(savedInstanceState.getParcelable(LIST_KEY));
+                        savedInstanceState.remove(LIST_KEY);
+                    }
                 }
                 else {
                     API api = APIProvider.getAPI(requireActivity());
@@ -143,6 +149,12 @@ public class FileFragment extends SwipeRefreshFragment
         }
         
         return binding.getRoot();
+    }
+    
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(LIST_KEY, binding.fileList.onSaveInstanceState());
     }
     
     public static byte[] readFully(InputStream in) throws IOException {

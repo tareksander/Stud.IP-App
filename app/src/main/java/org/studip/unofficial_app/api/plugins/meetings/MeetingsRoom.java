@@ -1,6 +1,9 @@
 package org.studip.unofficial_app.api.plugins.meetings;
 import com.google.gson.annotations.SerializedName;
-public class MeetingsRoom
+
+import java.io.Serializable;
+
+public class MeetingsRoom  implements Serializable
 {
     public String meeting_id; // the id used in the join link
     public String course_id;
@@ -24,7 +27,7 @@ public class MeetingsRoom
     public Details details;
     public boolean enabled;
     
-    public static class Features {
+    public static class Features  implements Serializable {
         public boolean muteOnStart;
         public boolean room_anyone_can_start;
         public boolean webcamsOnlyForModerator;
@@ -43,7 +46,7 @@ public class MeetingsRoom
         @SerializedName("guestPolicy-ASK_MODERATOR")
         public String guestPolicy_ASK_MODERATOR;
     }
-    public static class Details {
+    public static class Details  implements Serializable {
         public String creator; // full name
         public String date; // full date
     }
