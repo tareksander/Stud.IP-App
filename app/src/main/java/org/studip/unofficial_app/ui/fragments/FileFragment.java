@@ -95,8 +95,8 @@ public class FileFragment extends SwipeRefreshFragment
                     //System.out.println(folder.subfolders);
                     //System.out.println(folder.file_refs);
                     ad.clear();
-                    ad.addAll(folder.subfolders);
-                    ad.addAll(folder.file_refs);
+                    ad.addAll((Object[]) folder.subfolders);
+                    ad.addAll((Object[]) folder.file_refs);
                     binding.fileList.setAdapter(ad); // when the fragment is first shown, the data will not be visible without this
                     if (savedInstanceState != null && savedInstanceState.containsKey(LIST_KEY)) {
                         binding.fileList.onRestoreInstanceState(savedInstanceState.getParcelable(LIST_KEY));

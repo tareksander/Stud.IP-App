@@ -26,6 +26,7 @@ import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.ui.fragments.dialog.DiscoveryErrorDialogFragment;
 import org.studip.unofficial_app.ui.fragments.dialog.LoginErrorDialogFragment;
 import org.studip.unofficial_app.ui.fragments.dialog.OAuthDisabledDialogFragment;
+import org.studip.unofficial_app.ui.fragments.dialog.TextDialogFragment;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -76,17 +77,30 @@ public class LoginActivity extends AppCompatActivity
                                 if (body != null) {
                                     OAuthUtils.OAuthToken temp = OAuthUtils.getTokenFromResponse(body, true);
                                     if (temp == null) {
+                                        Bundle args = new Bundle();
+                                        args.putString(TextDialogFragment.TITLE, getString(R.string.oauth_error_title));
+                                        args.putString(TextDialogFragment.TEXT, getString(R.string.oauth_error_no_token));
+                                        args.putString(TextDialogFragment.BUTTON_TEXT, getString(R.string.ok));
+                                        TextDialogFragment t = new TextDialogFragment();
+                                        t.setArguments(args);
+                                        t.show(getSupportFragmentManager(), "oauth_error_dialog");
                                         return;
                                     }
                                     api.setToken(temp);
                                     api.authToken(a);
-                                    System.out.println(API.HTTPS+api.getHostname()+OAuthUtils.authorize_url+"?oauth_token="+temp.oauth_token);
+                                    //System.out.println(API.HTTPS+api.getHostname()+OAuthUtils.authorize_url+"?oauth_token="+temp.oauth_token);
                                 }
                             }
     
                             @Override
-                            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-                                
+                            public void onFailure(@NonNull Call<String> call, @NonNull Throwable th) {
+                                Bundle args = new Bundle();
+                                args.putString(TextDialogFragment.TITLE, getString(R.string.oauth_error_title));
+                                args.putString(TextDialogFragment.TEXT, getString(R.string.oauth_error_no_token));
+                                args.putString(TextDialogFragment.BUTTON_TEXT, getString(R.string.ok));
+                                TextDialogFragment t = new TextDialogFragment();
+                                t.setArguments(args);
+                                t.show(getSupportFragmentManager(), "oauth_error_dialog");
                             }
                         });
                     }
@@ -101,6 +115,14 @@ public class LoginActivity extends AppCompatActivity
                         //System.out.println(code);
                         if (code == 200) {
                             toHome();
+                        } else {
+                            Bundle args = new Bundle();
+                            args.putString(TextDialogFragment.TITLE, getString(R.string.oauth_error_title));
+                            args.putString(TextDialogFragment.TEXT, getString(R.string.oauth_error_token_invalid));
+                            args.putString(TextDialogFragment.BUTTON_TEXT, getString(R.string.ok));
+                            TextDialogFragment t = new TextDialogFragment();
+                            t.setArguments(args);
+                            t.show(getSupportFragmentManager(), "oauth_error_dialog");
                         }
                     });
                 });

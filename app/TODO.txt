@@ -25,6 +25,7 @@
     Roadmap:
         0.5.0:
             [x] option to browse the web version in an activity with a fullscreen WebView
+                [x] the overview button doesn't work on-device
                 [x] set user agent to mobile
                 [x] redirect page loads for pages not on the server to the browser
                 [x] allow javascript
@@ -54,7 +55,7 @@
                     [x] space the icons wider out, make them into 2 rows for each course
                 [x] courseware
                     [x] fix the bug that causes the buttons for opencast videos to display incorrectly when in landscape mode
-            [ ] support for OAuth1 for authentication
+            [x] support for OAuth1 for authentication
                 https://oauth1.wp-api.org/docs/basics/Auth-Flow.html
                 https://stackoverflow.com/questions/2665796/android-handle-oauth-callback-using-intent-filter
                 [x] make a class with the hostnames and OAuth data for supported servers
@@ -62,18 +63,20 @@
                     to enable OAuth support for the Stud.IP installation.
                 [x] The callback uri doesn't seem to work, the browser doesn't redirect to it. Probably a bug in Stud.IP
                 [x] authorize the token via an intent to the browser
-                [ ] add error dialogs for OAuth login
+                [x] add error dialogs for OAuth login
                 [x] add OAuth authentication to the downloads
                 [x] add an authentication interceptor for oauth authentication, save the token in the API shared preferences
-                [ ] check: do things which require a session cookie work with OAuth? Do you get a session cookie when using OAuth?
-                    [ ] some features might have to be disabled, or only supported via the new JSONAPI, or require the user to log in in the app
-                        [ ] forum post
-                        [ ] search for addressees
+                [x] check: do things which require a session cookie work with OAuth? Do you get a session cookie when using OAuth?
+                    [x] some features might have to be disabled, or only supported via the new JSONAPI, or require the user to log in in the app
+                        [x] forum post
+                        [x] search for addressees
+                        [x] the notifications don't work, because the route used is a dispatch route
+                        [x] getting and setting the Stud.IP notification settings also doesn't work
             [ ] fully save UI state
                 [x] save the scrolling position in ScrollViews
                 [ ] save state for WebViewActivity
                     [ ] also save scrolling position
-                    [ ] is history saved by default for a WebView?
+                    [ ] save the history
                     [ ] is the cookie jar saved?
                 [x] save the selected semester in the courses screen
                 [x] SavedStateModule for all ViewModels for special data not from the database
@@ -90,17 +93,24 @@
                     [x] measure the performance after these changes, check if re-creation from an configuration change is still fast
                         https://medium.com/androiddevelopers/testing-app-startup-performance-36169c27ee55
             [x] bump version
-            [ ] update help text
+            [x] update help text
+                [x] for Cookie auth, the notifications only work as long as the cookie is valid
+                [x] for OAuth, several features don't work, including notifications
+                [x] also include all other new things
             [ ] new & more screenshots, with UI improvements
             [ ] update description
             [ ] write changelog
         1.0.0:
+            [ ] option to upload multiple files at once
+            [ ] support for viewing Images in Forum Posts: Probably with another ImageHandler for Html.fromHtml
             [ ] add shortcuts
                 [ ] they have to be dynamic shortcuts, because the intent data has to be changed for every Stud.IP server
                 [ ] own files
                 [ ] courses
                 [ ] course files
                 [ ] messages
+            [ ] app integration
+                [ ] intent filter for sending a message to someone
             [ ] deep links improvements
                 [ ] support for more link types, for courseware, opencast and meetings links
                 [ ] for messages, load the message if it isn't already, and view it
@@ -131,6 +141,7 @@
             [ ] new & more screenshots, with UI improvements
             [ ] update description
             [ ] write changelog
+            [ ] also publish on play store
         1.1.0:
             [ ] OAuth
                 [ ] add the option for the user to provide a OAuth consumer key and consumer secret, so private installations can enable OAuth
@@ -141,6 +152,7 @@
                 [ ] support for course blubbers
                 [ ] if you invite people to a personal blubber, does it become a group chat?
                 [ ] whatsapp-like list for chats, try to emulate a messenger app with blubber
+                [ ] intent filter to send a blubber to someone
             [ ] bump version
             [ ] update help text
             [ ] update description
@@ -212,10 +224,6 @@ Document provider:
     https://developer.android.com/guide/topics/providers/create-document-provider
     https://medium.com/androiddevelopers/building-a-documentsprovider-f7f2fb38e86a
     Add a setting to load image previews from the provider always/only wifi/never
-    
-    
-TODO:
-    add the studip notification settings to the settings screen, so you can control from the app what notifications you get.
     
     
 TODO: intent filter for sending a message to someone

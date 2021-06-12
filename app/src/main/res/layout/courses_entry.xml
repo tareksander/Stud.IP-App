@@ -113,7 +113,7 @@
                 android:id="@+id/course_meetings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="24dp"
+                android:layout_marginEnd="16dp"
                 android:visibility="visible"
                 app:srcCompat="@drawable/chat_grey" />
 

@@ -4,7 +4,10 @@ Es können Ankündigungen des Systems gelesen werden, Kurse angeschaut werden,
 eigene Dateien und die von Kursen angeschaut, heruntergeladen und hochgeladen werden,
 Nachrichten gelesen und geschrieben werden, Forenbeiträge gelesen und geschrieben werden.
 Opencast-Videos und Courseware können auch angeschaut werden, und es kann an BigBlueButton-Konferenzen teilgenommen werden.
-Mit dem document provider kann man auf die Dateien auf Stud.IP wie auf ganz normale Dateien auf dem Gerät zugreifen.
+Mit dem Document Provider kann man auf die Dateien auf Stud.IP wie auf ganz normale Dateien auf dem Gerät zugreifen.
+Sie können auch die Browser-Version von Stud.IP in der App benutzen, mit unterstützung für Autofill für Benutzername und Passwort.
+
+Wenn Ihr Stud.IP-Server OAuth für diese App unterstützt, müssen sie ihr nicht einmal Ihre Anmeldedaten anvertrauen, Sie können sich einfach bei Stud.IP anmelden und der App den Zugriff gewähren.
 
 Mit dem Benachrichtigungsservice können Stud.IP-Benachrichtigungen auf dem Gerät angezeigt werden.
 
@@ -12,16 +15,12 @@ Für Hilfe: Einstellungen->Hilfe anzeigen
 
 
 Erklärung der Berechtigungen:
-
-Netzwerkstatus abrufen: Wird benötigt, damit keine Bilder über mobile Daten heruntergeladen werden, weil das viel Datenvolumen verbrauchen könnte.
-
-Internet: Verbindung zum Internet wird gebraucht, um mit dem Stud.IP-Server zu kommunizieren.
-
-auf freigegebenen Speicher schreiben: Wird beim Herunterladen von Dateien nocheinal angefragt.
+<ul>
+<li>Netzwerkstatus abrufen: Wird benötigt, damit keine Bilder über mobile Daten heruntergeladen werden, weil das viel Datenvolumen verbrauchen könnte.</li>
+<li>Internet: Verbindung zum Internet wird gebraucht, um mit dem Stud.IP-Server zu kommunizieren.</li>
+<li>auf freigegebenen Speicher schreiben: Wird beim Herunterladen von Dateien nocheinal angefragt.
 Wird gebraucht, damit die Dateien in den Downloads gespeichert werden können.
-Wird ab Android 10 nicht mehr benötigt.
-
-Audio aufnehmen, Audioeinstellungen ändern, Kamera benutzen, Ruhezustand deaktivieren: Wird für die BigBlueButton Videokonferenzen benötigt.
-
-Vordergrunddienst, beim Start ausführen: Wird für den Benachrichtigungsservice benötigt.
-
+Wird ab Android 10 nicht mehr benötigt.</li>
+<li>Audio aufnehmen, Audioeinstellungen ändern, Kamera benutzen, Ruhezustand deaktivieren: Wird für die BigBlueButton Videokonferenzen benötigt.</li>
+<li>Vordergrunddienst, beim Start ausführen: Wird für den Benachrichtigungsservice benötigt.</li>
+</ul>

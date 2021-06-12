@@ -3,11 +3,11 @@ package org.studip.unofficial_app.ui;
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.ValueCallback;
@@ -27,8 +27,6 @@ import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.databinding.ActivityWebViewBinding;
 import org.studip.unofficial_app.model.APIProvider;
 
-import java.util.ArrayList;
-
 public class WebViewActivity extends AppCompatActivity
 {
     
@@ -44,7 +42,8 @@ public class WebViewActivity extends AppCompatActivity
         binding = ActivityWebViewBinding.inflate(getLayoutInflater());
     
     
-        launch = registerForActivityResult(new ActivityResultContracts.OpenDocument(), result -> filePathCallback.onReceiveValue(new Uri[]{result}));
+        launch = registerForActivityResult(new ActivityResultContracts.OpenMultipleDocuments(),
+                result -> filePathCallback.onReceiveValue(result.toArray(new Uri[0])));
         
         
         
@@ -87,8 +86,8 @@ public class WebViewActivity extends AppCompatActivity
     
     @SuppressLint("SetJavaScriptEnabled")
     private void recreateWebView() {
-        binding.browserViewParent.removeAllViews();
         if (browserView != null) {
+            binding.browserRefresh.removeView(browserView);
             browserView.destroy();
         }
         browserView = new WebView(getApplicationContext());
@@ -114,11 +113,9 @@ public class WebViewActivity extends AppCompatActivity
             }
             api.downloadFile(a, s, uri.getLastPathSegment()+uri.getQuery(), true);
         });
+    
         
-        
-        
-        binding.browserViewParent.addView(browserView);
-        
+        binding.browserRefresh.addView(browserView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
     
     @Override
@@ -131,19 +128,21 @@ public class WebViewActivity extends AppCompatActivity
     }
     
     public class WebActivityWebChromeClient extends WebChromeClient {
-        
-        
-    
+        private View customView = null;
         @Override
         public void onShowCustomView(View view, CustomViewCallback callback) {
-            binding.browserViewParent.removeAllViews();
-            binding.browserViewParent.addView(view);
+            binding.browserRefresh.removeView(browserView);
+            binding.browserRefresh.addView(view);
+            customView = view;
         }
     
         @Override
         public void onHideCustomView() {
-            binding.browserViewParent.removeAllViews();
-            binding.browserViewParent.addView(browserView);
+            if (customView != null) {
+                binding.browserRefresh.removeView(customView);
+            }
+            binding.browserRefresh.addView(browserView);
+            customView = null;
         }
     
         @Override
@@ -226,7 +225,7 @@ public class WebViewActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        binding.browserViewParent.removeAllViews();
+        binding.browserRefresh.removeView(browserView);
         if (browserView != null) {
             browserView.destroy();
         }

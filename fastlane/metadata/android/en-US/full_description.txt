@@ -4,22 +4,23 @@ You can read system-wide news, view your courses, course news, course forums, po
 read and write messages, view, download and upload your files and course files.
 You can also view Opencast videos, browse Courseware and join BigBlueButton meetings.
 With the document provider you can access your Stud.IP files like all other files on your device.
+You can use the mobile browser version of Stud.IP in the app, with support for autofilling your username and password.
 
-You can enable the notification service to get your Stu.IP notification as notification on the device.
+If your Stud.IP server supports OAuth for this app, you don't even have to trust it with your login data, you can simply log in to Stud.IP and give the app access.
+
+You can enable the notification service to get your Stud.IP notifications as notifications on the device.
+
 
 For Help: Settings->view help
 
 
 Permission description:
-
-View network connections: Used to not download pictures when mobile data is used, to preserve mobile data volume.
-
-Full network access: An internet connection is required to communicate with the Stud.IP-Server.
-
-Modify contents of shared storage: Is requested at runtime when you download files.
+<ul>
+<li>View network connections: Used to not download pictures when mobile data is used, to preserve mobile data volume.</li>
+<li>Full network access: An internet connection is required to communicate with the Stud.IP-Server.</li>
+<li>Modify contents of shared storage: Is requested at runtime when you download files.
 Is needed to save the files to the downloads directory.
-Not used anymore for Android 10 or later.
-
-Record audio, change audio settings, use camera, prevent phone from sleeping: Used for the BigBlueButton video conferences.
-
-foreground services, start at boot: used for the Notification service.
+Not used anymore for Android 10 or later.</li>
+<li>Record audio, change audio settings, use camera, prevent phone from sleeping: Used for the BigBlueButton video conferences.</li>
+<li>foreground services, start at boot: used for the Notification service.</li>
+</ul>

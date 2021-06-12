@@ -4,6 +4,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,6 +29,7 @@ public class HelpActivity extends AppCompatActivity
         setContentView(R.layout.activity_help);
         TextView v = findViewById(R.id.help_view);
         v.setText(fromHTML(getString(R.string.help_content)));
+        v.setMovementMethod(new LinkMovementMethod());
     }
     
 }

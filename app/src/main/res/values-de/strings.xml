@@ -82,21 +82,46 @@
     <string name="message_no_send">Nachricht konnte nicht gesendet werden</string>
     <string name="message_send_successfully">Nachricht gesendet</string>
     <string name="help_button">Hilfe anzeigen</string>
-    <string name="help_content"><![CDATA["<big><h1>Hilfe</h1></big>
+    <string name="help_content"><![CDATA["
+<big><h1>Hilfe</h1></big>
 <h2>1. Anmeldung</h2>
 Zuerst sollten Sie in den Einstellungen die Authentifizierungsmethode festlegen.<br>
 Wenn Sie sich nur einmal einloggen wollen, sollten sie HTTP Basic Authentication benutzen.<br>
 Wenn Sie nicht wollen, dass Benutzername und Passwort auf dem Gerät gespeichert ist (keine Sorge, es ist verschlüsselt), dann sollten Sie Session Cookie wählen.<br>
-OAuth ist noch nicht implementiert.<br>
-Weiter Informationen zu den einzelnen Authentifizierungsmethoden bekommen Sie, wenn Sie in den Einstellungen lange auf die entsprechende Einstellung drücken.<br><br>
+Wenn Sie den Session Cookie benutzen, funktionieren Benachrichtigungen nur solange der Cookie gültig ist.<br>
+Wenn die Sitzung abekaufen ist, müssen Sie sich erneut anmelden, um Benachrichtigungen zu erhalten.<br>
+Wenn Sie Ihren Benutzernamen und das Passwort nicht in dieser App eingeben wollen, können sie OAuth benutzen.<br>
+OAuth funktioniert nur für Stud.IP-Server, bei denen die App für OAuth registriert ist.<br>
+Wenn die App bei Ihrem System nicht registriert ist, bekommen sie die Möglichkeit Ihre Mail-App mit einem vorgefertigtem Text zu öffnen, um diesen Ihrem Administrator zu schicken, damit dieser OAuth für die App aktivieren kann.<br>
+Wenn danach alles gutgeht, bringt das nächste App-Update OAuth-Unterstützung für Ihren Stud.IP-Server.<br>
+Der Nachteil an OAuth ist, dass einige Funktionen der App eine Sitzung für den Stud.IP-Server erfordern, und mit OAuth bekommt die App eine solche Sitzung nicht.<br>
+Die nicht verfügbaren Funktionen sind:<br>
+<ul>
+<li>Beim Schreiben einer Nachricht nach Addressaten suchen.<br>
+Sie können nur Leuten schreiben, die Ihnen schon geschrieben haben oder die Sie in Kursteilnehmerbildschirm in der App gesehen haben.<br></li>
+<li>Im Forum posten. Die API hat einen Fehler, der das Posten im Forum verhindert. Deshalb postet die App, wie es der Browser normalerweise tut. Dies erfordert aber eine Sitzung.<br></li>
+<li>Benachrichtigungen bekommen. Ähnlich wie beim Forum, es gibt über die API keine Möglichkeit, die Benachrichtigungen abzurufen.<br></li>
+<li>Stud.IP-Benachrichtigungseinstellungen in der App ändern. Wie bei den Benachrichtigungen, eine API dafür existiert nicht.<br></li>
+<li>Die Courseware, Opencast und Meetings-Plugins.<br></li>
+</ul><br>
+Weitere Informationen zu den einzelnen Authentifizierungsmethoden bekommen Sie, wenn Sie in den Einstellungen lange auf die entsprechende Einstellung drücken.<br><br><br>
 Zum Anmelden müssen Sie dann Ihren Stud.IP-Server auswählen.<br>
 Sie können schauen, ob Ihr Server in der Liste ist (scrollen ist möglich), oder sie geben im Eingabefeld selbst den Hostnamen (ohne https://) ein.<br>
-Dann müssen Sie Ihren Benutzernamen und Ihr Passwort eingeben.<br>
+Dann müssen Sie Ihren Benutzernamen und Ihr Passwort eingeben (wenn Sie nicht OAuth benutzen).<br>
 <br><br>
+
+
 <h2>2. Generelles und Einstellungen</h2>
 Alle Dialoge und Bildschirme können mit einem nach unten Ziehen dazu gebracht werden, aktuelle Daten vom Server zu beziehen.<br>
 Bis auf die Dateien sind alle Daten auf dem Gerät zwischengespeichert und können auch ohne Netzwerkverbindung angeschaut werden.<br>
 Die Dateien müssen jeweils explizit heruntergeladen werden, um Datenvolumen zu sparen.<br>
+Es gibt 2 Wege, normale Bildschirme zu erreichen:<br>
+<ul>
+<li>Nach links und rechts wischen, um in den Nachbarbildschirm zu kommen.<br></li>
+<li>Das Tab-Icon oben benutzen um zu einem Bestimmten Bildschirm zu springen.<br></li>
+</ul><br>
+Auf kleineren Geräten müssen Sie vielleicht die Tabs oben nach links oder rechts scrollen, weil nicht alle Icons auf einmal auf den Bildschirm passen.<br>
+2 Bildschirme können nur über das Tab-Icon erreicht werden: Der Einstellungsbildschirm und die mobile Ansicht von Stud.IP.<br>
 Der Benachrichtigungs-Service aktualisiert auch periodisch die Daten und gibt dann Benachrichtigungen falls gewünscht.<br>
 Periode and Anderes kann in den Einstellungen angepasst werden.<br>
 Es werden aber nur Benachrichtigugen angezeigt, die Sie in Stud.IP aktiviert haben.<br>
@@ -106,22 +131,37 @@ Nachdem Sie sich angemeldet und Ihre Kurse abgerufen haben, können sie in den E
 Sie können außerdem festlegen, ob Vorschaubilder angezeigt werden sollen, wenn mobile Daten benutzt werden.<br><br>
 
 
-<h2>3. Startbildschirm</h2>
+<h2>3. Deaktivierte Funktionen</h2>
+Ihr Stud.IP-Administrator hat vielleicht nicht die ganze API angeschaltet.<br>
+Die App benutzt nicht die ganze API, also ist das vielleicht gar kein Problem.<br>
+Wenn die App beim Anmelden aber bemerkt, dass Teile der API deaktiviert sind, die die App benutzt, bekommen Sie einen Dialog mit allen deaktivierten Funktionen.<br>
+Wenn Kernteile der API deaktiviert sind, klappt nicht einmal das Einloggen mit der App.<br>
+Sie können Ihren Administrator bitten, die API anzuschalten.<br>
+Alle API-Routen, die die App benutzt, sind in der <a href="https://github.com/tareksander/Stud.IP-App">Github Readme</a> aufgelistet.<br>
+In den Einstellungen können Sie erneut nach deaktivierten Funktionen scannen.<br>
+Benutzen Sie des, wenn Ihr Administrator Teile der API angeschaltet hat, aber Sie sich nicht wieder einloggen wollen.<br>
+Sie können der App auch befehlen, die deaktivierten Funktionen zu ignorieren.<br>
+Alle Funktionen benutzen meherere API-Routen, also funktioniert ein Feature vielleicht Teilweise, wenn nur ein Teil der Routen deaktiviert ist, aber verlassen Sie sich nicht darauf.<br>
+Wenn Sie eine Funktion verwenden wollen, für die die API deaktiviert ist, können Sie auch die mobile Ansicht von Stud.IP benutzen.<br>
+<br><br>
+
+
+<h2>4. Startbildschirm</h2>
 Auf diesem Bildschirm wird Ihr Name, wie er in dem Stud.IP-System steht, angezeigt, und dazu die globalen Ankündigungen des Systems.<br><br>
 
-<h2>4. Kursbildschirm</h2>
+<h2>5. Kursbildschirm</h2>
 Auf diesem Bildschirm können Sie Ihre Kurse für ein ausgewähltes Semester anschauen.<br>
 Die Symbole zu den Kursen funktionieren wie auf der Weboberfläche, aber für manche sind die Funktionen noch nicht implementiert.<br>
 Mit dem Flaggen-Symbol können Sie die Ankündigungen eines Kurses lesen.<br>
 Mit dem Datei-Symbol können Sie sich die Dateien eines Kurses anschauen, herunterladen und hochladen.<br><br>
 
-<h2>5. Dateibildschirm</h2>
+<h2>6. Dateibildschirm</h2>
 Auf diesem Bildschirm können Sie Sich ihre Dateien auf dem System und die Dateien von Kursen ansehen.<br>
 Durch tippen auf den \"…\"-Eintrag kommen Sie in das Elternverzeichnis zurück, falls vorhanden, durch halten kommen sie zu Ihren eigenen Dateien zurück.<br>
 Beim antippen eines Verzeichnisses werden die Inhalte angezeigt, bei einer Datei wird sie heruntergeladen.<br>
 Durch Halten auf eine Datei oder ein Verzeichnis wird es gelöscht.<br><br>
 
-<h2>6. Nachrichtenbildschirm</h2>
+<h2>7. Nachrichtenbildschirm</h2>
 Auf diesem Bildschirm können Sie Ihre Stud.IP-Nachrichten lesen und neue Verfassen.<br>
 Durch lange auf eine Nachricht halten wird diese gelöscht.<br>
 Beim Addressat auswählen schlägt die App Ihnen schon bekannte Benutzer vor.<br>
@@ -129,26 +169,40 @@ Wenn Sie den "Suchen"-Button benutzen, sucht die App im System nach Benutzern mi
 Ein Addressat wird hinzugefügt, indem Sie ihn in der Liste antippen.<br>
 Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br>
 
-<h2>7. Courseware-Plugin</h2>
+<h2>8. Courseware-Plugin</h2>
 Wenn Sie auf das Courseware-Icon im Kurs-Bildschirm tippen, können Sie sich die Courseware anschauen, falls vorhanden.<br>
 Tippen Sie auf ein Kapitel, um die Unterkapitel zu laden und auf ein Unterkaptiel, um die Abschnitte zu laden.<br>
-Unterstützte Courseware-Blöcke:<br>
-HTML<br>
-Opencast<br>
-PDF<br>
+Unterstützte Courseware-Blöcke:<li>
+<ul>
+<li>HTML<br></li>
+<li>Opencast<br></li>
+<li>PDF<br></li>
+</ul>
 <br><br>
 
-<h2>8. Meetings-Plugin</h2>
-Wenn sie das Meetings-Icon antippen, sehen sie alle verfügbaren Meeting-Räume eines Kurses.<br>
-Wenn sei auf einen der Buttins klicken, wird das Meeting in einem neuen Fenster geöffnet.<br>
-Funktioniert im Moment nur mit HTTP Basic Authentication.<br>
-Wenn sie wegnavigieren, wird das Meeting automatisch in den Picture-in-Picure Modus geschaltet, damit die Konferenz nicht unterbrochen wird.<br>
+<h2>9. Meetings-Plugin</h2>
+Wenn Sie das Meetings-Icon antippen, sehen sie alle verfügbaren Meeting-Räume eines Kurses.<br>
+Wenn Sie auf einen der Buttons klicken, wird das Meeting in einem neuen Fenster geöffnet.<br>
+Wenn Sie wegnavigieren, wird das Meeting automatisch in den Picture-in-Picure Modus geschaltet, damit die Konferenz nicht unterbrochen wird.<br>
 Dabei wird auch automatisch die Präsentation in den Vollbildmodus geschaltet.<br>
-Währen die Konferend läuft, gibt es eine Benachrichtigung, die Sie nicht verwerfen können.<br>
-Din dieser Benachrichtigung gibt es Aktionen, um aus der Konferenz auszutreten und um das Mikrofon an/auszuschalten.<br>
+Währen die Konferenz läuft, gibt es eine Benachrichtigung, die Sie nicht verwerfen können.<br>
+In dieser Benachrichtigung gibt es Aktionen, um aus der Konferenz auszutreten und um das Mikrofon an/auszuschalten.<br>
 Auf die Benachrichtigung tippen bringt die Konferenz wieder in den Vollbildmodus.<br>
 Das PiP-Fenster hat auch einen Button, um das Mikrofon umzuschalten.<br>
 <br><br>
+
+<h2>10. Mobile Ansicht von Stud.IP</h2>
+Sie können die Browser-Version von Stud.IP in der App öffnen, indem SIe auf das Globus-Icon tippen.<br>
+Wenn Sie HTTP Basic Authentication benutzen, werden Ihre Logindaten automatisch ausgefüllt.<br>
+Wenn Sie einen Session Cookie zum Anmelden benutzen, wird dieser mit der Browser-Version geteilt und Sie müssen sich nicht anmelden, solange der Cookie gültig ist.<br>
+Wenn Sie OAuth verwenden, müssen Sie sich normal anmelden.<br>
+Wenn Sie einen Link anklicken, der Sie von Stud.IP-Server wegführt, wird dieser in Ihrer Browser-App geöffnet.<br>
+Wenn Sie in der Browser-Version Dateien herunterladen wird der Dateiname die URL sein, weil die App den Dateinamen so nicht herausfinden kann.<br>
+Wie in anderen Bildschirmen können Sie nach unten wischen, um die Seite neu zu laden<br>
+Wenn Sie versuchen sich auszuloggen, werden Sie stattdessen zum vorherigen Bildschirm geleitet.<br>
+Der zurück-Button navigiert im Browserverlauf zurück, oder zum vorherigen Bildschirm, wenn keine Seite mehr im Verlauf ist.<br>
+<br><br>
+
 "]]></string>
     <string name="view">Anschauen: %1$s</string>
     <string name="download">Herunterladen: %1$s</string>
@@ -211,7 +265,7 @@ Wenn Sie die Funktionen verwenden wollen,  kontaktieren Sie Ihren Administrator 
 Diese App ist nicht als OAuth-Applikation bei Ihrem Stud.IP-System registriert.<br>
 Bitten Sie Ihren Administrator, diese App hinzuzufügen.<br>
 Tippen sie auf den Button unten, um Ihre Mail-App mit einem Vorlagetext zu öffnen, den Sie Ihrem Administrator schicken können.<br>
-Wenn dannach alles gut geht, sollte mit dem nächten Update OAuth-Support für dieses Stud.IP-System kommen.
+Wenn danach alles gut geht, sollte mit dem nächten Update OAuth-Support für dieses Stud.IP-System kommen.
 "]]></string>
     <string name="oauth_template_button">Mail-App mit Vorlagetext öffnen</string>
     <string name="oauth_mail_template_subject">OAuth für App aktivieren</string>
@@ -239,6 +293,9 @@ Wenn Sie den Zugriff erlaubt haben, kehren Sie hierher zurück und drücken Sie 
 "]]></string>
     <string name="login">Einloggen</string>
     <string name="cont">Weiter</string>
+    <string name="oauth_error_title">OAuth Error</string>
+    <string name="oauth_error_no_token">Konnte kein Token von Server bekommen. Überprüfen Sie bitte Ihre Netzwerkverbindung. Wenn das Problem bestehen bleibt, fragen Sie Ihren Stud.IP-Administrator, ob die App wirklich für OAuth registriert ist.</string>
+    <string name="oauth_error_token_invalid">Das Token ist nicht autorisiert oder Sie haben keine Internetverbindung. Bitte prüfen Sie Ihre Internetverbindung. Haben Sie sich mit dem linken Button bei Stud.IP eingeloggt und den Zugriff für die App zugelassen?</string>
 
 
 </resources>

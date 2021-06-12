@@ -68,7 +68,7 @@
     <string name="auth_cookie">session cookie</string>
     <string name="auth_cookie_desc">This is the method browsers use. Username and password are used to fetch a session cookie, after that the password is deleted.\nOnly the cookie is saved on the device, with the same security as the password with HTTP Basic Authentication. If the cookie is leaked, someone can impersonate you for as long as the cookie lasts, but they cannot change your password.\nThe downside is that the cookie eventually expires and you have to log in again.</string>
     <string name="auth_oauth">OAuth</string>
-    <string name="auth_oauth_desc">Not implemented yet. The safest method: It works like a session cookie, but instead of entering the username and password in the app, you are redirected to the Stud.IP-Server and have to log in there.\nThe app only gets the authentication token afterwards, which works like a session cookie.</string>
+    <string name="auth_oauth_desc">The safest method: It works like a session cookie, but instead of entering the username and password in the app, you are redirected to the Stud.IP-Server and have to log in there.\nThe app only gets the authentication token afterwards, which works like a session cookie.</string>
     <string name="settings_developer">Developer settings:\nThese settings could make the app unstable or lower the security. Use at your own risk.</string>
     <string name="semester_select">select semester</string>
     <string name="my_documents">Your files</string>
@@ -77,21 +77,49 @@
     <string name="message_no_send">could not send message</string>
     <string name="message_send_successfully">message send</string>
     <string name="help_button">view help</string>
-    <string name="help_content"><![CDATA["<big><h1>Help</h1></big>
+    <string name="help_content"><![CDATA["
+<big><h1>Help</h1></big>
 <h2>1. Login</h2>
 First you should choose you authentication method from the settings.<br>
 If you only want to log in once, you should use HTTP Basic authentication.<br>
 If you don't want you username and password stored on the device (don't worry they're encrypted), you should choose the session cookie.<br>
-OAuth isn't implemented yet.<br>
-If you want more information about the authentication methods, long press on them in the settings screen.<br><br>
+If you use the session cookie, notifications will only work as long as the cookie is valid.<br>
+When the session is over, you have to log in again to get notifications.<br>
+If you don't want to give your username and password to this app, you can use OAuth.<br>
+For OAuth you will be redirected to you Stud.IP in your browser app and have to log in there, to authorize access for the app.<br>
+OAuth only works for Stud.IP systems that have this app registered.<br>
+If your Stud.IP system isn't registered, you are offered the option to open you mailing app with a template text to send to you administrator, 
+so they can enable OAuth for this app for your Stud.IP.<br>
+If all goes well after that, the next app update will bring OAuth support for the Stud.IP system.<br>
+The downside to OAuth is that some features in the app require a valid Stud.IP session, which the app doesn't get with OAuth.<br>
+The unavailable features are:<br>
+<ul>
+<li>Searching for addressees when writing a message.<br>
+You can only write messages to people who wrote messages to you or people whe you have seen in the course members screen in the app.<br></li>
+<li>Posting in the forum. The API has a bug that prevents posting in the forum with the API, so the app 
+uses the way a browser would post, but that requires a session.<br></li>
+<li>Getting notifications. Similarly to the forum posting, there is no API to get notification.<br></li>
+<li>Changing the Stud.IP notification settings in the app. Again, like the forum posting, there is no API.<br></li>
+<li>The courseware, opencast and meetings plugins.<br></li>
+</ul><br>
+If you want more information about the authentication methods, long press on them in the settings screen.<br><br><br>
 To log in you have to select you Stud.IP server.<br>
 You can look for it in the list (scrolling is possible), or type it in yourself (without https://).<br>
-Then you have to enter your username and password.<br>
+Then you have to enter your username and password (if you don't use OAuth).<br>
 <br><br>
+
+
 <h2>2. General & Settings</h2>
 All dialogs and screens use swipe-to-refresh to get new data from the server.<br>
 Apart from the files all data is cached on the device and can be viewed without an internet connection.<br>
 The files have to be downloaded manually on demand.<br>
+You have 2 ways of reaching normal screens:<br>
+<ul>
+<li>swiping left and right to go to the adjacent screen.<br></li>
+<li>use the tab icon at the top to jump to the specific screen.<br></li>
+</ul><br>
+On smaller devices, you may have to scroll the tabs to the left or right, because the tab icons may not all fit on the screen.<br>
+2 screen can only be reached via the tab icon: The settings screen and the mobile view screen.<br>
 The notification service can send you notifications if the data changes.<br>
 You can set the update frequency and notification priority in the settings.<br>
 The notification service only shows notifications you enabled in the Stud.IP notification settings.<br>
@@ -100,10 +128,25 @@ With the document provider you can use your Stud.IP files like all other files o
 After you logged in, you can use the settings screen to select the courses you wish to expose via the document provider.<br>
 You can also set whether to show image previews when using mobile data.<br><br>
 
-<h2>3. Home</h2>
+<h2>3. Deactivated features</h2>
+Your Stud.IP administrators may not have enabled the whole API.<br>
+The App doesn't use the whole API, so that may not be a problem.<br>
+But if the app detects at login that parts of the API are deactivated that the app actually uses, you will see a dialog reporting all missing features.<br>
+If some core API is disabled, logging in will not work at all.<br>
+You can ask your administrators to enable the API.<br>
+All API routes the app uses are listed in the <a href="https://github.com/tareksander/Stud.IP-App">Github Readme</a>.<br>
+In the settings screen, you also have the option to re-scan for missing features.<br>
+Use this if your administrators have enabled parts of the API and you don't want to log in again.<br>
+You can also tell the App to ignore missing features.<br>
+All features use multiple API routes, so if only some of them are disabled, a feature might work partially, but don't rely on it working.<br>
+If you want to use a feature for which the API is disabled, you can also use the mobile view screen.<br>
+<br><br>
+
+
+<h2>4. Home</h2>
 On this screen you can see your Stud.IP name and the global Stud.IP news.<br><br>
 
-<h2>4. Courses</h2>
+<h2>5. Courses</h2>
 On this screen you can view your courses for a specific semester.<br>
 The icons for the courses work like on the website, but some features aren't implemented yet.<br>
 You can use the flag icon to view course news.<br>
@@ -111,13 +154,13 @@ With the file icon you can view the files of a specific course.<br><br>
 
 
 
-<h2>5. Files</h2>
+<h2>6. Files</h2>
 On this screen you can view your files and course files.<br>
 Tap \"…\" to return to the parent directory, hold to return to you own files.<br>
 Tap on a folder to view its contents, tap on a file to download it.<br>
 Long press on a file or folder to delete it.<br><br>
 
-<h2>6. Messages</h2>
+<h2>7. Messages</h2>
 On this screen you can view and write Stud.IP messages.<br>
 Long press on a message to delete it.<br>
 To choose the addressee the app searches for known users with a name like the one you wrote.<br>
@@ -126,25 +169,39 @@ Add the addressee by tapping it in the list.<br>
 Long press on an addressee to remove it.<br>
 <br><br>
 
-<h2>7. Courseware plugin</h2>
+<h2>8. Courseware plugin</h2>
 By clicking the courseware icon for a course in the courses screen you can view the Courseware, if there is any.<br>
 Tap in a chapter on the left to load the subchapters, tap on a subchapter to load the sections.<br>
 Supported blocks are:<br>
-HTML<br>
-Opencast<br>
-PDF<br>
+<ul>
+<li>HTML<br></li>
+<li>Opencast<br></li>
+<li>PDF<br></li>
+</ul>
 <br><br>
 
-<h2>8. Meetings plugin</h2>
+<h2>9. Meetings plugin</h2>
 Tapping the meetings icon for a course loads all meeting rooms available.<br>
 When you click a button, a new window will open with the BigBlueButton conference.<br>
-Currently only works with HTTP basic auth.<br>
 When navigating away, the window automatically goes into picture-in-picture mode and the presentation is set to fullscreen, so the conference can continue without interruption.<br>
 As long as the conference is active, there is a non-dismissable notification present.<br>
 The notification has actions to exit the conference and to toggle the microphone.<br>
 Tapping the notification returns to the conference in full-screen.<br>
 The PiP-window also has a button to toggle the microphone.<br>
 <br><br>
+
+<h2>10. Mobile view screen</h2>
+You can open the mobile browser version of Stud.IP by clicking the globe tab icon.<br>
+If you use HTTP Basic authentication, the login form will be filled out for you.<br>
+If you use cookie authentication, the cookie will be shared with the mobile screen and you don't have to log in as long as you session cookie is valid.<br>
+With OAuth the app doesn't get a session cookie, so you have to log in manually.<br>
+If you click a link that would navigate away from Stud.IP, the link will be opened in you browser app.<br>
+If you download files in the mobile view, the filename will be the download URL, because the app can't determine the filename.<br>
+Like with all screens, you can swipe down to refresh the page.<br>
+If you logout, the app instead returns you to the previous screen.<br>
+The back button navigates back in the web page history, or returns to the previous screen if there is no history left.<br>
+<br><br>
+
 "]]></string>
     <string name="view">View: %1$s</string>
     <string name="download">Download: %1$s</string>
@@ -230,6 +287,9 @@ After you accept, return here and click continue.
     <string name="login">Login</string>
     <string name="cont">Continue</string>
     <string name="message_time_template" translatable="false">%1$d.%2$d.%3$d  %4$d:%5$d</string>
+    <string name="oauth_error_title">OAuth error</string>
+    <string name="oauth_error_no_token">Could not get a token from the server. Check your network connectivity and try again. If the issue persists, ask you Stud.IP administrator if the App is really registered for OAuth.</string>
+    <string name="oauth_error_token_invalid">The token is not authorised or you don\'t have an internet connection. Check yout internet connection. Have you logged into Stud.IP with the left button and authorised access for the app?</string>
 
 
 </resources>

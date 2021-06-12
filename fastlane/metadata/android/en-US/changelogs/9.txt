@@ -1,0 +1,11 @@
+Added support for using the browser version of Stud.IP in the app.
+Links in the forum are now clickable.
+Added API detection, so features that use an unavailable part of the API will be disabled, instead of the app not working at all.
+Added Support for OAuth authentication.
+UI improvements:
+- Fixed button text color for dark mode
+- changed dark mode colors
+- Text now doesn't go up to the edge of the screen, so it's easier to read.
+- Same thing with dialog edges.
+- The icons in the courses screen are now in 2 rows and spaced out, so you don't accidentally click the wrong one.
+- all screens now always remember the scrolling position, so you return exactly where you left when clicking the app in the Recents screen.
