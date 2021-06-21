@@ -123,13 +123,14 @@
             [x] update description
             [x] write changelog
             [ ] publish on play store
-                [ ] write privacy policy
+                [x] write privacy policy
                 [ ] put the badge on the github readme: https://play.google.com/intl/en_gb/badges/
         1.0.0:
             [ ] add a table of contents to the help screen, with hyperlinks. probably requires using a WebView do use the hyperlinks
             [ ] app integration
                 [ ] https://developer.android.com/training/sharing/receive
                     https://developer.android.com/codelabs/android-direct-share
+                    Apparently, there is a bug in the android 10 emulator which prevents sharing shortcuts from working
                     [ ] add the last people the user send messages to as persons
             [ ] a way to open multiple tasks for the app, e.g. to view multiple coursewares
             [ ] option to upload multiple files at once

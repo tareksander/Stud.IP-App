@@ -53,8 +53,8 @@
             android:targetPackage="org.studip.unofficial_app"
             android:targetClass="org.studip.unofficial_app.ui.HomeActivity"/>
     </shortcut>
-    <share-target android:targetClass="org.studip.unofficial_app.ui.DeepLinkActivity">
-        <datat android:mimeType="text/plain" />
+    <share-target android:targetClass="org.studip.unofficial_app.ui.HomeActivity">
+        <data android:mimeType="text/plain" />
         <category android:name="org.studip.unofficial_app.TEXT_SHARE_TARGET" />
     </share-target>
 </shortcuts>

@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.Person;
 import androidx.core.content.pm.ShortcutInfoCompat;
 import androidx.core.content.pm.ShortcutManagerCompat;
 import androidx.core.graphics.drawable.IconCompat;
@@ -199,23 +200,8 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
         if (savedInstanceState == null) {
             handleIntent(getIntent());
         }
+        //ShortcutManagerCompat.pushDynamicShortcut(this, new ShortcutInfoCompat.Builder(this, "test").setShortLabel("test").setIntent(new Intent(Intent.ACTION_VIEW)).setIcon(IconCompat.createWithResource(this, R.drawable.admin_blue)).build());
         
-        
-        // TODO get sharing shortcuts working
-        /*
-        ShortcutInfoCompat.Builder info = new ShortcutInfoCompat.Builder(a, "person:");
-        info.setShortLabel("Test");
-        HashSet<String> cat = new HashSet<>();
-        cat.add("org.studip.unofficial_app.TEXT_SHARE_TARGET");
-        info.setCategories(cat);
-        info.setIcon(IconCompat.createWithResource(a, R.drawable.mail_blue));
-        Intent i = new Intent(a, DeepLinkActivity.class);
-        i.setAction(a.getPackageName()+".dynamic_shortcut");
-        i.setData(Uri.parse(a.getPackageName()+".share://"));
-        info.setIntent(i);
-        //info.setActivity(getComponentName());
-        ShortcutManagerCompat.pushDynamicShortcut(a, info.build());
-        */
         setContentView(binding.getRoot());
     }
     

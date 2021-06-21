@@ -33,6 +33,8 @@ import org.studip.unofficial_app.ui.DeepLinkActivity;
 import org.studip.unofficial_app.ui.HomeActivity;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.schedulers.Schedulers;
@@ -281,20 +283,34 @@ public class MessageWriteDialogFragment extends DialogFragment
                         HomeActivity.onStatusReturn(requireActivity(),response.code());
                         //System.out.println(response.code());
                     } else {
-                        /*
                         ShortcutInfoCompat.Builder info = new ShortcutInfoCompat.Builder(requireActivity(), "person:"+recipients[0]);
-                        info.setShortLabel(ad.getItem(0).name.formatted);
+                        final StudipUser u = ad.getItem(0);
+                        info.setShortLabel(u.name.formatted);
                         HashSet<String> cat = new HashSet<>();
-                        cat.add("org.studip.unofficial_app.directshare.category.TEXT_SHARE_TARGET");
+                        cat.add("org.studip.unofficial_app.TEXT_SHARE_TARGET");
                         info.setCategories(cat);
                         info.setIcon(IconCompat.createWithResource(requireActivity(), R.drawable.mail_blue));
                         Intent i = new Intent(requireActivity(), DeepLinkActivity.class);
                         i.setAction(requireActivity().getPackageName()+".dynamic_shortcut");
                         i.setData(Uri.parse(requireActivity().getPackageName()+".share://"+recipients[0]));
                         info.setIntent(i);
-                        info.setActivity(new ComponentName(requireActivity().getPackageName(), requireActivity().getPackageName()+".ui.HomeActivity"));
-                        ShortcutManagerCompat.pushDynamicShortcut(requireActivity(), info.build());
-                        */
+                        info.setActivity(new ComponentName(requireActivity().getPackageName(),
+                                requireActivity().getPackageName()+".ui.HomeActivity"));
+                        try {
+                            ShortcutManagerCompat.pushDynamicShortcut(requireActivity(), info.build());
+                        } catch (IllegalArgumentException e) {
+                            // seems to happen instead of replacing a shortcut in api <30
+                            // try to remove a shortcut to make room and try pushing the shortcut again
+                            try {
+                                List<ShortcutInfoCompat> l = ShortcutManagerCompat.getDynamicShortcuts(requireActivity());
+                                if (l.size() > 0) {
+                                    List<String> l2 = new LinkedList<>();
+                                    l2.add(l.get(0).getId());
+                                    ShortcutManagerCompat.removeDynamicShortcuts(requireActivity(), l2);
+                                    ShortcutManagerCompat.pushDynamicShortcut(requireActivity(), info.build());
+                                }
+                            } catch (Exception ignored) {}
+                        }
                         Toast.makeText(requireActivity(),R.string.message_send_successfully,Toast.LENGTH_SHORT).show();
                         dismiss();
                     }

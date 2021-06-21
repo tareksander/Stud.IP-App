@@ -21,6 +21,7 @@ import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.api.rest.StudipNotifications;
 import org.studip.unofficial_app.ui.DeepLinkActivity;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class NotificationWorker extends Worker
@@ -46,9 +47,10 @@ public class NotificationWorker extends Worker
             try {
                 StudipNotifications nots = api.dispatch.getNotifications().execute().body();
                 if (nots != null && nots.notifications != null) {
+                    Arrays.sort(nots.notifications, (o1, o2) -> (int) ((o1.personal_notification_id-o2.personal_notification_id)%Integer.MAX_VALUE));
                     NotificationManagerCompat m = NotificationManagerCompat.from(getApplicationContext());
                     for (StudipNotifications.Notification n : nots.notifications) {
-                        if (s.last_notification_id <= n.personal_notification_id) {
+                        if (s.last_notification_id >= n.personal_notification_id) {
                             continue;
                         }
                         s.last_notification_id = n.personal_notification_id;
