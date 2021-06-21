@@ -12,6 +12,7 @@ import java.util.List;
 import retrofit2.Call;
 public class NewsResource extends NetworkResource<List<StudipNews>>
 {
+    public boolean empty = true;
     private final String cid;
     public NewsResource(Context c, String cid)
     {
@@ -52,6 +53,9 @@ public class NewsResource extends NetworkResource<List<StudipNews>>
             for (StudipNews n : res.collection.values()) {
                 n.courseID = cid;
             }
+        }
+        if (res.collection.size() != 0) {
+            empty = false;
         }
         DBProvider.getDB(c).newsDao().updateInsertMultiple(res.collection.values().toArray(new StudipNews[0]));
     }

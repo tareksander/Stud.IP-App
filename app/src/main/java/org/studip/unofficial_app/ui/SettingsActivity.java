@@ -3,13 +3,19 @@ package org.studip.unofficial_app.ui;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -30,6 +36,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.hardware.display.DisplayManagerCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -359,6 +366,58 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
                 buildNotificationSettings();
             }
         }
+        
+        
+        binding.browserNone.setOnClickListener(v -> settings.browser = null);
+        binding.browserNone.setChecked(true);
+        
+        PackageManager pm = getPackageManager();
+        Intent webIntent = new Intent(Intent.ACTION_VIEW);
+        webIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+        int flags = PackageManager.MATCH_DEFAULT_ONLY;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            flags |= PackageManager.MATCH_ALL;
+        }
+        webIntent.setData(Uri.parse("https://test.domain.com.co.uk.tld")); // ensure the domain doesn't point to an app with app links
+        for (ResolveInfo info : pm.queryIntentActivities(webIntent, flags)) {
+            if (info.activityInfo.applicationInfo.packageName.equals(getPackageName())) continue;
+            try {
+                Resources res = pm.getResourcesForApplication(
+                        (info.resolvePackageName == null) ? info.activityInfo.packageName : info.resolvePackageName);
+                RadioButton b = new RadioButton(this);
+                if (info.labelRes != 0) {
+                    b.setText(res.getText(info.labelRes));
+                } else {
+                    b.setText(info.activityInfo.applicationInfo.loadLabel(pm));
+                }
+                Drawable d;
+                if (info.icon != 0) {
+                    //noinspection UseCompatLoadingForDrawables
+                    d = res.getDrawable(info.icon);
+                } else {
+                    d = info.activityInfo.loadIcon(pm);
+                }
+                d.setBounds(0, 0, (int) b.getTextSize(), (int) b.getTextSize());
+                b.setCompoundDrawables(d, null, null, null);
+                b.setCompoundDrawablePadding((int) (5 * getResources().getDisplayMetrics().density));
+                ComponentName name = new ComponentName(info.activityInfo.packageName, info.activityInfo.name);
+                b.setOnClickListener(v -> settings.browser = name.flattenToString());
+                binding.browserGroup.addView(b);
+                if (settings.browser != null && name.equals(ComponentName.unflattenFromString(settings.browser))) {
+                    b.setChecked(true);
+                }
+            }
+            catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        binding.buttonPrivacy.setOnClickListener(v1 -> {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.addCategory(Intent.CATEGORY_BROWSABLE);
+            i.setData(Uri.parse("https://github.com/tareksander/Stud.IP-App/blob/master/privacy.md"));
+            startActivity(i);
+        });
         
         
     }

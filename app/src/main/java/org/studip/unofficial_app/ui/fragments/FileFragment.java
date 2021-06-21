@@ -2,6 +2,7 @@ package org.studip.unofficial_app.ui.fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,14 +20,20 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.content.pm.ShortcutManagerCompat;
+import androidx.core.graphics.drawable.IconCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.api.Features;
+import org.studip.unofficial_app.api.rest.StudipCourse;
 import org.studip.unofficial_app.api.rest.StudipFolder;
+import org.studip.unofficial_app.api.routes.Studip;
 import org.studip.unofficial_app.databinding.DialogFileEntryBinding;
 import org.studip.unofficial_app.databinding.DialogForumEntryBinding;
 import org.studip.unofficial_app.databinding.FragmentFileBinding;
@@ -83,7 +90,6 @@ public class FileFragment extends SwipeRefreshFragment
             h.filesCourse.observe(getViewLifecycleOwner(), (course) -> {
                 if (course != null) {
                     binding.filesCourseName.setText(course.title);
-                    m.setFolder(requireActivity(), course.course_id, true);
                 }
                 else {
                     binding.filesCourseName.setText(R.string.my_documents);
@@ -115,8 +121,37 @@ public class FileFragment extends SwipeRefreshFragment
                 //System.out.println("refresh");
                 m.refresh(requireActivity());
             }
-    
-    
+            
+            
+            binding.filesCourseName.setOnLongClickListener(v -> {
+                StudipFolder f = m.get().getValue();
+                StudipCourse course = h.filesCourse.getValue();
+                final Activity a = requireActivity();
+                if (f != null && ShortcutManagerCompat.isRequestPinShortcutSupported(a)) {
+                    if ((f.name == null || f.name.equals("")) && course == null) {
+                        return true;
+                    }
+                    ShortcutInfoCompat.Builder b = new ShortcutInfoCompat.Builder(a, "folder:"+f.id);
+                    b.setIcon(IconCompat.createWithResource(a, R.drawable.file_blue));
+                    if ((f.name == null || f.name.equals(""))) {
+                        b.setShortLabel(course.title);
+                    } else {
+                        b.setShortLabel(f.name);
+                    }
+                    Intent i = new Intent(a, HomeActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    i.setAction(a.getPackageName()+".dynamic_shortcut");
+                    Uri data = Uri.parse(a.getPackageName()+".folder://"+f.id);
+                    if (course != null) {
+                        data = data.buildUpon().query(course.course_id).build();
+                    }
+                    i.setData(data);
+                    b.setIntent(i);
+                    ShortcutManagerCompat.requestPinShortcut(a, b.build(), null);
+                }
+                return true;
+            });
+            
             binding.buttonMkdir.setOnClickListener(this::onMkdir);
             binding.buttonUpload.setOnClickListener(this::onUpload);
     

@@ -113,9 +113,13 @@ public class CourseOpencastDialog  extends DialogFragment
             OpencastVideo v = getItem(position);
             
             b.opencastTitle.setText(v.title);
+            b.opencastTitle.setTextIsSelectable(true);
             b.opencastDate.setText(v.date);
+            b.opencastDate.setTextIsSelectable(true);
             b.opencastAuthor.setText(v.author);
+            b.opencastAuthor.setTextIsSelectable(true);
             b.opencastDescription.setText(v.description);
+            b.opencastDescription.setTextIsSelectable(true);
             
             Settings s = SettingsProvider.getSettings(requireActivity());
             ConnectivityManager con = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);

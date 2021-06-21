@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.api.rest.StudipUser;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.DBProvider;
@@ -32,16 +33,18 @@ public class HomeViewModel extends AndroidViewModel
         if (user == null) {
             user = new MutableLiveData<>();
             //System.out.println("userID: "+APIProvider.getAPI(c).getUserID());
-            DBProvider.getDB(c).userDao().getSingle(APIProvider.getAPI(c).getUserID()).subscribeOn(Schedulers.io()).subscribe((studipUser, throwable) ->
-            {
-                if (throwable != null) {
-                    throwable.printStackTrace();
-                }
-                if (studipUser != null)
+            API api = APIProvider.getAPI(c);
+            if (api != null) {
+                DBProvider.getDB(c).userDao().getSingle(api.getUserID()).subscribeOn(Schedulers.io()).subscribe((studipUser, throwable) ->
                 {
-                    user.postValue(studipUser);
-                }
-            });
+                    if (throwable != null) {
+                        throwable.printStackTrace();
+                    }
+                    if (studipUser != null) {
+                        user.postValue(studipUser);
+                    }
+                });
+            }
         }
         return user;
     }

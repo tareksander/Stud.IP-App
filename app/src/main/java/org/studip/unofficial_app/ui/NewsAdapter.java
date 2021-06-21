@@ -42,6 +42,8 @@ public class NewsAdapter extends ArrayAdapter
         TextView content = v.findViewById(R.id.news_content);
         title.setText(news[position].topic);
         content.setText(HelpActivity.fromHTML(news[position].body_html));
+        title.setTextIsSelectable(true);
+        content.setTextIsSelectable(true);
         return v;
     }
     @Override

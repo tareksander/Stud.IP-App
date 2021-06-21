@@ -216,7 +216,6 @@ public class MeetingsFragment extends Fragment
         if (requireActivity().isFinishing()) {
             //System.out.println("finishing");
             NotificationManagerCompat m = NotificationManagerCompat.from(requireActivity());
-            conference.clearCache(false);
             conference.destroy();
             conference = null;
             m.cancel(Integer.MIN_VALUE);
@@ -237,7 +236,7 @@ public class MeetingsFragment extends Fragment
     }
     
     private class MeetingsWebViewClient extends WebViewClient {
-        private FrameLayout f;
+        private final FrameLayout f;
         private boolean loading;
         public MeetingsWebViewClient(FrameLayout f) {
             this.f = f;

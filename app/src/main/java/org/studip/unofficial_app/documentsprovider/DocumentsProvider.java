@@ -85,6 +85,7 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
     private final HashMap<String,Integer> openFiles = new HashMap<>();
     
     
+    private final String DOCSDIR = "documents";
     
     private final String DOCS_LOCK = "docs_lock";
     private DocumentsDB docs;
@@ -277,7 +278,7 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
                     getContext().getContentResolver().notifyChange(DocumentsContract.buildChildDocumentsUri(AUTHORITIES, f.folder_id), null);
                     getContext().getContentResolver().notifyChange(DocumentsContract.buildDocumentUri(AUTHORITIES, documentId), null);
                     // delete the thumbnails, if it was there
-                    new File(getContext().getCacheDir()+"/thumbnail-"+documentId).delete();
+                    new File(new File(getContext().getCacheDir(), DOCSDIR), "/thumbnail-"+documentId).delete();
                 }
             }
             catch (IOException e) {
@@ -427,7 +428,7 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
     
     
         try {
-            File tmp = new File(getContext().getCacheDir()+"/"+documentId);
+            File tmp = new File(new File(getContext().getCacheDir(),DOCSDIR), documentId);
             //System.out.println(tmp.getAbsolutePath());
             synchronized (openFiles) {
                 if (!openFiles.containsKey(documentId)) {
@@ -720,7 +721,7 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
         
         //System.out.println("thumbnail");
         
-        File tmp = new File(getContext().getCacheDir()+"/thumbnail-"+documentId);
+        File tmp = new File(new File(getContext().getCacheDir(), DOCSDIR),"/thumbnail-"+documentId);
         if (! tmp.exists()) {
             try (ResponseBody body = api.file.download(documentId).execute().body();
                  FileOutputStream out = new FileOutputStream(tmp)) {
@@ -860,8 +861,9 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
         }
         checkDB(); // somehow doesn't work if initialization is deferred
         // clear the cache, just in case the provider got terminated while files were open
-        File cacheDir = getContext().getCacheDir();
-        File[] files = cacheDir.listFiles();
+        File fileCache = new File(getContext().getCacheDir(), DOCSDIR);
+        fileCache.mkdirs();
+        File[] files = fileCache.listFiles();
         if (files != null) {
             for (File f : files) {
                 f.delete();

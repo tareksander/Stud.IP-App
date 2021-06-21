@@ -2,19 +2,18 @@ package org.studip.unofficial_app.ui.fragments.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.TypedValue;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.studip.unofficial_app.api.rest.StudipMessage;
-import org.studip.unofficial_app.databinding.MessageViewDialogBinding;
+import org.studip.unofficial_app.databinding.DialogViewMessageBinding;
+import org.studip.unofficial_app.ui.HelpActivity;
 
 public class MessageDialogFragment extends DialogFragment
 {
@@ -26,8 +25,8 @@ public class MessageDialogFragment extends DialogFragment
     {
         AlertDialog.Builder b = new AlertDialog.Builder(requireActivity());
 
-        MessageViewDialogBinding binding = MessageViewDialogBinding.inflate(getLayoutInflater());
-        b.setView(binding.getRoot());
+        DialogViewMessageBinding binding = DialogViewMessageBinding.inflate(getLayoutInflater());
+        
         
         
         Bundle args = getArguments();
@@ -42,11 +41,22 @@ public class MessageDialogFragment extends DialogFragment
         b.setCustomTitle(title);
         title.setText(m.subject);
         title.setTextSize(TypedValue.COMPLEX_UNIT_DIP,26);
+        title.setTextIsSelectable(true);
         
         
-        
-        Document doc = Jsoup.parse(m.message_html);
-        binding.messageContent.setText(doc.wholeText());
+        binding.messageContent.setText(HelpActivity.fromHTML(m.message_html));
+        binding.messageContent.setTextIsSelectable(true);
+        binding.messageReply.setOnClickListener(v -> {
+            Bundle args2 = new Bundle();
+            args2.putString(MessageWriteDialogFragment.SUBJECT_KEY, "RE: "+m.subject);
+            args2.putString(MessageWriteDialogFragment.ADDRESSEE_KEY, m.sender);
+            MessageWriteDialogFragment d = new MessageWriteDialogFragment();
+            d.setArguments(args2);
+            d.show(getParentFragmentManager(), "message_write");
+            dismiss();
+        });
+    
+        b.setView(binding.getRoot());
         return b.create();
     }
 }

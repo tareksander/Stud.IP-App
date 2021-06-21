@@ -48,7 +48,7 @@ public class NotificationWorker extends Worker
                 if (nots != null && nots.notifications != null) {
                     NotificationManagerCompat m = NotificationManagerCompat.from(getApplicationContext());
                     for (StudipNotifications.Notification n : nots.notifications) {
-                        if (s.last_notification_id >= n.personal_notification_id) {
+                        if (s.last_notification_id <= n.personal_notification_id) {
                             continue;
                         }
                         s.last_notification_id = n.personal_notification_id;

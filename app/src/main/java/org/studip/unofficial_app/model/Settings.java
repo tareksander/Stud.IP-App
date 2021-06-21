@@ -65,7 +65,8 @@ public class Settings
     private static final String LOAD_IMAGES_ON_MOBILE_KEY = "images_mobile";
     public boolean load_images_on_mobile;
     
-    
+    private static final String BROWSER_KEY = "browser";
+    public String browser;
     
     public Settings()
     {
@@ -92,6 +93,7 @@ public class Settings
         documents_search = false;
         
         load_images_on_mobile = false;
+        browser = null;
     }
     public static Settings load(SharedPreferences prefs)
     {
@@ -119,6 +121,7 @@ public class Settings
             s.documents_search = prefs.getBoolean(DOCUMENTS_PROVIDER_SEARCH_KEY, false);
             
             s.load_images_on_mobile = prefs.getBoolean(LOAD_IMAGES_ON_MOBILE_KEY, false);
+            s.browser = prefs.getString(BROWSER_KEY, null);
         }
         else
         {
@@ -154,6 +157,7 @@ public class Settings
             e.putBoolean(DOCUMENTS_PROVIDER_SEARCH_KEY, documents_search);
             
             e.putBoolean(LOAD_IMAGES_ON_MOBILE_KEY, load_images_on_mobile);
+            e.putString(BROWSER_KEY, browser);
             
             e.commit();
         }

@@ -1,5 +1,6 @@
 package org.studip.unofficial_app.ui.fragments;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,6 +9,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.paging.LivePagedListBuilder;
@@ -64,7 +68,20 @@ public class MessageFragment extends SwipeRefreshFragment
         API api = APIProvider.getAPI(requireActivity());
         if (api != null && api.isFeatureEnabled(Features.FEATURE_MESSAGES)) {
             m.mes.getStatus().observe(getViewLifecycleOwner(), status -> HomeActivity.onStatusReturn(requireActivity(), status));
-            m.mes.isRefreshing().observe(getViewLifecycleOwner(), ref -> binding.messagesRefresh.setRefreshing(ref));
+            m.mes.isRefreshing().observe(getViewLifecycleOwner(), ref -> {
+                binding.messagesRefresh.setRefreshing(ref);
+                String open = m.open.getValue();
+                if (! ref && open != null) {
+                    LiveData<StudipMessage> d = DBProvider.getDB(requireActivity()).messagesDao().observe(open);
+                    d.observe(getViewLifecycleOwner(), m -> {
+                        d.removeObservers(getViewLifecycleOwner());
+                        if (m != null) {
+                            viewMessage(m);
+                        }
+                    });
+                    m.open.setValue(null);
+                }
+            });
     
             //ad = new MessageAdapter(requireActivity(),ArrayAdapter.IGNORE_ITEM_VIEW_TYPE);
             ad = new MessageAdapter();
@@ -85,7 +102,19 @@ public class MessageFragment extends SwipeRefreshFragment
                 binding.messagesList.setAdapter(ad);
             });
             
-    
+            m.source.observe(getViewLifecycleOwner(), source -> {
+                if (source != null) {
+                    Bundle args = new Bundle();
+                    args.putString(MessageWriteDialogFragment.SUBJECT_KEY, source.getStringExtra(Intent.EXTRA_SUBJECT));
+                    args.putString(MessageWriteDialogFragment.CONTENT_KEY, source.getStringExtra(Intent.EXTRA_TEXT));
+                    MessageWriteDialogFragment d = new MessageWriteDialogFragment();
+                    d.setArguments(args);
+                    d.show(getParentFragmentManager(), "message_write");
+                    m.source.setValue(null);
+                }
+            });
+            
+            
             PagedList.Config conf = new PagedList.Config.Builder().setEnablePlaceholders(true).setPageSize(10).build();
     
             new LivePagedListBuilder<>(DBProvider.getDB(requireActivity()).messagesDao().getPagedList(), conf).build().observe(getViewLifecycleOwner(),
@@ -158,11 +187,7 @@ public class MessageFragment extends SwipeRefreshFragment
             View layout = b.getRoot();
 
             layout.setOnClickListener((v) -> {
-                MessageDialogFragment d = new MessageDialogFragment();
-                Bundle args = new Bundle();
-                args.putSerializable(MessageDialogFragment.ARG_MESSAGE_ID,m);
-                d.setArguments(args);
-                d.show(getParentFragmentManager(),"message_view_dialog");
+                viewMessage(m);
             });
 
             layout.setOnLongClickListener(v -> {
@@ -210,6 +235,13 @@ public class MessageFragment extends SwipeRefreshFragment
         }
     }
     
+    public void viewMessage(StudipMessage m) {
+        MessageDialogFragment d = new MessageDialogFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(MessageDialogFragment.ARG_MESSAGE_ID,m);
+        d.setArguments(args);
+        d.show(getParentFragmentManager(),"message_view_dialog");
+    }
     
     
 }

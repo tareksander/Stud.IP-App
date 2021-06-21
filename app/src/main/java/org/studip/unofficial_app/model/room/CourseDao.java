@@ -21,7 +21,7 @@ public interface CourseDao extends BasicDao<StudipCourse>
     @Query("SELECT * FROM news WHERE course_id = :id")
     StudipNews[] getNews(String id);
     
-    @Query("SELECT * FROM courses")
+    @Query("SELECT * FROM courses ORDER BY `group` ASC")
     LiveData<StudipCourse[]> observeAll();
 
     @Query("SELECT * FROM forum_categories WHERE course = :id")
@@ -38,7 +38,7 @@ public interface CourseDao extends BasicDao<StudipCourse>
     // WARNING: observable queries fire if any of the mentioned tables are changed, not only the object you look at
 
 
-    @Query("SELECT * FROM courses WHERE (SELECT `begin` FROM semesters WHERE id = start_semester) <= (SELECT `begin` FROM semesters WHERE id = :id) AND (((SELECT `end` FROM semesters WHERE id = end_semester) >= (SELECT `end` FROM semesters WHERE id = :id)) OR end_semester IS NULL)")
+    @Query("SELECT * FROM courses WHERE (SELECT `begin` FROM semesters WHERE id = start_semester) <= (SELECT `begin` FROM semesters WHERE id = :id) AND (((SELECT `end` FROM semesters WHERE id = end_semester) >= (SELECT `end` FROM semesters WHERE id = :id)) OR end_semester IS NULL) ORDER BY `group` ASC")
     LiveData<StudipCourse[]> observeSemester(String id);
     
     @Query("SELECT * FROM news WHERE course_id = :id")

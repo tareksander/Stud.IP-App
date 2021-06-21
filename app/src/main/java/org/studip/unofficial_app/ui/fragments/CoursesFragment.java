@@ -1,6 +1,9 @@
 package org.studip.unofficial_app.ui.fragments;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +13,10 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.content.pm.ShortcutManagerCompat;
+import androidx.core.graphics.drawable.IconCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
@@ -27,6 +34,7 @@ import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.room.DB;
 import org.studip.unofficial_app.model.viewmodels.CoursesViewModel;
+import org.studip.unofficial_app.model.viewmodels.FileViewModel;
 import org.studip.unofficial_app.model.viewmodels.HomeActivityViewModel;
 import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.fragments.dialog.CourseForumDialogFragment;
@@ -156,6 +164,22 @@ public class CoursesFragment extends SwipeRefreshFragment
                 public void onNothingSelected(AdapterView<?> parent) {
                 }
             });
+            
+            m.forumIntent.observe(getViewLifecycleOwner(), i -> {
+                if (i != null) {
+                    Fragment oldD = getParentFragmentManager().findFragmentByTag("course_forum");
+                    if (oldD != null) {
+                        try {
+                            DialogFragment d = (DialogFragment) oldD;
+                            d.dismiss();
+                        }
+                        catch (ClassCastException ignored) {
+                        }
+                    }
+                }
+            });
+            
+            
         } else {
             binding.coursesRefresh.setOnRefreshListener(() -> binding.coursesRefresh.setRefreshing(false));
         }
@@ -202,6 +226,8 @@ public class CoursesFragment extends SwipeRefreshFragment
                 if (api.isFeatureEnabled(Features.FEATURE_COURSE_FILES) && api.isFeatureEnabled(Features.FEATURE_FILES)) {
                     b.courseFiles.setOnClickListener(v1 -> {
                         h.setFilesCourse(c);
+                        FileViewModel m = new ViewModelProvider(requireActivity()).get(FileViewModel.class);
+                        m.setFolder(requireActivity(), c.course_id, true);
                         HomeActivity a = (HomeActivity) requireActivity();
                         a.navigateTo(2);
                     });
@@ -212,9 +238,31 @@ public class CoursesFragment extends SwipeRefreshFragment
                     b.courseForum.setOnClickListener(v1 -> {
                         Bundle args = new Bundle();
                         args.putString("cid", c.course_id);
+                        Intent i = m.forumIntent.getValue();
+                        if (i != null) {
+                            args.putString(CourseForumDialogFragment.SUBJECT_KEY, i.getStringExtra(Intent.EXTRA_SUBJECT));
+                            args.putString(CourseForumDialogFragment.CONTENT_KEY, i.getStringExtra(Intent.EXTRA_TEXT));
+                            m.forumIntent.setValue(null);
+                        }
                         CourseForumDialogFragment forum = new CourseForumDialogFragment();
                         forum.setArguments(args);
                         forum.show(getParentFragmentManager(), "course_forum");
+                    });
+                    b.courseForum.setOnLongClickListener(v12 -> {
+                        final Activity a = requireActivity();
+                        if (ShortcutManagerCompat.isRequestPinShortcutSupported(a)) {
+                            ShortcutInfoCompat.Builder b1 = new ShortcutInfoCompat.Builder(a, "forum:"+c.course_id);
+                            b1.setIcon(IconCompat.createWithResource(a, R.drawable.forum_blue));
+                            b1.setShortLabel(c.title);
+                            Intent i = new Intent(a, HomeActivity.class);
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            i.setAction(a.getPackageName()+".dynamic_shortcut");
+                            Uri data = Uri.parse(a.getPackageName()+".forum://"+c.course_id);
+                            i.setData(data);
+                            b1.setIntent(i);
+                            ShortcutManagerCompat.requestPinShortcut(a, b1.build(), null);
+                        }
+                        return true;
                     });
                 } else {
                     b.courseForum.setVisibility(View.INVISIBLE);

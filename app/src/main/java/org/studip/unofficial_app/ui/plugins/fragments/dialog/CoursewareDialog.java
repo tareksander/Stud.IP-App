@@ -1,5 +1,6 @@
 package org.studip.unofficial_app.ui.plugins.fragments.dialog;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
@@ -28,6 +29,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.content.pm.ShortcutManagerCompat;
+import androidx.core.graphics.drawable.IconCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -55,6 +59,7 @@ import org.studip.unofficial_app.databinding.DialogOpencastCoursewareBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.viewmodels.CoursewareViewModel;
 import org.studip.unofficial_app.model.viewmodels.StringSavedStateViewModelFactory;
+import org.studip.unofficial_app.ui.HomeActivity;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -67,8 +72,6 @@ public class CoursewareDialog extends DialogFragment
     public static final String COURSE_ID_KEY = "cid";
     private CoursewareViewModel m;
     private DialogCoursewareBinding binding;
-    
-    private static final String LIST_KEY = "list";
     
     @Override
     public void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
@@ -93,8 +96,14 @@ public class CoursewareDialog extends DialogFragment
         m = new ViewModelProvider(this,new StringSavedStateViewModelFactory(this, null, requireActivity().getApplication()
                 ,args.getString(COURSE_ID_KEY))).get(CoursewareViewModel.class);
     
-    
-        
+        if (savedInstanceState == null) {
+            String sel = args.getString("selected");
+            if (sel != null) {
+                m.selectSite(requireActivity(), sel);
+            } else {
+                m.refresh(requireActivity(), null, CoursewareViewModel.TYPE_CHAPTERS);
+            }
+        }
     
         binding.coursewareSections.addItemDecoration(new DividerItemDecoration(requireActivity(), RecyclerView.HORIZONTAL));
         binding.coursewareSections.addItemDecoration(new SpacingDecorator(true, 30));
@@ -137,6 +146,18 @@ public class CoursewareDialog extends DialogFragment
                                                     binding.coursewareSectionTitle.setText(sub.sections[0].name);
                                                     if (sub.sections[0].blocks == null) {
                                                         m.refresh(requireActivity(), m.selectedSectionData.getValue(), CoursewareViewModel.TYPE_SECTION);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    for (CoursewareSubchapter sub : c.subchapters) {
+                                        if (sub.id.equals(m.selectedSubchapterData.getValue())) {
+                                            if (sub.sections != null) {
+                                                for (CoursewareSection sect : sub.sections) {
+                                                    if (sect.id.equals(m.selectedSectionData.getValue()) && args.get("selected") != null) {
+                                                        binding.coursewareSectionTitle.setText(sect.name);
                                                     }
                                                 }
                                             }
@@ -309,6 +330,23 @@ public class CoursewareDialog extends DialogFragment
                                             m.refresh(requireActivity(), m.selectedSectionData.getValue(), CoursewareViewModel.TYPE_SECTION);
                                         }
                                         binding.coursewareBlocks.getAdapter().notifyDataSetChanged();
+                                    });
+                                    v.setOnLongClickListener(v12 -> {
+                                        final Activity a = requireActivity();
+                                        Bundle args = getArguments();
+                                        if (ShortcutManagerCompat.isRequestPinShortcutSupported(a) && args != null) {
+                                            ShortcutInfoCompat.Builder b1 = new ShortcutInfoCompat.Builder(a, "courseware:" +args.getString("cid"));
+                                            b1.setIcon(IconCompat.createWithResource(a, R.drawable.group3_blue));
+                                            b1.setShortLabel(s.sections[position].name);
+                                            Intent i = new Intent(a, HomeActivity.class);
+                                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            i.setAction(a.getPackageName()+".dynamic_shortcut");
+                                            Uri data = Uri.parse(a.getPackageName()+".courseware://"+args.getString("cid")+"?"+s.sections[position].id);
+                                            i.setData(data);
+                                            b1.setIntent(i);
+                                            ShortcutManagerCompat.requestPinShortcut(a, b1.build(), null);
+                                        }
+                                        return true;
                                     });
                                 }
                                 break;

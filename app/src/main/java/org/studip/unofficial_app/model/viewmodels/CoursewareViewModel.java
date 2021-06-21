@@ -11,11 +11,17 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.SavedStateHandle;
 
 import org.jetbrains.annotations.NotNull;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.studip.unofficial_app.api.API;
+import org.studip.unofficial_app.api.plugins.courseware.CoursewareBlock;
 import org.studip.unofficial_app.api.plugins.courseware.CoursewareChapter;
 import org.studip.unofficial_app.api.plugins.courseware.CoursewareSection;
 import org.studip.unofficial_app.api.plugins.courseware.CoursewareSubchapter;
 import org.studip.unofficial_app.model.APIProvider;
+
+import io.reactivex.functions.BiConsumer;
 
 public class CoursewareViewModel extends AndroidViewModel
 {
@@ -43,10 +49,82 @@ public class CoursewareViewModel extends AndroidViewModel
         selectedChapterData = h.getLiveData("chapter");
         selectedSubchapterData = h.getLiveData("subchapter");
         selectedSectionData = h.getLiveData("section");
-        if (data.getValue() == null) {
-            refresh(application, null, TYPE_CHAPTERS);
+    }
+    
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressLint("CheckResult")
+    public void selectSite(Context c, String selected) {
+        API api = APIProvider.getAPI(c);
+        if (! refreshing.getValue() && api != null) {
+            refreshing.setValue(true);
+            api.courseware.routes.getCourseware(cid, selected).subscribe((s, throwable) -> {
+                refreshing.postValue(false);
+                if (s != null) {
+                    //System.out.println(s);
+                    Document d = Jsoup.parse(s);
+                    Elements el = d.getElementsByAttributeValue("class", "chapter selected");
+                    if (el.size() != 1) {
+                        //System.out.println("no active chapter");
+                        status.postValue(true);
+                        return;
+                    }
+                    String chapter = el.get(0).attr("data-blockid");
+                    selectedChapterData.postValue(chapter);
+                    el = d.getElementsByAttributeValue("class", "subchapter selected");
+                    if (el.size() != 1) {
+                        //System.out.println("no active subchapter");
+                        status.postValue(true);
+                        return;
+                    }
+                    String subchapter = el.get(0).attr("data-blockid");
+                    selectedSubchapterData.postValue(subchapter);
+                    el = d.getElementsByAttributeValueContaining("class", "section selected");
+                    if (el.size() != 1) {
+                        //System.out.println("no active section");
+                        status.postValue(true);
+                        return;
+                    }
+                    String section = el.get(0).attr("data-blockid");
+                    selectedSectionData.postValue(section);
+                    CoursewareChapter[] chapters = api.courseware.getChaptersFromSite(s);
+                    CoursewareSubchapter[] subchapters = api.courseware.getSubchaptersFromSite(s);
+                    CoursewareSection[] sections = api.courseware.getSectionsFromSite(s);
+                    CoursewareBlock[] blocks = api.courseware.getCoursewareBlocksFromSite(s);
+                    if (chapters == null || subchapters == null || sections == null || blocks == null) {
+                        //System.out.println("some data null");
+                        status.postValue(true);
+                        return;
+                    }
+                    boolean found = false;
+                    for (CoursewareChapter c1 : chapters) {
+                        if (c1.id.equals(chapter)) {
+                            c1.subchapters = subchapters;
+                            for (CoursewareSubchapter sub : subchapters) {
+                                if (sub.id.equals(subchapter)) {
+                                    sub.sections = sections;
+                                    for (CoursewareSection sect : sections) {
+                                        if (sect.id.equals(section)) {
+                                            sect.blocks = blocks;
+                                            found = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (! found) {
+                        //System.out.println("elements not found");
+                        status.postValue(true);
+                        return;
+                    }
+                    data.postValue(chapters);
+                } else {
+                    status.postValue(true);
+                }
+            });
         }
     }
+    
     
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @SuppressLint("CheckResult")

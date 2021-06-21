@@ -53,11 +53,10 @@ public class CourseNewsDialogFragment extends DialogFragment
                     savedInstanceState.remove(LIST_KEY);
                 }
             });
-            
+            m.news.refresh(requireActivity());
             m.news.isRefreshing().observe(this, ref -> {
                 if (! ref) {
-                    List<StudipNews> l = m.news.get().getValue();
-                    if (l != null && l.size() == 0) {
+                    if (m.news.empty) {
                         dismiss();
                     }
                 }
@@ -71,7 +70,6 @@ public class CourseNewsDialogFragment extends DialogFragment
                     HomeActivity.onStatusReturn(requireActivity(), status);
                 }
             });
-            m.news.refresh(requireActivity());
         } else {
             dismiss();
         }

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="courses"
+        android:enabled="true"
+        android:icon="@drawable/seminar_blue"
+        android:shortcutShortLabel="@string/courses"
+        android:shortcutLongLabel="@string/courses"
+        tools:ignore="UnusedAttribute">
+        <intent
+            android:action="org.studip.unofficial_app.shortcut"
+            android:data="courses" 
+            android:targetPackage="org.studip.unofficial_app"
+            android:targetClass="org.studip.unofficial_app.ui.HomeActivity"/>
+    </shortcut>
+    <shortcut
+        android:shortcutId="messages"
+        android:enabled="true"
+        android:icon="@drawable/mail_blue"
+        android:shortcutShortLabel="@string/channel_messages"
+        android:shortcutLongLabel="@string/channel_messages"
+        tools:ignore="UnusedAttribute">
+        <intent
+            android:action="org.studip.unofficial_app.shortcut"
+            android:data="messages"
+            android:targetPackage="org.studip.unofficial_app"
+            android:targetClass="org.studip.unofficial_app.ui.HomeActivity"/>
+    </shortcut>
+    <shortcut
+        android:shortcutId="files"
+        android:enabled="true"
+        android:icon="@drawable/file_blue"
+        android:shortcutShortLabel="@string/channel_files"
+        android:shortcutLongLabel="@string/channel_files"
+        tools:ignore="UnusedAttribute">
+        <intent
+            android:action="org.studip.unofficial_app.shortcut"
+            android:data="files"
+            android:targetPackage="org.studip.unofficial_app"
+            android:targetClass="org.studip.unofficial_app.ui.HomeActivity"/>
+    </shortcut>
+    <shortcut
+        android:shortcutId="webview"
+        android:enabled="true"
+        android:icon="@drawable/globe_blue"
+        android:shortcutShortLabel="@string/studip_mobile"
+        android:shortcutLongLabel="@string/studip_mobile"
+        tools:ignore="UnusedAttribute">
+        <intent
+            android:action="org.studip.unofficial_app.shortcut"
+            android:data="webview"
+            android:targetPackage="org.studip.unofficial_app"
+            android:targetClass="org.studip.unofficial_app.ui.HomeActivity"/>
+    </shortcut>
+    <share-target android:targetClass="org.studip.unofficial_app.ui.DeepLinkActivity">
+        <datat android:mimeType="text/plain" />
+        <category android:name="org.studip.unofficial_app.TEXT_SHARE_TARGET" />
+    </share-target>
+</shortcuts>

@@ -1,7 +1,10 @@
 package org.studip.unofficial_app.ui.fragments.dialog;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
@@ -15,6 +18,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.content.pm.ShortcutManagerCompat;
+import androidx.core.graphics.drawable.IconCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -53,7 +59,11 @@ import retrofit2.Response;
 public class CourseForumDialogFragment extends DialogFragment
 {
     public static final String COURSE_ID_KEY = "cid";
+    public static final String CONTENT_KEY = "content";
+    public static final String SUBJECT_KEY = "subject";
+    
     private static final String OBJECT_KEY = "obj";
+    
     
     private ForumViewModel m;
     private DialogForumBinding binding;
@@ -76,8 +86,13 @@ public class CourseForumDialogFragment extends DialogFragment
         m = new ViewModelProvider(this,new StringSavedStateViewModelFactory(this, null, 
                 requireActivity().getApplication(),cid)).get(ForumViewModel.class);
         
-        
         binding = DialogForumBinding.inflate(getLayoutInflater());
+        
+        if (savedInstanceState == null) {
+            binding.forumContent.setText(args.getString(CONTENT_KEY, ""));
+            binding.forumSubject.setText(args.getString(SUBJECT_KEY, ""));
+        }
+        
         
         b.setView(binding.getRoot());
         
@@ -87,7 +102,17 @@ public class CourseForumDialogFragment extends DialogFragment
         
         binding.forumRefresh.setOnRefreshListener(() -> m.f.refresh(requireActivity()));
         
-        m.f.isRefreshing().observe(this, binding.forumRefresh::setRefreshing);
+        final boolean[] entrySet = new boolean[1];
+        m.f.isRefreshing().observe(this, ref -> {
+            binding.forumRefresh.setRefreshing(ref);
+            if (! ref && savedInstanceState == null && ! entrySet[0]) {
+                entrySet[0] = true;
+                String entry = args.getString("entry");
+                if (entry != null) {
+                    m.f.setEntry(requireActivity(), new ForumResource.ForumEntry(entry, ForumResource.ForumEntry.Type.ENTRY));
+                }
+            }
+        });
         m.f.getStatus().observe(this, (status) -> {
             if (status != 200 && status != 201 && status != -1)
             {
@@ -365,6 +390,10 @@ public class CourseForumDialogFragment extends DialogFragment
                         m.f.setEntry(requireActivity(), new ForumResource.ForumEntry(e.topic_id, ForumResource.ForumEntry.Type.ENTRY));
                     }
                 });
+                t.setOnLongClickListener(v -> {
+                    pinEntry(e);
+                    return true;
+                });
             }
             if (o instanceof StudipForumEntryWithChildren) {
                 StudipForumEntryWithChildren ec = (StudipForumEntryWithChildren) o;
@@ -383,6 +412,7 @@ public class CourseForumDialogFragment extends DialogFragment
                     }
                     t.setMovementMethod(LinkMovementMethod.getInstance());
                     t.setText(HelpActivity.fromHTML(e.content));
+                    t.setTextIsSelectable(true);
                 } else {
                     Collections.sort(children);
                     e = children.toArray(new StudipForumEntry[0])[position];
@@ -393,9 +423,29 @@ public class CourseForumDialogFragment extends DialogFragment
                             m.f.setEntry(requireActivity(), new ForumResource.ForumEntry(finalE.topic_id, ForumResource.ForumEntry.Type.ENTRY));
                         }
                     });
+                    t.setOnLongClickListener(v -> {
+                        pinEntry(finalE);
+                        return true;
+                    });
                 }
             }
             return t;
+        }
+    }
+    
+    private void pinEntry(StudipForumEntry e) {
+        final Activity a = requireActivity();
+        if (ShortcutManagerCompat.isRequestPinShortcutSupported(a)) {
+            ShortcutInfoCompat.Builder b1 = new ShortcutInfoCompat.Builder(a, "forum_entry:"+e.topic_id);
+            b1.setIcon(IconCompat.createWithResource(a, R.drawable.forum_blue));
+            b1.setShortLabel(Jsoup.parse(e.subject).wholeText());
+            Intent i = new Intent(a, HomeActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            i.setAction(a.getPackageName()+".dynamic_shortcut");
+            Uri data = Uri.parse(a.getPackageName()+".forum_entry://"+cid+"?"+e.topic_id);
+            i.setData(data);
+            b1.setIntent(i);
+            ShortcutManagerCompat.requestPinShortcut(a, b1.build(), null);
         }
     }
     

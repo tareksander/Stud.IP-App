@@ -2,6 +2,7 @@ Support für die Browser-Version von STud.IP hinzugefügt.
 Links im Forum sind nun anklickbar.
 API-Erkennung hinzugefügt, damit die App bei fehlenden Teilen der API Funktionen abschaltet, anstatt gar nicht zu funktionieren.
 Unterstützung für OAuth-Authentifizierung hinzugefügt.
+Shortcuts hinzugefügt.
 UI-Verbesserungen:
 - Textfarbe für Buttons im dark mode gefixt
 - Andere Farben im dark mode

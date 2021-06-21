@@ -73,7 +73,7 @@ public abstract class NetworkResource<T>
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull Throwable t)
                 {
-                    //System.out.println("newtwork call failed");
+                    //System.out.println("network call failed");
                     t.printStackTrace();
                     refreshing.setValue(false);
                 }

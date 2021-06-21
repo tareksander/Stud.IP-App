@@ -2,6 +2,7 @@ Added support for using the browser version of Stud.IP in the app.
 Links in the forum are now clickable.
 Added API detection, so features that use an unavailable part of the API will be disabled, instead of the app not working at all.
 Added Support for OAuth authentication.
+Added shortcuts.
 UI improvements:
 - Fixed button text color for dark mode
 - changed dark mode colors

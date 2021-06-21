@@ -1,7 +1,10 @@
 package org.studip.unofficial_app.ui.fragments.dialog;
 
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +15,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.content.pm.ShortcutManagerCompat;
+import androidx.core.graphics.drawable.IconCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.LiveData;
 
 import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
@@ -22,8 +29,10 @@ import org.studip.unofficial_app.databinding.DialogNewMessageBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.room.DB;
+import org.studip.unofficial_app.ui.DeepLinkActivity;
 import org.studip.unofficial_app.ui.HomeActivity;
 
+import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.schedulers.Schedulers;
@@ -33,11 +42,11 @@ import retrofit2.Response;
 
 public class MessageWriteDialogFragment extends DialogFragment
 {
-    private static final String ADDRESSEE_KEY = "addressee";
+    public static final String ADDRESSEE_KEY = "addressee";
     private static final String ADDRESSEE_LIST_KEY = "addressee_list";
     private static final String ADDRESSEE_LIST_AUTOCOMPLETE_KEY = "addressee_list_autocomplete";
-    private static final String SUBJECT_KEY = "subject";
-    private static final String CONTENT_KEY = "content";
+    public static final String SUBJECT_KEY = "subject";
+    public static final String CONTENT_KEY = "content";
     
 
     private DialogNewMessageBinding b;
@@ -80,6 +89,23 @@ public class MessageWriteDialogFragment extends DialogFragment
         
         ad = new AddresseeAdapter(requireActivity(), R.layout.list_textview);
         ad_autocomplete = new AddresseeAdapter(requireActivity(), R.layout.list_textview);
+    
+        if (savedInstanceState == null && getArguments() != null) {
+            Bundle args = getArguments();
+            b.messageSubjectEdit.setText(args.getString(SUBJECT_KEY, ""));
+            b.messageContentEdit.setText(args.getString(CONTENT_KEY, ""));
+            String adr = args.getString(ADDRESSEE_KEY);
+            if (adr != null) {
+                LiveData<StudipUser> d = DBProvider.getDB(requireActivity()).userDao().observe(adr);
+                d.observe(this, u -> {
+                    d.removeObservers(this);
+                    if (u != null) {
+                        ad.add(u);
+                    }
+                });
+            }
+        }
+        
         
         b.messageAddresseeList.setAdapter(ad);
         b.messageAddressee.setAdapter(ad_autocomplete);
@@ -94,8 +120,7 @@ public class MessageWriteDialogFragment extends DialogFragment
         }
 
         final boolean[] showOnUpdate = new boolean[1];
-        showOnUpdate[0] = false;
-        
+    
         DBProvider.getDB(requireActivity()).userDao().observeAll().observe(this,(users) -> {
             ad_autocomplete.clear();
             if (users != null)
@@ -137,7 +162,7 @@ public class MessageWriteDialogFragment extends DialogFragment
         APIProvider.getAPI(requireActivity()).dispatch.startMessage().enqueue(new Callback<Void>()
         {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response)
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response)
             {
                 if (response.code() == 200) {
                     canSearch[0] = true;
@@ -145,7 +170,7 @@ public class MessageWriteDialogFragment extends DialogFragment
                 HomeActivity.onStatusReturn(requireActivity(),response.code());
             }
             @Override
-            public void onFailure(Call<Void> call, Throwable t)
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t)
             {
                 Toast.makeText(requireActivity(),R.string.message_no_search,Toast.LENGTH_SHORT).show();
             }
@@ -157,7 +182,7 @@ public class MessageWriteDialogFragment extends DialogFragment
                 APIProvider.getAPI(requireActivity()).dispatch.startMessage().enqueue(new Callback<Void>()
                 {
                     @Override
-                    public void onResponse(Call<Void> call, Response<Void> response)
+                    public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response)
                     {
                         if (response.code() == 200) {
                             canSearch[0] = true;
@@ -167,7 +192,7 @@ public class MessageWriteDialogFragment extends DialogFragment
                         HomeActivity.onStatusReturn(requireActivity(),response.code());
                     }
                     @Override
-                    public void onFailure(Call<Void> call, Throwable t)
+                    public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t)
                     {
                         Toast.makeText(requireActivity(),R.string.message_no_search,Toast.LENGTH_SHORT).show();
                     }
@@ -178,7 +203,7 @@ public class MessageWriteDialogFragment extends DialogFragment
                 api.dispatch.searchAddresses(b.messageAddressee.getText().toString()).enqueue(new Callback<StudipSearchUser[]>()
                 {
                     @Override
-                    public void onResponse(Call<StudipSearchUser[]> call, Response<StudipSearchUser[]> response)
+                    public void onResponse(@NonNull Call<StudipSearchUser[]> call, @NonNull Response<StudipSearchUser[]> response)
                     {
                         StudipSearchUser[] users = response.body();
                         if (users != null) {
@@ -189,7 +214,7 @@ public class MessageWriteDialogFragment extends DialogFragment
                                 api.user.user(u.user_id).enqueue(new Callback<StudipUser>()
                                 {
                                     @Override
-                                    public void onResponse(Call<StudipUser> call, Response<StudipUser> response)
+                                    public void onResponse(@NonNull Call<StudipUser> call, @NonNull Response<StudipUser> response)
                                     {
                                         StudipUser u = response.body();
                                         if (u != null) {
@@ -197,22 +222,22 @@ public class MessageWriteDialogFragment extends DialogFragment
                                                 db.userDao().updateInsert(u);
                                                 if (count.incrementAndGet() == users.length) {
                                                     showOnUpdate[0] = false;
-                                                    System.out.println("finished");
+                                                    //System.out.println("finished");
                                                 }
                                             });
                                         } else {
                                             if (count.incrementAndGet() == users.length) {
                                                 showOnUpdate[0] = false;
-                                                System.out.println("finished");
+                                                //System.out.println("finished");
                                             }
                                         }
                                     }
                                     @Override
-                                    public void onFailure(Call<StudipUser> call, Throwable t)
+                                    public void onFailure(@NonNull Call<StudipUser> call, @NonNull Throwable t)
                                     {
                                         if (count.incrementAndGet() == users.length) {
                                             showOnUpdate[0] = false;
-                                            System.out.println("finished");
+                                            //System.out.println("finished");
                                         }
                                     }
                                 });
@@ -221,7 +246,7 @@ public class MessageWriteDialogFragment extends DialogFragment
                         HomeActivity.onStatusReturn(requireActivity(),response.code());
                     }
                     @Override
-                    public void onFailure(Call<StudipSearchUser[]> call, Throwable t) {}
+                    public void onFailure(@NonNull Call<StudipSearchUser[]> call, @NonNull Throwable t) {}
                 });
             }
         });
@@ -248,7 +273,7 @@ public class MessageWriteDialogFragment extends DialogFragment
             APIProvider.getAPI(requireActivity()).message.create(b.messageSubjectEdit.getText().toString(),b.messageContentEdit.getText().toString(),recipients).enqueue(new Callback<Void>()
             {
                 @Override
-                public void onResponse(Call<Void> call, Response<Void> response)
+                public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response)
                 {
                     if (response.code() != 201)
                     {
@@ -256,13 +281,27 @@ public class MessageWriteDialogFragment extends DialogFragment
                         HomeActivity.onStatusReturn(requireActivity(),response.code());
                         //System.out.println(response.code());
                     } else {
+                        /*
+                        ShortcutInfoCompat.Builder info = new ShortcutInfoCompat.Builder(requireActivity(), "person:"+recipients[0]);
+                        info.setShortLabel(ad.getItem(0).name.formatted);
+                        HashSet<String> cat = new HashSet<>();
+                        cat.add("org.studip.unofficial_app.directshare.category.TEXT_SHARE_TARGET");
+                        info.setCategories(cat);
+                        info.setIcon(IconCompat.createWithResource(requireActivity(), R.drawable.mail_blue));
+                        Intent i = new Intent(requireActivity(), DeepLinkActivity.class);
+                        i.setAction(requireActivity().getPackageName()+".dynamic_shortcut");
+                        i.setData(Uri.parse(requireActivity().getPackageName()+".share://"+recipients[0]));
+                        info.setIntent(i);
+                        info.setActivity(new ComponentName(requireActivity().getPackageName(), requireActivity().getPackageName()+".ui.HomeActivity"));
+                        ShortcutManagerCompat.pushDynamicShortcut(requireActivity(), info.build());
+                        */
                         Toast.makeText(requireActivity(),R.string.message_send_successfully,Toast.LENGTH_SHORT).show();
                         dismiss();
                     }
                 }
 
                 @Override
-                public void onFailure(Call<Void> call, Throwable t)
+                public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t)
                 {
                     Toast.makeText(requireActivity(),R.string.message_no_send,Toast.LENGTH_SHORT).show();
                 }

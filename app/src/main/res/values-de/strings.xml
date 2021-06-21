@@ -128,7 +128,11 @@ Es werden aber nur Benachrichtigugen angezeigt, die Sie in Stud.IP aktiviert hab
 Diese Einstellungen können Sie auch in der App verändern, unter "Stud.IP Benachrichtigungseinstellungen".<br>
 Mit dem Document Provider können Sie auf die Stud.IP-Dateien zugreifen, wie auf alle anderen Dateien auf Ihrem Gerät.<br>
 Nachdem Sie sich angemeldet und Ihre Kurse abgerufen haben, können sie in den Einstellungen festlegen, welche Kurse so bereitgestellt werden sollen.<br>
-Sie können außerdem festlegen, ob Vorschaubilder angezeigt werden sollen, wenn mobile Daten benutzt werden.<br><br>
+Sie können außerdem festlegen, ob Vorschaubilder angezeigt werden sollen, wenn mobile Daten benutzt werden.<br>
+Sie können diese App als Ihre Browser-App setzten, um Stud.IP-Links automatisch in der App zu öffnen.<br>
+Diese App ist aber kein vollwertiger Browser, deshalb müssen Links, die nicht zu Stud.IP gehen, zu einer richtigen Browser-App weitergeleitet werden.<br>
+In den EInstellungen können Sie aussuchen, mit welcher App diese Links geöffnet werden sollen.<br>
+Wenn Sie keine App aussuchen, werden Sie bei jedem Link gefragt, welche benutzt werden soll.<br><br>
 
 
 <h2>3. Deaktivierte Funktionen</h2>
@@ -203,6 +207,18 @@ Wenn Sie versuchen sich auszuloggen, werden Sie stattdessen zum vorherigen Bilds
 Der zurück-Button navigiert im Browserverlauf zurück, oder zum vorherigen Bildschirm, wenn keine Seite mehr im Verlauf ist.<br>
 <br><br>
 
+<h2>11. Shortcuts</h2>
+Wenn sie im Launcher das App-Icon halten, sehen sie ein paar Standard-Shortcuts:<br>
+- Der Dateibildschirm<br>
+- Der Kursbildschirm<br>
+- Der Nachrichtenbildschirm<br>
+Sie können auch für spezielle Dinge selbst Shortcuts erstellen:<br>
+Für ein bestimmtes Verzeichnis, indem Sie "Deine Dateien" oder den Kursnamen im Dateibildschirm halten.<br>
+Für eine Forenbeitrag, indem Sie den Titel in der Liste halten.<br>
+Für eine Courseware-Seite, indem Sie das entsprechende "i"-Icon halten.<br>
+Für eine Seite in der mobilen Ansicht:<br>
+Indem Sie nach unten scrollen und das Linsen-Icon unten rechts drücken (Android 6.0+).<br>
+Indem Sie von der App weg und wieder hinnavigieren und das Linsen-Icon unten rechts drücken (Android 5.1-).
 "]]></string>
     <string name="view">Anschauen: %1$s</string>
     <string name="download">Herunterladen: %1$s</string>
@@ -296,6 +312,15 @@ Wenn Sie den Zugriff erlaubt haben, kehren Sie hierher zurück und drücken Sie 
     <string name="oauth_error_title">OAuth Error</string>
     <string name="oauth_error_no_token">Konnte kein Token von Server bekommen. Überprüfen Sie bitte Ihre Netzwerkverbindung. Wenn das Problem bestehen bleibt, fragen Sie Ihren Stud.IP-Administrator, ob die App wirklich für OAuth registriert ist.</string>
     <string name="oauth_error_token_invalid">Das Token ist nicht autorisiert oder Sie haben keine Internetverbindung. Bitte prüfen Sie Ihre Internetverbindung. Haben Sie sich mit dem linken Button bei Stud.IP eingeloggt und den Zugriff für die App zugelassen?</string>
+    <string name="studip_message">Nachricht</string>
+    <string name="share_with">Teilen mit</string>
+    <string name="reply">Antworten</string>
+    <string name="settings_relay">Links zum Browser weitergeben:</string>
+    <string name="none">Keiner</string>
+    <string name="open_with">Öffnen mit:</string>
+    <string name="studip_mobile">Stud.IP Mobile</string>
+    <string name="shortcut_disabled">Ausloggen macht alle SHortcuts ungültig</string>
+    <string name="privacy_button">Datenschutzerklärung</string>
 
 
 </resources>
