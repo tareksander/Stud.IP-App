@@ -171,6 +171,7 @@
                     [ ] configuration activity to configure what files will be displayed (own/course)
             [ ] messages
                 [ ] add support for viewing the outbox
+                [ ] downloading message attachments
                 [ ] add support for attachments via the "Wysiwyg Uploads" folder, also with share Intents
             [ ] bump version
             [ ] update help text

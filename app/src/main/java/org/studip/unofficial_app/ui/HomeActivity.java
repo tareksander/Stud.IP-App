@@ -200,6 +200,7 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
         if (savedInstanceState == null) {
             handleIntent(getIntent());
         }
+        //ShortcutManagerCompat.removeAllDynamicShortcuts(this);
         //ShortcutManagerCompat.pushDynamicShortcut(this, new ShortcutInfoCompat.Builder(this, "test").setShortLabel("test").setIntent(new Intent(Intent.ACTION_VIEW)).setIcon(IconCompat.createWithResource(this, R.drawable.admin_blue)).build());
         
         setContentView(binding.getRoot());
