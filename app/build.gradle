@@ -12,7 +12,7 @@ android {
         applicationId "org.studip.unofficial_app"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 13
+        versionCode 14
         versionName "0.5.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
