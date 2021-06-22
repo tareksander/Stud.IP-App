@@ -1,4 +1,4 @@
-Support für die Browser-Version von STud.IP hinzugefügt.
+Support für die Browser-Version von Stud.IP hinzugefügt.
 Links im Forum sind nun anklickbar.
 API-Erkennung hinzugefügt, damit die App bei fehlenden Teilen der API Funktionen abschaltet, anstatt gar nicht zu funktionieren.
 Unterstützung für OAuth-Authentifizierung hinzugefügt.
