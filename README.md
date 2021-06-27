@@ -4,6 +4,7 @@
 ![](https://img.shields.io/github/v/release/tareksander/Stud.IP-App?include_prereleases)
 
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" height="75">](https://f-droid.org/packages/org.studip.unofficial_app/)
+<a href='https://play.google.com/store/apps/details?id=org.studip.unofficial_app&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png' height="75"/></a>  
 
 An unofficial app for Stud.IP systems.
 
