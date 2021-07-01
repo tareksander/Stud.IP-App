@@ -315,6 +315,9 @@ After you accept, return here and click continue.
     <string name="studip_mobile">Stud.IP Mobile</string>
     <string name="shortcut_disabled">Logging out invalidates all shortcuts.</string>
     <string name="privacy_button">Privacy policy</string>
+    <string name="duplicate">New window</string>
+    <string name="start_semester">Start semester: %1$s</string>
+    <string name="end_semester">End semester: %1$s</string>
 
 
 </resources>

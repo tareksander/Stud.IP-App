@@ -38,6 +38,7 @@ import org.studip.unofficial_app.model.viewmodels.FileViewModel;
 import org.studip.unofficial_app.model.viewmodels.HomeActivityViewModel;
 import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.fragments.dialog.CourseForumDialogFragment;
+import org.studip.unofficial_app.ui.fragments.dialog.CourseInfoDialogFragment;
 import org.studip.unofficial_app.ui.fragments.dialog.CourseNewsDialogFragment;
 import org.studip.unofficial_app.ui.plugins.fragments.dialog.CourseOpencastDialog;
 import org.studip.unofficial_app.ui.plugins.fragments.dialog.CoursewareDialog;
@@ -289,6 +290,13 @@ public class CoursesFragment extends SwipeRefreshFragment
                 b.courseBlubber.setVisibility(View.INVISIBLE);
                 b.courseSchedule.setVisibility(View.INVISIBLE);
             }
+            b.courseInfo.setOnClickListener(v1 -> {
+                Bundle args = new Bundle();
+                args.putSerializable(CourseInfoDialogFragment.COURSE, c);
+                CourseInfoDialogFragment d = new CourseInfoDialogFragment();
+                d.setArguments(args);
+                d.show(getParentFragmentManager(), "course_info");
+            });
             b.courseNews.setOnClickListener(v1 ->
             {
                 Bundle args = new Bundle();

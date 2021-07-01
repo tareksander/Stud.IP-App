@@ -18,6 +18,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +27,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.pm.ShortcutInfoCompat;
 import androidx.core.content.pm.ShortcutManagerCompat;
 import androidx.core.graphics.drawable.IconCompat;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +51,7 @@ import org.studip.unofficial_app.ui.fragments.dialog.MkdirDialogFragment;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -60,6 +65,8 @@ public class FileFragment extends SwipeRefreshFragment
     private FragmentFileBinding binding;
     private FileViewModel m;
     
+    
+    private ActivityResultLauncher<String[]> launch;
     private static final String LIST_KEY = "list";
     
     @Nullable
@@ -183,7 +190,83 @@ public class FileFragment extends SwipeRefreshFragment
             binding.fileRefresh.setOnRefreshListener(() -> binding.fileRefresh.setRefreshing(false));
         }
         
+        launch = registerForActivityResult(new ActivityResultContracts.OpenMultipleDocuments(), this::uploadFiles);
+        
         return binding.getRoot();
+    }
+    
+    private void uploadFiles(List<Uri> files) {
+        final boolean[] finished = new boolean[files.size()];
+        MutableLiveData<Boolean> obs = new MutableLiveData<>();
+        obs.observe(this, o -> {
+            for (boolean b  : finished) {
+                if (! b) {
+                    return;
+                }
+            }
+            m.refresh(requireActivity());
+        });
+        for (int i = 0;i<files.size();i++) {
+            Uri file = files.get(i);
+            if (file != null)
+            {
+                StudipFolder f = m.get().getValue();
+                if (f != null)
+                {
+                    binding.fileRefresh.setRefreshing(true);
+                    byte[] data = null;
+                    try (InputStream in = requireActivity().getContentResolver().openInputStream(file)) {
+                        data = readFully(in);
+                    }
+                    catch (IOException ignored) {}
+                    if (data != null)
+                    {
+                        API api = APIProvider.getAPI(requireActivity());
+                        if (api != null)
+                        {
+                            MultipartBody.Part p = MultipartBody.Part.createFormData("filename",getFileName(file,requireActivity()), RequestBody.create(data));
+                            int finalI = i;
+                            api.file.upload(f.id, p).enqueue(new Callback<StudipFolder.FileRef>()
+                            {
+                                @Override
+                                public void onResponse(@NotNull Call<StudipFolder.FileRef> call, @NotNull Response<StudipFolder.FileRef> response)
+                                {
+                                    finished[finalI] = true;
+                                    obs.setValue(true);
+                                    if (response.code() != 201) {
+                                        if (response.code() == 500) {
+                                            Toast.makeText(requireActivity(),R.string.upload_failed,Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+                        
+                                @Override
+                                public void onFailure(@NotNull Call<StudipFolder.FileRef> call, @NotNull Throwable t)
+                                {
+                                    finished[finalI] = true;
+                                    obs.setValue(true);
+                                    //binding.fileRefresh.setRefreshing(false);
+                                }
+                            });
+                        } else {
+                            finished[i] = true;
+                            obs.setValue(true);
+                            //binding.fileRefresh.setRefreshing(false);
+                        }
+                    } else {
+                        finished[i] = true;
+                        obs.setValue(true);
+                        //binding.fileRefresh.setRefreshing(false);
+                    }
+                } else {
+                    finished[i] = true;
+                    obs.setValue(true);
+                }
+            } else {
+                finished[i] = true;
+                obs.setValue(true);
+            }
+        }
     }
     
     @Override
@@ -203,59 +286,6 @@ public class FileFragment extends SwipeRefreshFragment
         }
     }
     
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent intentData)
-    {
-        super.onActivityResult(requestCode, resultCode, intentData);
-        if (intentData != null)
-        {
-            Uri file = intentData.getData();
-            StudipFolder f = m.get().getValue();
-            if (f != null)
-            {
-                binding.fileRefresh.setRefreshing(true);
-                byte[] data = null;
-                try (InputStream in = requireActivity().getContentResolver().openInputStream(file)) {
-                    data = readFully(in);
-                }
-                catch (IOException ignored) {}
-                if (data != null)
-                {
-                    API api = APIProvider.getAPI(requireActivity());
-                    if (api != null)
-                    {
-                        MultipartBody.Part p = MultipartBody.Part.createFormData("filename",getFileName(file,requireActivity()), RequestBody.create(data));
-                        api.file.upload(f.id, p).enqueue(new Callback<StudipFolder.FileRef>()
-                        {
-                            @Override
-                            public void onResponse(@NotNull Call<StudipFolder.FileRef> call, @NotNull Response<StudipFolder.FileRef> response)
-                            {
-                                if (response.code() == 201)
-                                {
-                                    m.refresh(requireActivity());
-                                } else {
-                                    binding.fileRefresh.setRefreshing(false);
-                                    if (response.code() == 500) {
-                                        Toast.makeText(requireActivity(),R.string.upload_failed,Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(@NotNull Call<StudipFolder.FileRef> call, @NotNull Throwable t)
-                            {
-                                binding.fileRefresh.setRefreshing(false);
-                            }
-                        });
-                    } else {
-                        binding.fileRefresh.setRefreshing(false);
-                    }
-                } else {
-                    binding.fileRefresh.setRefreshing(false);
-                }
-            }
-        }
-    }
 
     private static String getFileName(Uri uri, Activity a)
     {
@@ -290,7 +320,10 @@ public class FileFragment extends SwipeRefreshFragment
         Intent intent = new Intent().setType("*/*").setAction(Intent.ACTION_OPEN_DOCUMENT);
         if (intent.resolveActivity(requireActivity().getPackageManager()) != null)
         {
-            startActivityForResult(Intent.createChooser(intent, getResources().getString(R.string.select_file)), 123);
+            if (launch != null) {
+                launch.launch(new String[]{"*/*"});
+            }
+            //startActivityForResult(Intent.createChooser(intent, getResources().getString(R.string.select_file)), 123);
         }
     }
     

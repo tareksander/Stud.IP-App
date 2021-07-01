@@ -65,14 +65,17 @@
             android:alwaysRetainTaskState="true" />
         <activity
             android:name=".ui.SettingsActivity"
+            android:launchMode="singleInstance"
             android:exported="false"
             android:alwaysRetainTaskState="true" />
         <activity
             android:name=".ui.LoginActivity"
+            android:launchMode="singleInstance"
             android:exported="false"
             android:alwaysRetainTaskState="true" />
         <activity
             android:name=".ui.ServerSelectActivity"
+            android:launchMode="singleInstance"
             android:exported="false"
             android:alwaysRetainTaskState="true" />
         <activity

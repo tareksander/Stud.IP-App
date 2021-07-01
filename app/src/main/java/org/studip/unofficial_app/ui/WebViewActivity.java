@@ -9,13 +9,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.webkit.CookieManager;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.ValueCallback;
+import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -35,8 +34,6 @@ import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.databinding.ActivityWebViewBinding;
 import org.studip.unofficial_app.model.APIProvider;
-
-import java.net.URLEncoder;
 
 public class WebViewActivity extends AppCompatActivity
 {
@@ -165,6 +162,13 @@ public class WebViewActivity extends AppCompatActivity
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK) && browserView.canGoBack()) {
+            WebBackForwardList l = browserView.copyBackForwardList();
+            /*
+            if (l.getCurrentIndex() > 0) {
+                WebHistoryItem last = l.getItemAtIndex(l.getCurrentIndex() - 1);
+                System.out.println(last.getUrl());
+            }
+             */
             browserView.goBack();
             return true;
         }

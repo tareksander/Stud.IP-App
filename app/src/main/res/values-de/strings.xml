@@ -321,6 +321,9 @@ Wenn Sie den Zugriff erlaubt haben, kehren Sie hierher zurück und drücken Sie 
     <string name="studip_mobile">Stud.IP Mobile</string>
     <string name="shortcut_disabled">Ausloggen macht alle SHortcuts ungültig</string>
     <string name="privacy_button">Datenschutzerklärung</string>
+    <string name="duplicate">Neues Fenster</string>
+    <string name="start_semester">Startsemester: %1$s</string>
+    <string name="end_semester">Endsemester: %1$s</string>
 
 
 </resources>

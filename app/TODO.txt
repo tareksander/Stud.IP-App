@@ -23,123 +23,25 @@
     
     
     Roadmap:
-        0.5.0:
-            [x] option to browse the web version in an activity with a fullscreen WebView
-                [x] the overview button doesn't work on-device
-                [x] set user agent to mobile
-                [x] redirect page loads for pages not on the server to the browser
-                [x] allow javascript
-                [x] autofill for login form
-                [x] back button goes back in history, finishes activity if no history left
-                [x] intercept logout, finish activity instead
-                [x] add swipe-to-refresh
-                [x] for cookie auth, the session cookie is shared
-                [x] handle the configuration change for the orientation change myself? no need to reload then, and no white flash while loading
-            [x] Forum
-                [x] clickable links in posts
-            [x] API detection:
-                [x] better error message when login fails
-                [x] see what routes are needed for what features, tell user on login which features are unavailable
-                [x] disable functions according to disabled features
-                [x] option to ignore unavailable features, features may partly work if some routes are enabled
-                [x] add the option to res-scan for features in the settings screen
-                [x] fail without message for features where the routes are disabled
-                [x] put the used routes in the Github Readme
-            [x] rework UI
-                [x] fix settings buttons text color for dark mode
-                [x] remove the "Experimental Features" text from the settings, the features work quite reliably
-                [x] remove the "developer settings" not used anyways
-                [x] try to find nicer colors for dark mode
-                [x] space everything more out in general
-                [x] courses screen
-                    [x] space the icons wider out, make them into 2 rows for each course
-                [x] courseware
-                    [x] fix the bug that causes the buttons for opencast videos to display incorrectly when in landscape mode
-            [x] support for OAuth1 for authentication
-                https://oauth1.wp-api.org/docs/basics/Auth-Flow.html
-                https://stackoverflow.com/questions/2665796/android-handle-oauth-callback-using-intent-filter
-                [x] make a class with the hostnames and OAuth data for supported servers
-                [x] extra error message when OAuth isn't supported for the app by a server, tell the user to send a predefined message to the admin,
-                    to enable OAuth support for the Stud.IP installation.
-                [x] The callback uri doesn't seem to work, the browser doesn't redirect to it. Probably a bug in Stud.IP
-                [x] authorize the token via an intent to the browser
-                [x] add error dialogs for OAuth login
-                [x] add OAuth authentication to the downloads
-                [x] add an authentication interceptor for oauth authentication, save the token in the API shared preferences
-                [x] check: do things which require a session cookie work with OAuth? Do you get a session cookie when using OAuth?
-                    [x] some features might have to be disabled, or only supported via the new JSONAPI, or require the user to log in in the app
-                        [x] forum post
-                        [x] search for addressees
-                        [x] the notifications don't work, because the route used is a dispatch route
-                        [x] getting and setting the Stud.IP notification settings also doesn't work
-            [x] fully save UI state
-                [x] make text selectable, so it can be copied
-                [x] save the scrolling position in ScrollViews
-                [x] save state for WebViewActivity
-                    [x] also save scrolling position. saving x scroll isn't possible
-                    [x] save the history
-                    [x] add a progress bar
-                    [x] is the cookie jar saved?
-                [x] save the selected semester in the courses screen
-                [x] SavedStateModule for all ViewModels for special data not from the database
-                    All objects have to be serializable correctly for this.
-                    The limit is 1mb, the CoursewareViewModel could exceed that. In that case, write the data to a file in the cache folder in a lifecycle method
-                    , make sure the document provider doesn't delete it on startup, and delete it when it is read.
-                    [x] maybe store the opencast und courseware data in the database?
-                    [x] MeetingsRoomsViewModel
-                    [x] OpencastViewModel
-                    [x] CoursewareViewModel
-                    [x] FileViewModel
-                    [x] ForumViewModel: current parent entry
-                    [x] selected semester for courses screen
-                    [x] measure the performance after these changes, check if re-creation from an configuration change is still fast
-                        https://medium.com/androiddevelopers/testing-app-startup-performance-36169c27ee55
-            [x] add shortcuts
-                [x] own files
-                [x] courses
-                [x] messages
-                [x] dynamic/pinned shortcuts: specific to the Stud.IP server, have to be removed on logout
-                    [x] add options to create these as pinned shortcuts
-                    [x] course files: Long press the course name in the files screen
-                    [x] specific folder: Long press the course name of "Your files" in the files screen
-                    [x] course forum: Long press on the forum icon
-                    [x] forum entry: Long press on the entry name (When it is in lost form, not when viewing it)
-                    [x] a specific BBB meeting: Long press on the meeting button
-                    [x] a specific courseware page: long press on the section
-                    [x] a specific page in the mobile view:
-            [x] app integration
-                [x] open the intent in the main task for the app
-                [x] intent filter for sending a message to someone
-                [x] same for posting on a forum
-                    [x] you can only have one filter per activity for the same intent. make a share activity that gets started, where the user can choose
-                        how to share the data
-            [x] add a reply button to the message view dialog
-            [x] deep links work delayed: the next link gets the data from the previous one. Only in in note app
-            [x] bump version
-            [x] update help text
-                [x] for Cookie auth, the notifications only work as long as the cookie is valid
-                [x] for OAuth, several features don't work, including notifications
-                [x] also include all other new things
-            [x] update description
-            [x] write changelog
-            [ ] publish on play store
-                [x] write privacy policy
-                [ ] put the badge on the github readme: https://play.google.com/intl/en_gb/badges/
         1.0.0:
+            [x] put the badge on the github readme: https://play.google.com/intl/en_gb/badges/
             [ ] add a table of contents to the help screen, with hyperlinks. probably requires using a WebView do use the hyperlinks
             [ ] app integration
                 [ ] https://developer.android.com/training/sharing/receive
                     https://developer.android.com/codelabs/android-direct-share
                     Apparently, there is a bug in the android 10 emulator which prevents sharing shortcuts from working
                     [ ] add the last people the user send messages to as persons
-            [ ] a way to open multiple tasks for the app, e.g. to view multiple coursewares
-            [ ] option to upload multiple files at once
+            [ ] fix the cache miss problem when logging in in the webview and using the back button, probably by excluding it from the history
+            [x] a way to open multiple tasks for the app, e.g. to view multiple coursewares
+            [x] option to upload multiple files at once (finish the refreshing after that)
             [ ] option to set the app as the default browser app and set a real browser app.
                 All links to Stud.IP will get opened in the app, all other links are relayed to the chosen browser app.
                 Only possible way for android < S, because you need ownership of a domain to use app links.
                 On android S, you can ask the user to set the app as a standard app for link types.
                     [ ] test the browser app querying on android 11
+                [ ] prepare the code to ask for the user to associate Stud.IP links with the app upon login for android S
             [ ] support for viewing Images in Forum Posts: Probably with another ImageHandler for Html.fromHtml
+                [ ] If the image is in a file url on the studip server, get it via the download route. If not, get it via picasso
             [ ] deep links improvements
                 [ ] support for more link types
                     [x] courseware
@@ -156,7 +58,7 @@
             [ ] better updating of messages, so not every message is downloaded on update, only the ones until a saved one is found
                 [ ] don't care about deleting messages deleted from the server, the user can just also delete them locally
                 [ ] when a message is deleted, don't sync with the server, just send a delete and delete it from the database
-            [ ] add the course info dialog
+            [x] add the course info dialog
             [ ] add the course members dialog
             [ ] add the user info dialog
             [ ] support for the planner
@@ -169,6 +71,8 @@
                 [ ] files
                     [ ] save behaviour as the files screen
                     [ ] configuration activity to configure what files will be displayed (own/course)
+                [ ] 1x1 "widget" that launches the app, but changes the icon with dark mode
+                    [ ] also let the app icon change with dark mode again, so the app icon is right in the overview screen
             [ ] messages
                 [ ] add support for viewing the outbox
                 [ ] downloading message attachments
@@ -178,6 +82,7 @@
             [ ] new & more screenshots, with UI improvements
             [ ] update description
             [ ] write changelog
+            [ ] update on play store
         1.1.0:
             [ ] OAuth
                 [ ] add the option for the user to provide a OAuth consumer key and consumer secret, so private installations can enable OAuth
@@ -189,6 +94,8 @@
                 [ ] if you invite people to a personal blubber, does it become a group chat?
                 [ ] whatsapp-like list for chats, try to emulate a messenger app with blubber
                 [ ] intent filter to send a blubber to someone
+                [ ] idea: encrypted blubber: use end-to-end-encryption with a pre-shared secret, Base64-encode the cypthertext and urlencode it
+                    [ ] decryption will only work in the app
             [ ] bump version
             [ ] update help text
             [ ] update description

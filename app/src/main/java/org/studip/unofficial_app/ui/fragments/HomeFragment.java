@@ -1,5 +1,6 @@
 package org.studip.unofficial_app.ui.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,6 +63,12 @@ public class HomeFragment extends SwipeRefreshFragment
             binding.homeRefresh.setOnRefreshListener(() -> binding.homeRefresh.setRefreshing(false));
         }
         
+        binding.duplicateButton.setOnClickListener(v -> {
+            Intent i = new Intent(requireActivity(), HomeActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK | Intent.FLAG_ACTIVITY_RETAIN_IN_RECENTS);
+            i.setAction(requireActivity().getPackageName()+".duplicate");
+            startActivity(i);
+        });
         
         return binding.getRoot();
     }
