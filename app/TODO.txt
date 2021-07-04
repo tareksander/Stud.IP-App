@@ -55,6 +55,9 @@
                 [ ] link to the planner
                 [x] open unknown link patterns in the WebView for the server
             [ ] delete data which is not in a server response, but still in the database
+            [ ] add the option to search for new news and forum entries when refreshing courses and color the icon red, to get the same feature as
+                the web version
+                [ ] add the option for the notification service to do this and emit extra notifications, even if the notification setting is turned off
             [ ] better updating of messages, so not every message is downloaded on update, only the ones until a saved one is found
                 [ ] don't care about deleting messages deleted from the server, the user can just also delete them locally
                 [ ] when a message is deleted, don't sync with the server, just send a delete and delete it from the database
