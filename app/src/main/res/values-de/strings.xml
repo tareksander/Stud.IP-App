@@ -84,7 +84,23 @@
     <string name="help_button">Hilfe anzeigen</string>
     <string name="help_content"><![CDATA["
 <big><h1>Hilfe</h1></big>
-<h2>1. Anmeldung</h2>
+<big><h2>Inhaltsverzeichnis</h2></big>
+<ul>
+<li><a href="#1">1. Anmeldung</a></li>
+<li><a href="#2">2. Generelles und Einstellungen</a></li>
+<li><a href="#3">3. Deaktivierte Funktionen</a></li>
+<li><a href="#4">4. Startbildschirm</a></li>
+<li><a href="#5">5. Kursbildschirm</a></li>
+<li><a href="#6">6. Dateibildschirm</a></li>
+<li><a href="#7">7. Nachrichtenbildschirm</a></li>
+<li><a href="#8">8. Courseware-Plugin</a></li>
+<li><a href="#9">9. Meetings-Plugin</a></li>
+<li><a href="#10">10. Mobile Ansicht von Stud.IP</a></li>
+<li><a href="#11">11. Shortcuts</a></li>
+</ul><br><br>
+
+
+<h2 id="1" >1. Anmeldung</h2>
 Zuerst sollten Sie in den Einstellungen die Authentifizierungsmethode festlegen.<br>
 Wenn Sie sich nur einmal einloggen wollen, sollten sie HTTP Basic Authentication benutzen.<br>
 Wenn Sie nicht wollen, dass Benutzername und Passwort auf dem Gerät gespeichert ist (keine Sorge, es ist verschlüsselt), dann sollten Sie Session Cookie wählen.<br>
@@ -111,7 +127,7 @@ Dann müssen Sie Ihren Benutzernamen und Ihr Passwort eingeben (wenn Sie nicht O
 <br><br>
 
 
-<h2>2. Generelles und Einstellungen</h2>
+<h2 id="2" >2. Generelles und Einstellungen</h2>
 Alle Dialoge und Bildschirme können mit einem nach unten Ziehen dazu gebracht werden, aktuelle Daten vom Server zu beziehen.<br>
 Bis auf die Dateien sind alle Daten auf dem Gerät zwischengespeichert und können auch ohne Netzwerkverbindung angeschaut werden.<br>
 Die Dateien müssen jeweils explizit heruntergeladen werden, um Datenvolumen zu sparen.<br>
@@ -135,7 +151,7 @@ In den EInstellungen können Sie aussuchen, mit welcher App diese Links geöffne
 Wenn Sie keine App aussuchen, werden Sie bei jedem Link gefragt, welche benutzt werden soll.<br><br>
 
 
-<h2>3. Deaktivierte Funktionen</h2>
+<h2 id="3" >3. Deaktivierte Funktionen</h2>
 Ihr Stud.IP-Administrator hat vielleicht nicht die ganze API angeschaltet.<br>
 Die App benutzt nicht die ganze API, also ist das vielleicht gar kein Problem.<br>
 Wenn die App beim Anmelden aber bemerkt, dass Teile der API deaktiviert sind, die die App benutzt, bekommen Sie einen Dialog mit allen deaktivierten Funktionen.<br>
@@ -150,22 +166,22 @@ Wenn Sie eine Funktion verwenden wollen, für die die API deaktiviert ist, könn
 <br><br>
 
 
-<h2>4. Startbildschirm</h2>
+<h2 id="4" >4. Startbildschirm</h2>
 Auf diesem Bildschirm wird Ihr Name, wie er in dem Stud.IP-System steht, angezeigt, und dazu die globalen Ankündigungen des Systems.<br><br>
 
-<h2>5. Kursbildschirm</h2>
+<h2 id="5" >5. Kursbildschirm</h2>
 Auf diesem Bildschirm können Sie Ihre Kurse für ein ausgewähltes Semester anschauen.<br>
 Die Symbole zu den Kursen funktionieren wie auf der Weboberfläche, aber für manche sind die Funktionen noch nicht implementiert.<br>
 Mit dem Flaggen-Symbol können Sie die Ankündigungen eines Kurses lesen.<br>
 Mit dem Datei-Symbol können Sie sich die Dateien eines Kurses anschauen, herunterladen und hochladen.<br><br>
 
-<h2>6. Dateibildschirm</h2>
+<h2 id="6" >6. Dateibildschirm</h2>
 Auf diesem Bildschirm können Sie Sich ihre Dateien auf dem System und die Dateien von Kursen ansehen.<br>
 Durch tippen auf den \"…\"-Eintrag kommen Sie in das Elternverzeichnis zurück, falls vorhanden, durch halten kommen sie zu Ihren eigenen Dateien zurück.<br>
 Beim antippen eines Verzeichnisses werden die Inhalte angezeigt, bei einer Datei wird sie heruntergeladen.<br>
 Durch Halten auf eine Datei oder ein Verzeichnis wird es gelöscht.<br><br>
 
-<h2>7. Nachrichtenbildschirm</h2>
+<h2 id="7" >7. Nachrichtenbildschirm</h2>
 Auf diesem Bildschirm können Sie Ihre Stud.IP-Nachrichten lesen und neue Verfassen.<br>
 Durch lange auf eine Nachricht halten wird diese gelöscht.<br>
 Beim Addressat auswählen schlägt die App Ihnen schon bekannte Benutzer vor.<br>
@@ -173,10 +189,10 @@ Wenn Sie den "Suchen"-Button benutzen, sucht die App im System nach Benutzern mi
 Ein Addressat wird hinzugefügt, indem Sie ihn in der Liste antippen.<br>
 Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br>
 
-<h2>8. Courseware-Plugin</h2>
+<h2 id="8" >8. Courseware-Plugin</h2>
 Wenn Sie auf das Courseware-Icon im Kurs-Bildschirm tippen, können Sie sich die Courseware anschauen, falls vorhanden.<br>
 Tippen Sie auf ein Kapitel, um die Unterkapitel zu laden und auf ein Unterkaptiel, um die Abschnitte zu laden.<br>
-Unterstützte Courseware-Blöcke:<li>
+Unterstützte Courseware-Blöcke:<br>
 <ul>
 <li>HTML<br></li>
 <li>Opencast<br></li>
@@ -184,7 +200,7 @@ Unterstützte Courseware-Blöcke:<li>
 </ul>
 <br><br>
 
-<h2>9. Meetings-Plugin</h2>
+<h2 id="9" >9. Meetings-Plugin</h2>
 Wenn Sie das Meetings-Icon antippen, sehen sie alle verfügbaren Meeting-Räume eines Kurses.<br>
 Wenn Sie auf einen der Buttons klicken, wird das Meeting in einem neuen Fenster geöffnet.<br>
 Wenn Sie wegnavigieren, wird das Meeting automatisch in den Picture-in-Picure Modus geschaltet, damit die Konferenz nicht unterbrochen wird.<br>
@@ -195,7 +211,7 @@ Auf die Benachrichtigung tippen bringt die Konferenz wieder in den Vollbildmodus
 Das PiP-Fenster hat auch einen Button, um das Mikrofon umzuschalten.<br>
 <br><br>
 
-<h2>10. Mobile Ansicht von Stud.IP</h2>
+<h2 id="10" >10. Mobile Ansicht von Stud.IP</h2>
 Sie können die Browser-Version von Stud.IP in der App öffnen, indem SIe auf das Globus-Icon tippen.<br>
 Wenn Sie HTTP Basic Authentication benutzen, werden Ihre Logindaten automatisch ausgefüllt.<br>
 Wenn Sie einen Session Cookie zum Anmelden benutzen, wird dieser mit der Browser-Version geteilt und Sie müssen sich nicht anmelden, solange der Cookie gültig ist.<br>
@@ -207,7 +223,7 @@ Wenn Sie versuchen sich auszuloggen, werden Sie stattdessen zum vorherigen Bilds
 Der zurück-Button navigiert im Browserverlauf zurück, oder zum vorherigen Bildschirm, wenn keine Seite mehr im Verlauf ist.<br>
 <br><br>
 
-<h2>11. Shortcuts</h2>
+<h2 id="11" >11. Shortcuts</h2>
 Wenn sie im Launcher das App-Icon halten, sehen sie ein paar Standard-Shortcuts:<br>
 - Der Dateibildschirm<br>
 - Der Kursbildschirm<br>

@@ -25,11 +25,12 @@
     Roadmap:
         1.0.0:
             [x] put the badge on the github readme: https://play.google.com/intl/en_gb/badges/
-            [ ] add a table of contents to the help screen, with hyperlinks. probably requires using a WebView do use the hyperlinks
+            [x] add a table of contents to the help screen, with hyperlinks. probably requires using a WebView do use the hyperlinks
             [ ] app integration
                 [ ] https://developer.android.com/training/sharing/receive
                     https://developer.android.com/codelabs/android-direct-share
                     Apparently, there is a bug in the android 10 emulator which prevents sharing shortcuts from working
+                    Test on-device instead.
                     [ ] add the last people the user send messages to as persons
             [ ] fix the cache miss problem when logging in in the webview and using the back button, probably by excluding it from the history
             [x] a way to open multiple tasks for the app, e.g. to view multiple coursewares
@@ -49,7 +50,6 @@
                     [x] meetings
                     [x] forum
                     [ ] planner
-                    [ ]
                 [x] for messages, load the message if it isn't already, and view it
                 [ ] link to the course info and member screens
                 [ ] link to the planner

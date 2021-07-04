@@ -79,7 +79,23 @@
     <string name="help_button">view help</string>
     <string name="help_content"><![CDATA["
 <big><h1>Help</h1></big>
-<h2>1. Login</h2>
+<big><h2>Table of contents</h2></big>
+<ul>
+<li><a href="#1">1. Login</a></li>
+<li><a href="#2">2. General & Settings</a></li>
+<li><a href="#3">3. Deactivated features</a></li>
+<li><a href="#4">4. Home</a></li>
+<li><a href="#5">5. Courses</a></li>
+<li><a href="#6">6. Files</a></li>
+<li><a href="#7">7. Messages</a></li>
+<li><a href="#8">8. Courseware plugin</a></li>
+<li><a href="#9">9. Meetings plugin</a></li>
+<li><a href="#10">10. Mobile view screen</a></li>
+<li><a href="#11">11. Shortcuts</a></li>
+</ul><br><br>
+
+
+<h2 id="1" >1. Login</h2>
 First you should choose you authentication method from the settings.<br>
 If you only want to log in once, you should use HTTP Basic authentication.<br>
 If you don't want you username and password stored on the device (don't worry they're encrypted), you should choose the session cookie.<br>
@@ -109,7 +125,7 @@ Then you have to enter your username and password (if you don't use OAuth).<br>
 <br><br>
 
 
-<h2>2. General & Settings</h2>
+<h2 id="2" >2. General & Settings</h2>
 All dialogs and screens use swipe-to-refresh to get new data from the server.<br>
 Apart from the files all data is cached on the device and can be viewed without an internet connection.<br>
 The files have to be downloaded manually on demand.<br>
@@ -132,7 +148,7 @@ But this app isn't a full browser, so links that don't point to Stud.IP have to 
 In the settings you can set which browser app to use.<br>
 If you don't set a browser app, you will be asked to choose one for every link.<br><br>
 
-<h2>3. Deactivated features</h2>
+<h2 id="3" >3. Deactivated features</h2>
 Your Stud.IP administrators may not have enabled the whole API.<br>
 The App doesn't use the whole API, so that may not be a problem.<br>
 But if the app detects at login that parts of the API are deactivated that the app actually uses, you will see a dialog reporting all missing features.<br>
@@ -147,10 +163,10 @@ If you want to use a feature for which the API is disabled, you can also use the
 <br><br>
 
 
-<h2>4. Home</h2>
+<h2 id="4" >4. Home</h2>
 On this screen you can see your Stud.IP name and the global Stud.IP news.<br><br>
 
-<h2>5. Courses</h2>
+<h2 id="5" >5. Courses</h2>
 On this screen you can view your courses for a specific semester.<br>
 The icons for the courses work like on the website, but some features aren't implemented yet.<br>
 You can use the flag icon to view course news.<br>
@@ -158,13 +174,13 @@ With the file icon you can view the files of a specific course.<br><br>
 
 
 
-<h2>6. Files</h2>
+<h2 id="6" >6. Files</h2>
 On this screen you can view your files and course files.<br>
 Tap \"…\" to return to the parent directory, hold to return to you own files.<br>
 Tap on a folder to view its contents, tap on a file to download it.<br>
 Long press on a file or folder to delete it.<br><br>
 
-<h2>7. Messages</h2>
+<h2 id="7" >7. Messages</h2>
 On this screen you can view and write Stud.IP messages.<br>
 Long press on a message to delete it.<br>
 To choose the addressee the app searches for known users with a name like the one you wrote.<br>
@@ -173,7 +189,7 @@ Add the addressee by tapping it in the list.<br>
 Long press on an addressee to remove it.<br>
 <br><br>
 
-<h2>8. Courseware plugin</h2>
+<h2 id="8" >8. Courseware plugin</h2>
 By clicking the courseware icon for a course in the courses screen you can view the Courseware, if there is any.<br>
 Tap in a chapter on the left to load the subchapters, tap on a subchapter to load the sections.<br>
 Supported blocks are:<br>
@@ -184,7 +200,7 @@ Supported blocks are:<br>
 </ul>
 <br><br>
 
-<h2>9. Meetings plugin</h2>
+<h2 id="9" >9. Meetings plugin</h2>
 Tapping the meetings icon for a course loads all meeting rooms available.<br>
 When you click a button, a new window will open with the BigBlueButton conference.<br>
 When navigating away, the window automatically goes into picture-in-picture mode and the presentation is set to fullscreen, so the conference can continue without interruption.<br>
@@ -194,7 +210,7 @@ Tapping the notification returns to the conference in full-screen.<br>
 The PiP-window also has a button to toggle the microphone.<br>
 <br><br>
 
-<h2>10. Mobile view screen</h2>
+<h2 id="10" >10. Mobile view screen</h2>
 You can open the mobile browser version of Stud.IP by clicking the globe tab icon.<br>
 If you use HTTP Basic authentication, the login form will be filled out for you.<br>
 If you use cookie authentication, the cookie will be shared with the mobile screen and you don't have to log in as long as you session cookie is valid.<br>
@@ -206,7 +222,7 @@ If you logout, the app instead returns you to the previous screen.<br>
 The back button navigates back in the web page history, or returns to the previous screen if there is no history left.<br>
 <br><br>
 
-<h2>11. Shortcuts</h2>
+<h2 id="11" >11. Shortcuts</h2>
 By long pressing the app icon on the laucher you see some standard shortcuts:<br>
 - The files screen<br>
 - The courses screen<br>
