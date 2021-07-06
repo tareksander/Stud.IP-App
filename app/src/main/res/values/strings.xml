@@ -25,7 +25,7 @@
     <string name="message_new">write message</string>
     <string name="message_delete_title">delete message</string>
     <string name="message_delete_msg">Really delete this message?</string>
-    <string name="message_search">Error</string>
+    <string name="message_search">Search</string>
     <string name="message_send">send</string>
     <string name="message_no_addressee">no addressee</string>
     <string name="message_no_subject">no subject</string>

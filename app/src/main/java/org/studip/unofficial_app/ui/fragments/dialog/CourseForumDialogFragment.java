@@ -411,7 +411,7 @@ public class CourseForumDialogFragment extends DialogFragment
                         e = children.toArray(new StudipForumEntry[0])[position - 1];
                     }
                     t.setMovementMethod(LinkMovementMethod.getInstance());
-                    t.setText(HelpActivity.fromHTML(e.content));
+                    t.setText(HelpActivity.fromHTML(e.content, true, requireActivity()));
                     t.setTextIsSelectable(true);
                 } else {
                     Collections.sort(children);

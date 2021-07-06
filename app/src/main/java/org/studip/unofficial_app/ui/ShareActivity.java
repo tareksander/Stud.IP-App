@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.Window;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.pm.ShortcutManagerCompat;
 
 import org.studip.unofficial_app.databinding.ActivityShareBinding;
 
@@ -30,6 +31,18 @@ public class ShareActivity extends AppCompatActivity
         if (i == null) {
             finish();
         } else {
+            String shortcut = i.getStringExtra(ShortcutManagerCompat.EXTRA_SHORTCUT_ID);
+            if (shortcut != null) {
+                String[] split = shortcut.split(":");
+                if (split.length == 2) {
+                    String type = split[0];
+                    if ("message".equals(type)) {
+                        toHomeActivity(i, SHARE_MESSAGE);
+                    }
+                }
+                finishAndRemoveTask();
+            }
+            
             binding.shareBlubber.setOnClickListener(v -> toHomeActivity(i, SHARE_BLUBBER));
             binding.shareForum.setOnClickListener(v -> toHomeActivity(i, SHARE_FORUM));
             binding.shareMessage.setOnClickListener(v -> toHomeActivity(i, SHARE_MESSAGE));

@@ -62,7 +62,7 @@ public class LoginActivity extends AppCompatActivity
                 oauthb = null;
                 setContentView(new ConstraintLayout(this));
             } else {
-                oauthb.oauthExplain.setText(HelpActivity.fromHTML(getString(R.string.oauth_login_explain)));
+                oauthb.oauthExplain.setText(HelpActivity.fromHTML(getString(R.string.oauth_login_explain), false, null));
                 
                 oauthb.oauthRedirect.setOnClickListener(v1 -> {
                     Call<String> tok = OAuthUtils.requestToken(api);

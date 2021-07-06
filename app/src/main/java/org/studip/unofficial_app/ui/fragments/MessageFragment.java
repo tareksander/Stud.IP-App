@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.pm.ShortcutManagerCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
@@ -107,6 +108,14 @@ public class MessageFragment extends SwipeRefreshFragment
                     Bundle args = new Bundle();
                     args.putString(MessageWriteDialogFragment.SUBJECT_KEY, source.getStringExtra(Intent.EXTRA_SUBJECT));
                     args.putString(MessageWriteDialogFragment.CONTENT_KEY, source.getStringExtra(Intent.EXTRA_TEXT));
+                    String shortcut = source.getStringExtra(ShortcutManagerCompat.EXTRA_SHORTCUT_ID);
+                    if (shortcut != null) {
+                        String[] split = shortcut.split(":");
+                        if (split.length == 2) {
+                            String uid = split[1];
+                            args.putString(MessageWriteDialogFragment.ADDRESSEE_KEY, uid);
+                        }
+                    }
                     MessageWriteDialogFragment d = new MessageWriteDialogFragment();
                     d.setArguments(args);
                     d.show(getParentFragmentManager(), "message_write");

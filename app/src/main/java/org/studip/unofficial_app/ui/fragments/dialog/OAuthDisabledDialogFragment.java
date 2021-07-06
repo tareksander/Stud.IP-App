@@ -36,7 +36,7 @@ public class OAuthDisabledDialogFragment extends DialogFragment
         b.setTitle(R.string.oauth_disabled_title);
         
         binding.msg.setMovementMethod(LinkMovementMethod.getInstance());
-        binding.msg.setText(HelpActivity.fromHTML(getString(R.string.oauth_disabled_msg)));
+        binding.msg.setText(HelpActivity.fromHTML(getString(R.string.oauth_disabled_msg), false, null));
         
         final String[] name = new String[]{""};
     

@@ -44,7 +44,7 @@ public class MessageDialogFragment extends DialogFragment
         title.setTextIsSelectable(true);
         
         
-        binding.messageContent.setText(HelpActivity.fromHTML(m.message_html));
+        binding.messageContent.setText(HelpActivity.fromHTML(m.message_html, true, requireActivity()));
         binding.messageContent.setTextIsSelectable(true);
         binding.messageReply.setOnClickListener(v -> {
             Bundle args2 = new Bundle();

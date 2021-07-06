@@ -45,7 +45,7 @@ public class LoginErrorDialogFragment extends DialogFragment
                 msg = R.string.login_error_message;
         }
         //System.out.println(code);
-        b.setTitle(R.string.login_error_title).setMessage(HelpActivity.fromHTML(getString(msg)));
+        b.setTitle(R.string.login_error_title).setMessage(HelpActivity.fromHTML(getString(msg), false, null));
         d = b.create();
         
         

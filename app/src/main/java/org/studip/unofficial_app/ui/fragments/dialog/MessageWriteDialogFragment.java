@@ -283,8 +283,7 @@ public class MessageWriteDialogFragment extends DialogFragment
                         HomeActivity.onStatusReturn(requireActivity(),response.code());
                         //System.out.println(response.code());
                     } else {
-                        /*
-                        ShortcutInfoCompat.Builder info = new ShortcutInfoCompat.Builder(requireActivity(), "person:"+recipients[0]);
+                        ShortcutInfoCompat.Builder info = new ShortcutInfoCompat.Builder(requireActivity(), "message:"+recipients[0]);
                         final StudipUser u = ad.getItem(0);
                         info.setShortLabel(u.name.formatted);
                         HashSet<String> cat = new HashSet<>();
@@ -312,7 +311,6 @@ public class MessageWriteDialogFragment extends DialogFragment
                                 }
                             } catch (Exception ignored) {}
                         }
-                         */
                         Toast.makeText(requireActivity(),R.string.message_send_successfully,Toast.LENGTH_SHORT).show();
                         dismiss();
                     }

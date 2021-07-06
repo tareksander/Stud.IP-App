@@ -59,11 +59,14 @@ import org.studip.unofficial_app.ui.plugins.fragments.dialog.CourseOpencastDialo
 import org.studip.unofficial_app.ui.plugins.fragments.dialog.CoursewareDialog;
 import org.studip.unofficial_app.ui.plugins.fragments.dialog.MeetingsRoomsDialog;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -107,7 +110,6 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
         super.onCreate(savedInstanceState);
         
         
-        binding = ActivityHomeBinding.inflate(getLayoutInflater());
 
         Notifications.initChannels(this);
 
@@ -151,11 +153,57 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
             finish();
             return;
         }
-        
-        
+    
+        binding = ActivityHomeBinding.inflate(getLayoutInflater());
         
         final Activity a = this;
-        
+        for (int i = 0;i<binding.tabs.getTabCount();i++) {
+            final int finalI = i;
+            TabLayout.Tab t = binding.tabs.getTabAt(i);
+            if (t != null) {
+                t.view.setOnLongClickListener(v -> {
+                    System.out.println("long press on " + finalI);
+                    String data = null;
+                    String label = null;
+                    int icon = 0;
+                    switch (finalI) {
+                        case 1:
+                            data = "courses";
+                            icon = R.drawable.seminar_blue;
+                            label = getString(R.string.courses);
+                            break;
+                        case 2:
+                            data = "files";
+                            icon = R.drawable.file_blue;
+                            label = getString(R.string.channel_files);
+                            break;
+                        case 3:
+                            data = "messages";
+                            icon = R.drawable.mail_blue;
+                            label = getString(R.string.channel_messages);
+                            break;
+                        case 4:
+                            data = "webview";
+                            icon = R.drawable.globe_blue;
+                            label = getString(R.string.studip_mobile);
+                    }
+                    if (data != null) {
+                        Intent intent = new Intent(this, HomeActivity.class);
+                        intent.setAction("org.studip.unofficial_app.shortcut");
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setData(Uri.parse(data));
+                        ShortcutInfoCompat.Builder b = new ShortcutInfoCompat.Builder(this, data);
+                        b.setIntent(intent);
+                        b.setIcon(IconCompat.createWithResource(this, icon));
+                        b.setShortLabel(label);
+                        if (ShortcutManagerCompat.isRequestPinShortcutSupported(this)) {
+                            ShortcutManagerCompat.requestPinShortcut(this, b.build(), null);
+                        }
+                    }
+                    return true;
+                });
+            }
+        }
         binding.tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
         {
             @Override
@@ -200,8 +248,24 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
         if (savedInstanceState == null) {
             handleIntent(getIntent());
         }
+    
+    
+        
+        
+        
+        
+        
+        /*
+        for (ShortcutInfoCompat info : ShortcutManagerCompat.getShortcuts(this, ShortcutManagerCompat.FLAG_MATCH_PINNED)) {
+            System.out.println(info.getId());
+        }
+        */
+        
         //ShortcutManagerCompat.removeAllDynamicShortcuts(this);
-        //ShortcutManagerCompat.pushDynamicShortcut(this, new ShortcutInfoCompat.Builder(this, "test").setShortLabel("test").setIntent(new Intent(Intent.ACTION_VIEW)).setIcon(IconCompat.createWithResource(this, R.drawable.admin_blue)).build());
+        //ShortcutManagerCompat.removeDynamicShortcuts(this, Arrays.asList("test"));
+        //HashSet<String> cat = new HashSet<>();
+        //cat.add("org.studip.unofficial_app.TEXT_SHARE_TARGET");
+        //ShortcutManagerCompat.pushDynamicShortcut(this, new ShortcutInfoCompat.Builder(this, "test").setShortLabel("test").setIntent(new Intent(this, DeepLinkActivity.class).setAction(Intent.ACTION_VIEW)).setIcon(IconCompat.createWithResource(this, R.drawable.admin_blue)).setCategories(cat).setActivity(new ComponentName(getPackageName(), getPackageName()+".ui.DeepLinkActivity")).build());
         
         setContentView(binding.getRoot());
     }
@@ -231,6 +295,17 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
             
         }
          */
+        if (Intent.ACTION_SEND.equals(start.getAction()) || Intent.ACTION_SEND_MULTIPLE.equals(start.getAction()) || Intent.ACTION_SENDTO.equals(start.getAction())) {
+            String share = start.getStringExtra(ShareActivity.SHARE_EXTRA);
+            if (share == null) {
+                Intent i = new Intent();
+                i.fillIn(start, 0);
+                i.setClass(this, DeepLinkActivity.class);
+                finishAndRemoveTask();
+                startActivity(i);
+                return;
+            }
+        }
         if ((getPackageName()+".shortcut").equals(start.getAction())) {
             closeAllDialogs(getSupportFragmentManager());
             if ("courses".equals(start.getDataString())) {
@@ -576,6 +651,7 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
                     //      and putting a file link at the end
                     
                     binding.pager.setCurrentItem(3);
+                    
                 }
                 if (type.equals(ShareActivity.SHARE_FORUM)) {
                     CoursesViewModel m = new ViewModelProvider(this).get(CoursesViewModel.class);

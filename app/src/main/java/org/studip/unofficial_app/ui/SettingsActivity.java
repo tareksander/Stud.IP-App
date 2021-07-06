@@ -734,6 +734,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     public void onHelpClicked(View v) {
         Intent i = new Intent(this,HelpActivity.class);
         startActivity(i);
+        finish();
     }
     
     public void onVisibilityClicked(View v) {

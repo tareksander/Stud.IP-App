@@ -615,6 +615,7 @@ public class API
             l.add(new Cookie.Builder().name(AUTH_COOKIE_NAME).hostOnlyDomain(hostname.split("/")[0]).value(auth).secure().build());
             api.cookies.put(hostname, l);
             api.userID = prefs.getString(USERID_KEY,null);
+            api.auth_method = Settings.AUTHENTICATION_COOKIE;
         }
         
         String username = prefs.getString(USERNAME_KEY,null);
@@ -625,6 +626,7 @@ public class API
             api.username = username;
             api.password = password;
             api.auth_method = Settings.AUTHENTICATION_BASIC;
+            api.cookies.clear();
         }
         
         api.disabled_features = prefs.getStringSet(DISABLED_FEATURES_KEY, new HashSet<>());
@@ -634,6 +636,7 @@ public class API
         if (oauth_secret != null && oauth_token != null) {
             api.oauth_token = new OAuthUtils.OAuthToken(oauth_token, oauth_secret, false);
             api.auth_method = Settings.AUTHENTICATION_OAUTH;
+            api.cookies.clear();
         }
         
         return api;
