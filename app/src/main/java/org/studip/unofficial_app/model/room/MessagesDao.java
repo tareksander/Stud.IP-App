@@ -2,6 +2,7 @@ package org.studip.unofficial_app.model.room;
 
 import androidx.lifecycle.LiveData;
 import androidx.paging.DataSource;
+import androidx.paging.PagingSource;
 import androidx.room.Dao;
 import androidx.room.Query;
 
@@ -25,7 +26,7 @@ public interface MessagesDao extends BasicDao<StudipMessage>
 
 
     @Query("SELECT * FROM messages ORDER BY mkdate DESC")
-    DataSource.Factory<Integer,StudipMessage> getPagedList();
+    PagingSource<Integer,StudipMessage> getPagedList();
     
     
 }

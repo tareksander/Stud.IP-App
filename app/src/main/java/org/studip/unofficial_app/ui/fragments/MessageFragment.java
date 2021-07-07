@@ -1,7 +1,6 @@
 package org.studip.unofficial_app.ui.fragments;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,15 +8,16 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.pm.ShortcutManagerCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModelKt;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.paging.LivePagedListBuilder;
-import androidx.paging.PagedList;
-import androidx.paging.PagedListAdapter;
+import androidx.paging.Pager;
+import androidx.paging.PagingConfig;
+import androidx.paging.PagingDataAdapter;
+import androidx.paging.PagingLiveData;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,6 +35,7 @@ import org.studip.unofficial_app.databinding.MessageEntryBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.GetMessageUsersWork;
+import org.studip.unofficial_app.model.room.DB;
 import org.studip.unofficial_app.model.viewmodels.MessagesViewModel;
 import org.studip.unofficial_app.ui.HomeActivity;
 import org.studip.unofficial_app.ui.fragments.dialog.MessageDialogFragment;
@@ -95,7 +96,7 @@ public class MessageFragment extends SwipeRefreshFragment
     
             m.mes.get().observe(getViewLifecycleOwner(), (messages) -> {
                 //System.out.println("messages");
-                if (messages.length == 0 && m.mes.getStatus().getValue() == -1) {
+                if (messages.length == 0 && m.mes.getStatus().getValue() != null && m.mes.getStatus().getValue() == -1) {
                     //System.out.println("refreshing");
                     binding.messagesRefresh.setRefreshing(true);
                     m.mes.refresh(requireActivity());
@@ -124,10 +125,13 @@ public class MessageFragment extends SwipeRefreshFragment
             });
             
             
-            PagedList.Config conf = new PagedList.Config.Builder().setEnablePlaceholders(true).setPageSize(10).build();
+            PagingConfig conf = new PagingConfig(10, 10, true);
     
-            new LivePagedListBuilder<>(DBProvider.getDB(requireActivity()).messagesDao().getPagedList(), conf).build().observe(getViewLifecycleOwner(),
-                    (l) -> ad.submitList(l));
+    
+            DB db = DBProvider.getDB(requireActivity());
+            PagingLiveData.cachedIn(PagingLiveData.getLiveData(new Pager<>(conf, null,
+                            () -> db.messagesDao().getPagedList())),
+                    ViewModelKt.getViewModelScope(m)).observe(getViewLifecycleOwner(), (d) -> ad.submitData(getLifecycle(), d));
             
     
             binding.messageWrite.setOnClickListener((v) -> new MessageWriteDialogFragment().show(getParentFragmentManager(), "message_write"));
@@ -163,7 +167,7 @@ public class MessageFragment extends SwipeRefreshFragment
         }
     };
     
-    public class MessageAdapter extends PagedListAdapter<StudipMessage,MessageViewHolder>
+    public class MessageAdapter extends PagingDataAdapter<StudipMessage,MessageViewHolder>
     {
         protected MessageAdapter()
         {
@@ -195,32 +199,41 @@ public class MessageFragment extends SwipeRefreshFragment
             }
             if (m.unread) {
                 b.messageSubject.setTextColor(0xffff0000);
+            } else {
+                if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                    b.messageSubject.setTextColor(0xffcccccc);
+                } else {
+                    b.messageSubject.setTextColor(0xff000000);
+                }
             }
             
             View layout = b.getRoot();
 
-            layout.setOnClickListener((v) -> {
-                viewMessage(m);
-            });
+            layout.setOnClickListener((v) -> viewMessage(m));
 
             layout.setOnLongClickListener(v -> {
                 binding.messagesRefresh.setRefreshing(true);
-                APIProvider.getAPI(requireActivity()).message.delete(m.message_id).enqueue(new Callback<Void>()
-                {
-                    @Override
-                    public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
-                        binding.messagesRefresh.setRefreshing(false);
-                        if (response.code() == 204 || response.code() == 404) {
-                            DBProvider.getDB(requireActivity()).messagesDao().deleteAsync(m).subscribeOn(Schedulers.io()).subscribe();
-                        } else {
-                            HomeActivity.onStatusReturn(requireActivity(),response.code());
+                API api = APIProvider.getAPI(requireActivity());
+                if (api != null) {
+                    api.message.delete(m.message_id).enqueue(new Callback<Void>()
+                    {
+                        @Override
+                        public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
+                            binding.messagesRefresh.setRefreshing(false);
+                            if (response.code() == 204 || response.code() == 404) {
+                                DBProvider.getDB(requireActivity()).messagesDao().deleteAsync(m).subscribeOn(Schedulers.io()).subscribe();
+                            }
+                            else {
+                                HomeActivity.onStatusReturn(requireActivity(), response.code());
+                            }
                         }
-                    }
-                    @Override
-                    public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
-                        binding.messagesRefresh.setRefreshing(false);
-                    }
-                });
+        
+                        @Override
+                        public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
+                            binding.messagesRefresh.setRefreshing(false);
+                        }
+                    });
+                }
                 return true;
             });
     
