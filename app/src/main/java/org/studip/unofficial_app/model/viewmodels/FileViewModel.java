@@ -28,8 +28,8 @@ public class FileViewModel extends ViewModel
     private static final String COURSE_KEY = "isCourse";
     private static final String FOLDER_KEY = "currentFolder";
     
-    private LiveData<Boolean> courseID;
-    private LiveData<String> folderID;
+    private final LiveData<Boolean> courseID;
+    private final LiveData<String> folderID;
     
     private final SavedStateHandle h;
     

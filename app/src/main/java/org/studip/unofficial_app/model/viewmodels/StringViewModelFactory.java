@@ -10,8 +10,8 @@ import java.lang.reflect.InvocationTargetException;
 
 public class StringViewModelFactory implements ViewModelProvider.Factory
 {
-    private Application mApplication;
-    private String mParam;
+    private final Application mApplication;
+    private final String mParam;
     public StringViewModelFactory(Application application, String param) {
         mApplication = application;
         mParam = param;

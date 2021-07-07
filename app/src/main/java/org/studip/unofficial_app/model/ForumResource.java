@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.SavedStateHandle;
@@ -15,8 +14,11 @@ import org.studip.unofficial_app.api.rest.StudipForumCategory;
 import org.studip.unofficial_app.api.rest.StudipForumEntry;
 import org.studip.unofficial_app.model.room.DB;
 
-import retrofit2.Call;
+import java.util.Objects;
 
+import retrofit2.Call;
+// cannot be generic for the type, so has to use raw types
+@SuppressWarnings("rawtypes")
 public class ForumResource extends NetworkResource<Object>
 {
     private final String courseID;
@@ -96,9 +98,12 @@ public class ForumResource extends NetworkResource<Object>
         return currentEntry.getValue();
     }
     
+    // cannot be generic for the type, so has to use raw types
+    @SuppressWarnings("unchecked")
     public void setEntry(Context c, ForumEntry e) {
         // we need current to be the same as when the request was made, to put the parent id in the database
-        if (isRefreshing().getValue()) {
+        LiveData<Boolean> ref = isRefreshing();
+        if (ref.getValue() != null && ref.getValue()) {
             return;
         }
         if (e == null) {
@@ -109,7 +114,7 @@ public class ForumResource extends NetworkResource<Object>
             data.removeSource(source);
         }
         DB db = DBProvider.getDB(c);
-        switch (currentEntry.getValue().getType()) {
+        switch (Objects.requireNonNull(currentEntry.getValue()).getType()) {
             case CATEGORY:
                 source = db.forumCategoryDao().observeCategoryWithEntries(currentEntry.getValue().getId());
                 break;
@@ -132,8 +137,8 @@ public class ForumResource extends NetworkResource<Object>
     @Override
     protected Call getCall(Context c)
     {
-        API api = APIProvider.getAPI(c);
-        switch (currentEntry.getValue().getType()) {
+        API api = Objects.requireNonNull(APIProvider.getAPI(c));
+        switch (Objects.requireNonNull(currentEntry.getValue()).getType()) {
             case CATEGORY:
                 return api.forum.areas(currentEntry.getValue().getId(),0,1000);
             case ENTRY:
@@ -143,7 +148,9 @@ public class ForumResource extends NetworkResource<Object>
                 return api.course.forumCategories(currentEntry.getValue().getId(),0,1000);
         }
     }
-
+    
+    // cannot be generic for the type, so has to use raw types
+    @SuppressWarnings("unchecked")
     @Override
     protected void updateDB(Context c, Object res)
     {
@@ -162,12 +169,12 @@ public class ForumResource extends NetworkResource<Object>
                 for (StudipForumEntry e : col.collection.values()) {
                     e.user = lastPathSegment(e.user);
                     e.course = lastPathSegment(e.course);
-                    e.parent_id = currentEntry.getValue().getId();
+                    e.parent_id = Objects.requireNonNull(currentEntry.getValue()).getId();
                     //System.out.println(e.parent_id);
                     //System.out.println("Entry: "+e.subject);
                     //db.forumEntryDao().updateInsert(e);
                 }
-                db.forumEntryDao().updateSyncChildren(currentEntry.getValue().getId(),col.collection.values().toArray(new StudipForumEntry[0]));
+                db.forumEntryDao().updateSyncChildren(Objects.requireNonNull(currentEntry.getValue()).getId(),col.collection.values().toArray(new StudipForumEntry[0]));
             }
         } else {
             StudipForumEntry e = (StudipForumEntry) res;
@@ -178,7 +185,7 @@ public class ForumResource extends NetworkResource<Object>
                 //System.out.println("Child: "+child.subject);
                 //db.forumEntryDao().updateInsert(child);
             }
-            db.forumEntryDao().updateSyncChildren(currentEntry.getValue().getId(),e.children);
+            db.forumEntryDao().updateSyncChildren(Objects.requireNonNull(currentEntry.getValue()).getId(),e.children);
         }
     }
 }

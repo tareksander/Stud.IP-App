@@ -8,13 +8,15 @@ import androidx.lifecycle.Transformations;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+// cannot be generic for the type, so has to use raw types
+@SuppressWarnings("rawtypes")
 public abstract class NetworkResource<T>
 {
     protected abstract LiveData<T> getDBData(Context c);
@@ -45,9 +47,11 @@ public abstract class NetworkResource<T>
         return refreshing;
     }
     
+    // cannot be generic for the type, so has to use raw types
+    @SuppressWarnings("unchecked")
     public void refresh(Context con) {
         Context c = con.getApplicationContext();
-        if (! refreshing.getValue()) {
+        if (refreshing.getValue() != null && ! refreshing.getValue()) {
             refreshing.setValue(true);
             getCall(con).enqueue(new Callback()
             {

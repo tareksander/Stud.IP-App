@@ -21,8 +21,6 @@ import org.studip.unofficial_app.api.plugins.courseware.CoursewareSection;
 import org.studip.unofficial_app.api.plugins.courseware.CoursewareSubchapter;
 import org.studip.unofficial_app.model.APIProvider;
 
-import io.reactivex.functions.BiConsumer;
-
 public class CoursewareViewModel extends AndroidViewModel
 {
     

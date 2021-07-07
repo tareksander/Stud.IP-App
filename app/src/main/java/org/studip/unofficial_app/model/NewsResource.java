@@ -8,8 +8,10 @@ import org.studip.unofficial_app.api.rest.StudipCollection;
 import org.studip.unofficial_app.api.rest.StudipNews;
 
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
+
 public class NewsResource extends NetworkResource<List<StudipNews>>
 {
     public boolean empty = true;
@@ -38,12 +40,14 @@ public class NewsResource extends NetworkResource<List<StudipNews>>
         //System.out.println("refeshing news");
         if (cid == null)
         {
-            return APIProvider.getAPI(c).studip.news(0, 1000);
+            return Objects.requireNonNull(APIProvider.getAPI(c)).studip.news(0, 1000);
         } else {
-            return APIProvider.getAPI(c).course.news(cid,0,1000);
+            return Objects.requireNonNull(APIProvider.getAPI(c)).course.news(cid,0,1000);
         }
     }
-
+    
+    // cannot be generic for the type, so has to use raw types
+    @SuppressWarnings("unchecked")
     @Override
     protected void updateDB(Context c, Object o)
     {

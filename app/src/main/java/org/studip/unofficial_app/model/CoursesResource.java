@@ -12,6 +12,7 @@ import org.studip.unofficial_app.api.rest.StudipCourse;
 import org.studip.unofficial_app.model.room.DB;
 
 import java.util.Map;
+import java.util.Objects;
 
 import retrofit2.Call;
 
@@ -35,9 +36,11 @@ public class CoursesResource extends NetworkResource<StudipCourse[]> {
     @Override
     protected Call<StudipCollection<StudipCourse>> getCall(Context c)
     {
-        return APIProvider.getAPI(c).user.userCourses(APIProvider.getAPI(c).getUserID(),0,1000);
+        return Objects.requireNonNull(APIProvider.getAPI(c)).user.userCourses(Objects.requireNonNull(APIProvider.getAPI(c)).getUserID(),0,1000);
     }
-
+    
+    // cannot be generic for the type, so has to use raw types
+    @SuppressWarnings("unchecked")
     @Override
     protected void updateDB(Context c, Object o)
     {

@@ -9,9 +9,10 @@ import org.studip.unofficial_app.api.rest.StudipMessage;
 import org.studip.unofficial_app.model.room.DB;
 
 import java.util.Map;
+import java.util.Objects;
 
 import retrofit2.Call;
-
+// cannot be generic for the type, so has to use raw types
 public class MessagesResource extends NetworkResource<StudipMessage[]>
 {
     public MessagesResource(Context c)
@@ -29,9 +30,12 @@ public class MessagesResource extends NetworkResource<StudipMessage[]>
     protected Call<StudipCollection<StudipMessage>> getCall(Context c)
     {
         // TODO only get the necessary messages, so get one at a time and stop if the first known message is encountered
-        return APIProvider.getAPI(c).user.userBox(APIProvider.getAPI(c).getUserID(),"inbox",0,10000);
+        return Objects.requireNonNull(APIProvider.getAPI(c)).user.userBox(
+                Objects.requireNonNull(APIProvider.getAPI(c)).getUserID(),"inbox",0,10000);
     }
-
+    
+    // cannot be generic for the type, so has to use raw types
+    @SuppressWarnings("unchecked")
     @Override
     protected void updateDB(Context c, Object o)
     {

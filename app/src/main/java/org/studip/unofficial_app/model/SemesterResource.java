@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData;
 import org.studip.unofficial_app.api.rest.StudipCollection;
 import org.studip.unofficial_app.api.rest.StudipSemester;
 
+import java.util.Objects;
+
 import retrofit2.Call;
 
 public class SemesterResource extends NetworkResource<StudipSemester[]>{
@@ -26,9 +28,11 @@ public class SemesterResource extends NetworkResource<StudipSemester[]>{
     @Override
     protected Call<StudipCollection<StudipSemester>> getCall(Context c)
     {
-        return APIProvider.getAPI(c).semester.semesters(0,1000);
+        return Objects.requireNonNull(APIProvider.getAPI(c)).semester.semesters(0,1000);
     }
-
+    
+    // cannot be generic for the type, so has to use raw types
+    @SuppressWarnings("unchecked")
     @Override
     protected void updateDB(Context c, Object o)
     {

@@ -1,7 +1,6 @@
 package org.studip.unofficial_app.model.room;
 
 import androidx.lifecycle.LiveData;
-import androidx.paging.DataSource;
 import androidx.paging.PagingSource;
 import androidx.room.Dao;
 import androidx.room.Query;

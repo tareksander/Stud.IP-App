@@ -46,7 +46,6 @@
                 On android S, you can ask the user to set the app as a standard app for link types.
                     [x] test the browser app querying on android 11
             [x] support for viewing Images in Forum Posts: Probably with another ImageHandler for Html.fromHtml
-            [ ] try to match the Stud.IP dialog style with the dialogs, including the blue outline
             [ ] deep links improvements
                 [ ] support for more link types
                     [x] courseware
