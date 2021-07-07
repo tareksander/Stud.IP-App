@@ -37,13 +37,15 @@
             [ ] fix the cache miss problem when logging in in the webview and using the back button, probably by excluding it from the history
             [x] a way to open multiple tasks for the app, e.g. to view multiple coursewares
             [x] option to upload multiple files at once (finish the refreshing after that)
+            [x] send a notification_read request when the user taps on a notification
+            [x] set a message to read when the user opens it
+            [ ] color unread messages with red in the list
             [x] option to set the app as the default browser app and set a real browser app.
                 All links to Stud.IP will get opened in the app, all other links are relayed to the chosen browser app.
                 Only possible way for android < S, because you need ownership of a domain to use app links.
                 On android S, you can ask the user to set the app as a standard app for link types.
                     [x] test the browser app querying on android 11
-            [ ] support for viewing Images in Forum Posts: Probably with another ImageHandler for Html.fromHtml
-                [ ] If the image is in a file url on the studip server, get it via the download route. If not, get it via picasso
+            [x] support for viewing Images in Forum Posts: Probably with another ImageHandler for Html.fromHtml
             [ ] try to match the Stud.IP dialog style with the dialogs, including the blue outline
             [ ] deep links improvements
                 [ ] support for more link types

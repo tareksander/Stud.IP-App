@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -24,6 +25,10 @@ import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 
 import java.util.LinkedList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DeepLinkActivity extends AppCompatActivity
 {
@@ -82,6 +87,16 @@ public class DeepLinkActivity extends AppCompatActivity
             if (notification != -1) {
                 NotificationManagerCompat m = NotificationManagerCompat.from(this);
                 m.cancel((int) (notification % Integer.MAX_VALUE));
+                API api = APIProvider.getAPI(this);
+                if (api != null) {
+                    api.dispatch.setNotificationRead(Long.toString(notification)).enqueue(new Callback<Void>()
+                    {
+                        @Override
+                        public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {}
+                        @Override
+                        public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {}
+                    });
+                }
             }
             API api = APIProvider.getAPI(this);
             if (api == null)

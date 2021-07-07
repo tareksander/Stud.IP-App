@@ -9,16 +9,12 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.text.Html;
 import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,42 +25,58 @@ import org.studip.unofficial_app.R;
 import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.model.APIProvider;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-
 public class HelpActivity extends AppCompatActivity
 {
     public static Spanned fromHTML(@NonNull String html, boolean images, Context c) {
-        Html.ImageGetter img = source -> {
-            //System.out.println(source);
-            if (images) {
-                API api = APIProvider.getAPI(c);
-                if (api != null && api.getHostname() != null) {
-                    Uri path = Uri.parse(source);
-                    if ("http".equals(path.getScheme()) || "https".equals(path.getScheme())) {
-                        if (path.getHost().equals(api.getHostname().split("/")[0])) {
-                            
-                        }
-                        else {
+        Html.ImageGetter img = new Html.ImageGetter()
+        {
+            // wait at most 4 seconds for all Images in an HTML document, since this runs on the main thread
+            private long millis = 4000;
+            @Override
+            public Drawable getDrawable(String source) {
+                if (images && millis > 0) {
+                    API api = APIProvider.getAPI(c);
+                    if (api != null && api.getHostname() != null) {
+                        Uri path = Uri.parse(source);
+                        if ("http".equals(path.getScheme()) || "https".equals(path.getScheme())) {
                             // ensure https
                             if ("http".equals(path.getScheme())) {
                                 path = path.buildUpon().scheme("https").build();
                             }
+                            final Bitmap[] bit = new Bitmap[1];
+                            final Uri finalPath = path;
+                            Thread t = new Thread(() -> {
+                                try {
+                                    Bitmap b = Picasso.get().load(finalPath).get();
+                                    synchronized (bit) {
+                                        bit[0] = b;
+                                    }
+                                }
+                                catch (Exception ignored) {}
+                            });
+                            t.start();
+                            long t1 = System.currentTimeMillis();
                             try {
-                                Picasso.get().load(path).
-                                return new BitmapDrawable(c.getResources(), new Bitmap.).;
-                                
-                                
-                                
+                                t.join(millis);
                             }
-                            catch (IOException e) {
-                                e.printStackTrace();
+                            catch (InterruptedException ignored) {}
+                            long t2 = System.currentTimeMillis();
+                            millis = millis - (t2-t1);
+                            synchronized (bit) {
+                                if (bit[0] == null) {
+                                    t.interrupt();
+                                    return null;
+                                }
+                                BitmapDrawable d = new BitmapDrawable(c.getResources(), bit[0]);
+                                d.setBounds(0, 0, bit[0].getScaledWidth(c.getResources().getDisplayMetrics()),
+                                        bit[0].getScaledHeight(c.getResources().getDisplayMetrics()));
+                                return d;
                             }
                         }
                     }
                 }
+                return null;
             }
-            return null;
         };
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             // it's OK, since the version check is there

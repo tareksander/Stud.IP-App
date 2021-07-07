@@ -26,8 +26,13 @@ public interface Dispatch
     
     @GET("dispatch.php/jsupdater/get")
     Call<StudipNotifications> getNotifications();
-
-
+    
+    @GET("/dispatch.php/jsupdater/notifications_seen")
+    Call<Void> setNotificationsSeen();
+    
+    @GET("/dispatch.php/jsupdater/mark_notification_read/{id}")
+    Call<Void> setNotificationRead(@Path("id") String id);
+    
     
     // call before trying to search for addressees 
     @GET("dispatch.php/messages/write")

@@ -248,8 +248,6 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
         if (savedInstanceState == null) {
             handleIntent(getIntent());
         }
-    
-    
         
         
         

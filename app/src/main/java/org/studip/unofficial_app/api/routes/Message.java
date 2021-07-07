@@ -19,9 +19,14 @@ public interface Message
     @GET("api.php/message/{mid}")
     Call<Void> get(@Path("mid") String id);
     
+    
+    // apparently, you cannot really pass a boolean to php via a form
+    // true or false get interpreted as true
+    // a non-empty string is interpreted as true
+    // an empty string is interpreted as false
     @FormUrlEncoded
     @PUT("api.php/message/{mid}")
-    Call<Void> update(@Path("mid") String id, @Field("unread") boolean unread);
+    Call<Void> update(@Path("mid") String id, @Field("unread") String unread);
     
     @GET("api.php/message/{mid}/file_folder")
     Call<StudipFolder> getFolder(@Path("mid") String id);

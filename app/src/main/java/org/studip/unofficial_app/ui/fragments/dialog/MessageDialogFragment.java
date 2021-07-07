@@ -11,9 +11,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.api.rest.StudipMessage;
 import org.studip.unofficial_app.databinding.DialogViewMessageBinding;
+import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.ui.HelpActivity;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MessageDialogFragment extends DialogFragment
 {
@@ -35,6 +41,18 @@ public class MessageDialogFragment extends DialogFragment
             return b.create();
         }
         StudipMessage m = (StudipMessage) args.getSerializable(ARG_MESSAGE_ID);
+        
+        API api = APIProvider.getAPI(requireActivity());
+        if (api != null) {
+            // mark the message as read
+            api.message.update(m.message_id, "").enqueue(new Callback<Void>()
+            {
+                @Override
+                public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {}
+                @Override
+                public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {}
+            });
+        }
         
         TextView title = new TextView(requireActivity());
         title.setPadding((int) (8*getResources().getDisplayMetrics().density),(int) (8*getResources().getDisplayMetrics().density),(int) (8*getResources().getDisplayMetrics().density), 0);
