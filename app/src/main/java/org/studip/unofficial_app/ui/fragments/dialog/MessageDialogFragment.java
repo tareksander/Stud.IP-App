@@ -15,8 +15,11 @@ import org.studip.unofficial_app.api.API;
 import org.studip.unofficial_app.api.rest.StudipMessage;
 import org.studip.unofficial_app.databinding.DialogViewMessageBinding;
 import org.studip.unofficial_app.model.APIProvider;
+import org.studip.unofficial_app.model.DBProvider;
+import org.studip.unofficial_app.model.room.DB;
 import org.studip.unofficial_app.ui.HelpActivity;
 
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -52,6 +55,11 @@ public class MessageDialogFragment extends DialogFragment
                 @Override
                 public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {}
             });
+            DB db = DBProvider.getDB(requireActivity());
+            if (db != null) {
+                m.unread = false;
+                db.messagesDao().updateAsync(m).subscribeOn(Schedulers.io()).subscribe();
+            }
         }
         
         TextView title = new TextView(requireActivity());

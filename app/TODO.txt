@@ -39,7 +39,7 @@
             [x] option to upload multiple files at once (finish the refreshing after that)
             [x] send a notification_read request when the user taps on a notification
             [x] set a message to read when the user opens it
-            [ ] color unread messages with red in the list
+            [x] color unread messages with red in the list
             [x] option to set the app as the default browser app and set a real browser app.
                 All links to Stud.IP will get opened in the app, all other links are relayed to the chosen browser app.
                 Only possible way for android < S, because you need ownership of a domain to use app links.

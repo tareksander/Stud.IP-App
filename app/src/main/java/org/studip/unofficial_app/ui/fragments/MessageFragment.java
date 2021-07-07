@@ -193,6 +193,10 @@ public class MessageFragment extends SwipeRefreshFragment
                 b.messageTime.setText("");
                 return;
             }
+            if (m.unread) {
+                b.messageSubject.setTextColor(0xffff0000);
+            }
+            
             View layout = b.getRoot();
 
             layout.setOnClickListener((v) -> {
