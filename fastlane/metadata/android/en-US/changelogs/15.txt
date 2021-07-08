@@ -1,0 +1,10 @@
+Removed static shortcuts, they can now be created by the user instead
+Added a table of contents to the help screen
+The app can now be opened multiple times
+You can now upload multiple files at once
+Unread messages now appear in red
+Unread messages are marked as read when opening them
+Notifications are marked ad read when tapping them
+Images are now loaded for forum posts and messages
+Added the course info dialog
+Recently messaged persons are now listed directly when sharing content from another app

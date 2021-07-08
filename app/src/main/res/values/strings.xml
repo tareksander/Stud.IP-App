@@ -164,7 +164,9 @@ If you want to use a feature for which the API is disabled, you can also use the
 
 
 <h2 id="4" >4. Home</h2>
-On this screen you can see your Stud.IP name and the global Stud.IP news.<br><br>
+On this screen you can see your Stud.IP name and the global Stud.IP news.<br>
+You can open another window for the app by clicking the button at the top.<br>
+<br><br>
 
 <h2 id="5" >5. Courses</h2>
 On this screen you can view your courses for a specific semester.<br>
@@ -223,11 +225,9 @@ The back button navigates back in the web page history, or returns to the previo
 <br><br>
 
 <h2 id="11" >11. Shortcuts</h2>
-By long pressing the app icon on the laucher you see some standard shortcuts:<br>
-- The files screen<br>
-- The courses screen<br>
-- The mails screen<br>
-You can also create launcher shortcuts for specific things:<br>
+By long pressing the tab icon you can create a shortcut to a specific screen.<br>
+You can use this to e.g. open the app directly in the messages screen.<br>
+You can also create launcher shortcuts for other things:<br>
 You can create a shortcut to a folder by holding the "Your files" or the course name in the files screen.<br>
 You can create a shortcut to a forum entry by holding the title on the entry list.<br>
 You can create a shortcut to a courseware section by holding the corresponding "i"-icon.V

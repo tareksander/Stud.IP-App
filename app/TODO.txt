@@ -23,7 +23,7 @@
     
     
     Roadmap:
-        1.0.0:
+        0.6.0:
             [x] add another way to generate the tab shortcuts, because the static shortcuts take space for the dynamic ones
                 [x] long press on the tab icon
             [x] put the badge on the github readme: https://play.google.com/intl/en_gb/badges/
@@ -34,7 +34,6 @@
                     Apparently, there is a bug in the android 10 emulator which prevents sharing shortcuts from working
                     Test on-device instead.
                     [x] add the last people the user send messages to as persons
-            [ ] fix the cache miss problem when logging in in the webview and using the back button, probably by excluding it from the history
             [x] a way to open multiple tasks for the app, e.g. to view multiple coursewares
             [x] option to upload multiple files at once (finish the refreshing after that)
             [x] send a notification_read request when the user taps on a notification
@@ -45,7 +44,15 @@
                 Only possible way for android < S, because you need ownership of a domain to use app links.
                 On android S, you can ask the user to set the app as a standard app for link types.
                     [x] test the browser app querying on android 11
-            [x] support for viewing Images in Forum Posts: Probably with another ImageHandler for Html.fromHtml
+            [x] support for viewing Images in Forum Posts and messages: Probably with another ImageHandler for Html.fromHtml
+            [x] add the course info dialog
+            [x] bump version
+            [x] update help text
+            [x] update description - no changes
+            [x] write changelog
+            [ ] update on play store
+        1.0.0:
+            [ ] fix the cache miss problem when logging in in the webview and using the back button, probably by excluding it from the history
             [ ] deep links improvements
                 [ ] support for more link types
                     [x] courseware
@@ -58,13 +65,14 @@
                 [ ] link to the planner
                 [x] open unknown link patterns in the WebView for the server
             [ ] delete data which is not in a server response, but still in the database
+                [ ] make all code blocks updating the database synchronized on the db,
+                    so the db can't get messed up when 2 windows update it at the same time
             [ ] add the option to search for new news and forum entries when refreshing courses and color the icon red, to get the same feature as
                 the web version
                 [ ] add the option for the notification service to do this and emit extra notifications, even if the notification setting is turned off
             [ ] better updating of messages, so not every message is downloaded on update, only the ones until a saved one is found
                 [ ] don't care about deleting messages deleted from the server, the user can just also delete them locally
                 [ ] when a message is deleted, don't sync with the server, just send a delete and delete it from the database
-            [x] add the course info dialog
             [ ] add the course members dialog
             [ ] add the user info dialog
             [ ] support for the planner

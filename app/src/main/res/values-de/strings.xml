@@ -105,15 +105,15 @@ Zuerst sollten Sie in den Einstellungen die Authentifizierungsmethode festlegen.
 Wenn Sie sich nur einmal einloggen wollen, sollten sie HTTP Basic Authentication benutzen.<br>
 Wenn Sie nicht wollen, dass Benutzername und Passwort auf dem Gerät gespeichert ist (keine Sorge, es ist verschlüsselt), dann sollten Sie Session Cookie wählen.<br>
 Wenn Sie den Session Cookie benutzen, funktionieren Benachrichtigungen nur solange der Cookie gültig ist.<br>
-Wenn die Sitzung abekaufen ist, müssen Sie sich erneut anmelden, um Benachrichtigungen zu erhalten.<br>
+Wenn die Sitzung abgelaufen ist, müssen Sie sich erneut anmelden, um Benachrichtigungen zu erhalten.<br>
 Wenn Sie Ihren Benutzernamen und das Passwort nicht in dieser App eingeben wollen, können sie OAuth benutzen.<br>
 OAuth funktioniert nur für Stud.IP-Server, bei denen die App für OAuth registriert ist.<br>
 Wenn die App bei Ihrem System nicht registriert ist, bekommen sie die Möglichkeit Ihre Mail-App mit einem vorgefertigtem Text zu öffnen, um diesen Ihrem Administrator zu schicken, damit dieser OAuth für die App aktivieren kann.<br>
-Wenn danach alles gutgeht, bringt das nächste App-Update OAuth-Unterstützung für Ihren Stud.IP-Server.<br>
+Wenn danach alles gut geht, bringt das nächste App-Update OAuth-Unterstützung für Ihren Stud.IP-Server.<br>
 Der Nachteil an OAuth ist, dass einige Funktionen der App eine Sitzung für den Stud.IP-Server erfordern, und mit OAuth bekommt die App eine solche Sitzung nicht.<br>
 Die nicht verfügbaren Funktionen sind:<br>
 <ul>
-<li>Beim Schreiben einer Nachricht nach Addressaten suchen.<br>
+<li>Beim Schreiben einer Nachricht nach Adressaten suchen.<br>
 Sie können nur Leuten schreiben, die Ihnen schon geschrieben haben oder die Sie in Kursteilnehmerbildschirm in der App gesehen haben.<br></li>
 <li>Im Forum posten. Die API hat einen Fehler, der das Posten im Forum verhindert. Deshalb postet die App, wie es der Browser normalerweise tut. Dies erfordert aber eine Sitzung.<br></li>
 <li>Benachrichtigungen bekommen. Ähnlich wie beim Forum, es gibt über die API keine Möglichkeit, die Benachrichtigungen abzurufen.<br></li>
@@ -139,8 +139,8 @@ Es gibt 2 Wege, normale Bildschirme zu erreichen:<br>
 Auf kleineren Geräten müssen Sie vielleicht die Tabs oben nach links oder rechts scrollen, weil nicht alle Icons auf einmal auf den Bildschirm passen.<br>
 2 Bildschirme können nur über das Tab-Icon erreicht werden: Der Einstellungsbildschirm und die mobile Ansicht von Stud.IP.<br>
 Der Benachrichtigungs-Service aktualisiert auch periodisch die Daten und gibt dann Benachrichtigungen falls gewünscht.<br>
-Periode and Anderes kann in den Einstellungen angepasst werden.<br>
-Es werden aber nur Benachrichtigugen angezeigt, die Sie in Stud.IP aktiviert haben.<br>
+Periode und Anderes kann in den Einstellungen angepasst werden.<br>
+Es werden aber nur Benachrichtigungen angezeigt, die Sie in Stud.IP aktiviert haben.<br>
 Diese Einstellungen können Sie auch in der App verändern, unter "Stud.IP Benachrichtigungseinstellungen".<br>
 Mit dem Document Provider können Sie auf die Stud.IP-Dateien zugreifen, wie auf alle anderen Dateien auf Ihrem Gerät.<br>
 Nachdem Sie sich angemeldet und Ihre Kurse abgerufen haben, können sie in den Einstellungen festlegen, welche Kurse so bereitgestellt werden sollen.<br>
@@ -161,13 +161,15 @@ Alle API-Routen, die die App benutzt, sind in der <a href="https://github.com/ta
 In den Einstellungen können Sie erneut nach deaktivierten Funktionen scannen.<br>
 Benutzen Sie des, wenn Ihr Administrator Teile der API angeschaltet hat, aber Sie sich nicht wieder einloggen wollen.<br>
 Sie können der App auch befehlen, die deaktivierten Funktionen zu ignorieren.<br>
-Alle Funktionen benutzen meherere API-Routen, also funktioniert ein Feature vielleicht Teilweise, wenn nur ein Teil der Routen deaktiviert ist, aber verlassen Sie sich nicht darauf.<br>
+Alle Funktionen benutzen mehrere API-Routen, also funktioniert ein Feature vielleicht Teilweise, wenn nur ein Teil der Routen deaktiviert ist, aber verlassen Sie sich nicht darauf.<br>
 Wenn Sie eine Funktion verwenden wollen, für die die API deaktiviert ist, können Sie auch die mobile Ansicht von Stud.IP benutzen.<br>
 <br><br>
 
 
 <h2 id="4" >4. Startbildschirm</h2>
-Auf diesem Bildschirm wird Ihr Name, wie er in dem Stud.IP-System steht, angezeigt, und dazu die globalen Ankündigungen des Systems.<br><br>
+Auf diesem Bildschirm wird Ihr Name, wie er in dem Stud.IP-System steht, angezeigt, und dazu die globalen Ankündigungen des Systems.<br>
+Mit dem Button oben können Sie ein weiteres Fenster für die App öffnen, wenn Sie z.B. Courseware offen haben wollen und Ihre Nachrichten lesen wollen.<br>
+<br><br>
 
 <h2 id="5" >5. Kursbildschirm</h2>
 Auf diesem Bildschirm können Sie Ihre Kurse für ein ausgewähltes Semester anschauen.<br>
@@ -178,20 +180,20 @@ Mit dem Datei-Symbol können Sie sich die Dateien eines Kurses anschauen, herunt
 <h2 id="6" >6. Dateibildschirm</h2>
 Auf diesem Bildschirm können Sie Sich ihre Dateien auf dem System und die Dateien von Kursen ansehen.<br>
 Durch tippen auf den \"…\"-Eintrag kommen Sie in das Elternverzeichnis zurück, falls vorhanden, durch halten kommen sie zu Ihren eigenen Dateien zurück.<br>
-Beim antippen eines Verzeichnisses werden die Inhalte angezeigt, bei einer Datei wird sie heruntergeladen.<br>
+Beim Antippen eines Verzeichnisses werden die Inhalte angezeigt, bei einer Datei wird sie heruntergeladen.<br>
 Durch Halten auf eine Datei oder ein Verzeichnis wird es gelöscht.<br><br>
 
 <h2 id="7" >7. Nachrichtenbildschirm</h2>
 Auf diesem Bildschirm können Sie Ihre Stud.IP-Nachrichten lesen und neue Verfassen.<br>
 Durch lange auf eine Nachricht halten wird diese gelöscht.<br>
-Beim Addressat auswählen schlägt die App Ihnen schon bekannte Benutzer vor.<br>
-Wenn Sie den "Suchen"-Button benutzen, sucht die App im System nach Benutzern mit dem im Addressat-Feld befindlichen Namen.<br>
-Ein Addressat wird hinzugefügt, indem Sie ihn in der Liste antippen.<br>
-Gedrückt halten auf einen hinzugefügten Addressaten löscht ihn wieder.<br><br>
+Beim Adressat auswählen schlägt die App Ihnen schon bekannte Benutzer vor.<br>
+Wenn Sie den "Suchen"-Button benutzen, sucht die App im System nach Benutzern mit dem im Adressat-Feld befindlichen Namen.<br>
+Ein Adressat wird hinzugefügt, indem Sie ihn in der Liste antippen.<br>
+Gedrückt halten auf einen hinzugefügten Adressaten löscht ihn wieder.<br><br>
 
 <h2 id="8" >8. Courseware-Plugin</h2>
 Wenn Sie auf das Courseware-Icon im Kurs-Bildschirm tippen, können Sie sich die Courseware anschauen, falls vorhanden.<br>
-Tippen Sie auf ein Kapitel, um die Unterkapitel zu laden und auf ein Unterkaptiel, um die Abschnitte zu laden.<br>
+Tippen Sie auf ein Kapitel, um die Unterkapitel zu laden und auf ein Unterkapitel, um die Abschnitte zu laden.<br>
 Unterstützte Courseware-Blöcke:<br>
 <ul>
 <li>HTML<br></li>
@@ -212,7 +214,7 @@ Das PiP-Fenster hat auch einen Button, um das Mikrofon umzuschalten.<br>
 <br><br>
 
 <h2 id="10" >10. Mobile Ansicht von Stud.IP</h2>
-Sie können die Browser-Version von Stud.IP in der App öffnen, indem SIe auf das Globus-Icon tippen.<br>
+Sie können die Browser-Version von Stud.IP in der App öffnen, indem Sie auf das Globus-Icon tippen.<br>
 Wenn Sie HTTP Basic Authentication benutzen, werden Ihre Logindaten automatisch ausgefüllt.<br>
 Wenn Sie einen Session Cookie zum Anmelden benutzen, wird dieser mit der Browser-Version geteilt und Sie müssen sich nicht anmelden, solange der Cookie gültig ist.<br>
 Wenn Sie OAuth verwenden, müssen Sie sich normal anmelden.<br>
@@ -224,10 +226,8 @@ Der zurück-Button navigiert im Browserverlauf zurück, oder zum vorherigen Bild
 <br><br>
 
 <h2 id="11" >11. Shortcuts</h2>
-Wenn sie im Launcher das App-Icon halten, sehen sie ein paar Standard-Shortcuts:<br>
-- Der Dateibildschirm<br>
-- Der Kursbildschirm<br>
-- Der Nachrichtenbildschirm<br>
+Wenn Sie lange auf das Tab-Icon eines Bildschirms halten, wird ein Shortcut dafür erstellt.<br>
+Damit können Sie z.B. die App direkt im Nachrichtenbildschirm öffnen.<br>
 Sie können auch für spezielle Dinge selbst Shortcuts erstellen:<br>
 Für ein bestimmtes Verzeichnis, indem Sie "Deine Dateien" oder den Kursnamen im Dateibildschirm halten.<br>
 Für eine Forenbeitrag, indem Sie den Titel in der Liste halten.<br>

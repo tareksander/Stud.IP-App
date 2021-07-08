@@ -1,0 +1,10 @@
+Statische Shortcuts entfernt, können stattdessen selbst erstellt werden
+Inhaltsverzeichnis zur Hilfe hinzugefügt
+App kann jetzt mehrmals geöffnet werden
+Es können mehrere Dateien auf einmal hochgeladen werden
+Ungelesene Nachrichten erscheinen in rot
+Nachrichten werden beim Öffnen als gelesen gesetzt
+Benachrichtigungen werden beim Öffnen als gelesen gesetzt
+Bilder in Nachrichten und im Forum werden jetzt angezeigt
+Dialog für Kursinformationen hinzugefügt
+Zuletzt angeschriebene Personen werden nun beim Teilen von Inhalten aus anderen Apps direkt vorgeschlagen
