@@ -23,36 +23,8 @@
     
     
     Roadmap:
-        0.6.0:
-            [x] add another way to generate the tab shortcuts, because the static shortcuts take space for the dynamic ones
-                [x] long press on the tab icon
-            [x] put the badge on the github readme: https://play.google.com/intl/en_gb/badges/
-            [x] add a table of contents to the help screen, with hyperlinks. probably requires using a WebView do use the hyperlinks
-            [x] app integration
-                [x] https://developer.android.com/training/sharing/receive
-                    https://developer.android.com/codelabs/android-direct-share
-                    Apparently, there is a bug in the android 10 emulator which prevents sharing shortcuts from working
-                    Test on-device instead.
-                    [x] add the last people the user send messages to as persons
-            [x] a way to open multiple tasks for the app, e.g. to view multiple coursewares
-            [x] option to upload multiple files at once (finish the refreshing after that)
-            [x] send a notification_read request when the user taps on a notification
-            [x] set a message to read when the user opens it
-            [x] color unread messages with red in the list
-            [x] option to set the app as the default browser app and set a real browser app.
-                All links to Stud.IP will get opened in the app, all other links are relayed to the chosen browser app.
-                Only possible way for android < S, because you need ownership of a domain to use app links.
-                On android S, you can ask the user to set the app as a standard app for link types.
-                    [x] test the browser app querying on android 11
-            [x] support for viewing Images in Forum Posts and messages: Probably with another ImageHandler for Html.fromHtml
-            [x] add the course info dialog
-            [x] bump version
-            [x] update help text
-            [x] update description - no changes
-            [x] write changelog
-            [ ] update on play store
         1.0.0:
-            [ ] fix the cache miss problem when logging in in the webview and using the back button, probably by excluding it from the history
+            [x] fix the cache miss problem when logging in in the webview and using the back button, probably by excluding it from the history
             [ ] deep links improvements
                 [ ] support for more link types
                     [x] courseware

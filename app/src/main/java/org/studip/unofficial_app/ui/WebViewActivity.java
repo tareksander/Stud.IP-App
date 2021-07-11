@@ -16,6 +16,7 @@ import android.webkit.RenderProcessGoneDetail;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -44,7 +45,7 @@ public class WebViewActivity extends AppCompatActivity
     private boolean login = false;
     private ActivityResultLauncher<String[]> launch;
     private ValueCallback<Uri[]> filePathCallback;
-    private Handler h = new Handler();
+    private final Handler h = new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,13 +163,6 @@ public class WebViewActivity extends AppCompatActivity
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK) && browserView.canGoBack()) {
-            WebBackForwardList l = browserView.copyBackForwardList();
-            /*
-            if (l.getCurrentIndex() > 0) {
-                WebHistoryItem last = l.getItemAtIndex(l.getCurrentIndex() - 1);
-                System.out.println(last.getUrl());
-            }
-             */
             browserView.goBack();
             return true;
         }
@@ -255,7 +249,14 @@ public class WebViewActivity extends AppCompatActivity
             return shouldOverrideUrlLoading(view, request.getUrl().toString());
         }
     
-        
+        @Override
+        public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+            if ("POST".equals(request.getMethod())) {
+                if (view.canGoBackOrForward(-2)) {
+                    view.goBackOrForward(-2);
+                }
+            }
+        }
     
         @Override
         public void onPageFinished(WebView view, String url) {
