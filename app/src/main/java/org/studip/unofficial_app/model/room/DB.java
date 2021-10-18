@@ -1,5 +1,6 @@
 package org.studip.unofficial_app.model.room;
 
+import androidx.room.AutoMigration;
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
@@ -16,8 +17,24 @@ import org.studip.unofficial_app.api.rest.StudipScheduleEntry;
 import org.studip.unofficial_app.api.rest.StudipSemester;
 import org.studip.unofficial_app.api.rest.StudipUser;
 
-@Database(entities = {StudipCourse.class, StudipCourseMember.class, StudipEvent.class, StudipForumCategory.class, StudipForumEntry.class, StudipLicense.class,
-                      StudipMessage.class, StudipNews.class, StudipScheduleEntry.class, StudipSemester.class, StudipUser.class},version = 1, exportSchema = false)
+
+
+
+
+@Database(entities = {
+            StudipCourse.class,
+            StudipCourseMember.class,
+            StudipEvent.class,
+            StudipForumCategory.class,
+            StudipForumEntry.class,
+            StudipLicense.class,
+            StudipMessage.class,
+            StudipNews.class,
+            StudipScheduleEntry.class,
+            StudipSemester.class,
+            StudipUser.class
+        },
+        version = 2)
 @TypeConverters({Converters.class})
 public abstract class DB extends RoomDatabase
 {
@@ -28,4 +45,5 @@ public abstract class DB extends RoomDatabase
     public abstract UserDao userDao();
     public abstract SemesterDao semesterDao();
     public abstract MessagesDao messagesDao();
+    public abstract CourseMemberDao courseMemberDao();
 }

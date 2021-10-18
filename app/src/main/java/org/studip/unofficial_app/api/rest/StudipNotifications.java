@@ -8,6 +8,10 @@ public class StudipNotifications implements Serializable
     public long server_timestamp;
     @SerializedName("PersonalNotifications.newNotifications")
     public Notification[] notifications;
+    public PersonalNotifications personalnotifications;
+    public static class PersonalNotifications implements Serializable {
+        public Notification[] notifications;
+    }
     public static class Notification implements Serializable {
         public long personal_notification_id;
         public String url;

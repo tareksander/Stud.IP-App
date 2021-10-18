@@ -61,6 +61,10 @@ public class NewsResource extends NetworkResource<List<StudipNews>>
         if (res.collection.size() != 0) {
             empty = false;
         }
-        DBProvider.getDB(c).newsDao().updateInsertMultiple(res.collection.values().toArray(new StudipNews[0]));
+        if (cid == null) {
+            DBProvider.getDB(c).newsDao().replaceGlobal(res.collection.values().toArray(new StudipNews[0]));
+        } else {
+            DBProvider.getDB(c).courseDao().replaceNews(res.collection.values().toArray(new StudipNews[0]), cid);
+        }
     }
 }

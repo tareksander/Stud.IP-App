@@ -153,6 +153,8 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
             finish();
             return;
         }
+        
+        new Thread(api::refreshSessionIfNeeded).start();
     
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         

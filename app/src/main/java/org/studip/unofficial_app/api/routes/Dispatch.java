@@ -27,10 +27,10 @@ public interface Dispatch
     @GET("dispatch.php/jsupdater/get")
     Call<StudipNotifications> getNotifications();
     
-    @GET("/dispatch.php/jsupdater/notifications_seen")
+    @GET("dispatch.php/jsupdater/notifications_seen")
     Call<Void> setNotificationsSeen();
     
-    @GET("/dispatch.php/jsupdater/mark_notification_read/{id}")
+    @GET("dispatch.php/jsupdater/mark_notification_read/{id}")
     Call<Void> setNotificationRead(@Path("id") String id);
     
     
@@ -78,4 +78,12 @@ public interface Dispatch
     Call<Void> saveNotificationSettings(@FieldMap Map<String, String> fields);
     
     
+    @POST("dispatch.php/my_courses/index")
+    @FormUrlEncoded
+    Call<Void> login(@Field("loginname") String username, @Field("password") String password,
+                     @Field("security_token") String token, @Field("login_ticket") String ticket);
+    
+    
+    @GET("/")
+    Call<String> loginPage();
 }

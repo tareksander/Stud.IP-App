@@ -60,6 +60,6 @@ public class MessagesResource extends NetworkResource<StudipMessage[]>
             }
             //System.out.println(m.subject);
         }
-        db.messagesDao().updateInsertMultiple(res.collection.values().toArray(new StudipMessage[0]));
+        db.messagesDao().replaceMessages(res.collection.values().toArray(new StudipMessage[0]));
     }
 }

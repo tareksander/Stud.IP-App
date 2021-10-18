@@ -9,29 +9,29 @@ import org.studip.unofficial_app.api.rest.StudipUser;
 import io.reactivex.Single;
 
 @Dao
-public interface UserDao extends BasicDao<StudipUser>
+public abstract class UserDao implements BasicDao<StudipUser>
 {
     @Query("SELECT * FROM users")
-    StudipUser[] getAll();
+    public abstract StudipUser[] getAll();
 
     @Query("SELECT * FROM users")
-    LiveData<StudipUser[]> observeAll();
+    public abstract LiveData<StudipUser[]> observeAll();
 
 
     @Query("SELECT * FROM users WHERE user_id = :id")
-    StudipUser get(String id);
+    public abstract StudipUser get(String id);
 
 
     @Query("SELECT * FROM users WHERE user_id = :id")
-    Single<StudipUser> getSingle(String id);
+    public abstract Single<StudipUser> getSingle(String id);
 
 
     @Query("SELECT * FROM users WHERE user_id = :id")
-    LiveData<StudipUser> observe(String id);
+    public abstract LiveData<StudipUser> observe(String id);
 
 
 
     @Query("SELECT * FROM users WHERE name_formatted LIKE '%:name%' OR username LIKE '%'+:name+'%'")
-    LiveData<StudipUser> search(String name);
+    public abstract LiveData<StudipUser> search(String name);
     
 }

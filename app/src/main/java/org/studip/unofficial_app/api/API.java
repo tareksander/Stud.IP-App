@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.NetworkOnMainThreadException;
 import android.webkit.CookieManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.MimeTypeMap;
@@ -40,7 +41,6 @@ import org.studip.unofficial_app.model.Settings;
 import org.studip.unofficial_app.model.SettingsProvider;
 import org.studip.unofficial_app.model.room.UserDao;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,6 +51,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Cookie;
@@ -71,6 +73,11 @@ public class API
     
     public final Retrofit retrofit;
     private final ConcurrentHashMap<String, List<Cookie>> cookies = new ConcurrentHashMap<>();
+    
+    private long lastRefresh = 0;
+    private static final Pattern LOGIN_TOKEN_PATTERN = Pattern.compile("<input[^>]*name=\"security_token\"[^>]*value=\"([^\"]+)\"");
+    private static final Pattern LOGIN_TICKET_PATTERN = Pattern.compile("<input[^>]*name=\"login_ticket\"[^>]*value=\"([^\"]+)\"");
+    
     
     private static final String AUTH_COOKIE_KEY = "cookie";
     private static final String HOSTNAME_KEY = "hostname";
@@ -148,14 +155,26 @@ public class API
                             {
                                 for (Cookie c : list)
                                 {
-                                    if (!clist.contains(c))
-                                    {
+                                    // replace existing cookies with the same name
+                                    boolean found = false;
+                                    for (Cookie calready : clist) {
+                                        if (calready.name().equals(c.name())) {
+                                            //System.out.println("replacing cookie: "+calready.name());
+                                            found = true;
+                                            clist.remove(calready);
+                                            clist.add(c);
+                                            break;
+                                        }
+                                    }
+                                    if (! found) {
+                                        //System.out.println("adding cookie");
                                         clist.add(c);
                                     }
                                 }
                             }
                             else
                             {
+                                //System.out.println("adding cookies");
                                 cookies.put(httpUrl.host(), new LinkedList<>(list));
                             }
                         }
@@ -170,7 +189,11 @@ public class API
                             if (clist == null) {
                                 return Collections.emptyList();
                             } else {
-                                //System.out.println("Cookies "+clist.toString()+" send to URL "+httpUrl.toString());
+                                /*
+                                for (Cookie c : clist) {
+                                    System.out.println("Cookie "+c.name()+" send to URL " + httpUrl.toString());
+                                }
+                                */
                                 return clist;
                             }
                         } else {
@@ -334,7 +357,44 @@ public class API
     }
     
     
+    // refreshes the session cookie if basic auth is used
+    // blocks the thread
+    public void refreshSession() {
+        if (auth_method == Settings.AUTHENTICATION_BASIC) {
+            try {
+                String html = dispatch.loginPage().execute().body();
+                if (html != null && html.contains("<body id=\"login\">")) {
+                    String token, ticket;
+                    Matcher m = LOGIN_TOKEN_PATTERN.matcher(html);
+                    if (m.find()) {
+                        token = m.group(1);
+                    } else {
+                        return;
+                    }
+                    m = LOGIN_TICKET_PATTERN.matcher(html);
+                    if (m.find()) {
+                        ticket = m.group(1);
+                    } else {
+                        return;
+                    }
+                    dispatch.login(username, password, token, ticket).execute();
+                    
+                    
+                    lastRefresh = System.currentTimeMillis();
+                }
+            } catch (NetworkOnMainThreadException e) {
+                throw e;
+            } catch (Exception ignored) {}
+        }
+    }
     
+    // refreshes the session cookie if basic auth is used and the last refresh is 20 minutes away
+    // blocks the thread
+    public void refreshSessionIfNeeded() {
+        if ((System.currentTimeMillis()-lastRefresh)/1000 >= 60*20) {
+            refreshSession();
+        }
+    }
     
     
     public boolean authWebView(HttpAuthHandler handler, String host) {
@@ -565,6 +625,7 @@ public class API
     
     @SuppressLint("ApplySharedPref")
     public void logout(EncryptedSharedPreferences prefs) {
+        cookies.clear();
         String hostname = prefs.getString(HOSTNAME_KEY,null);
         SharedPreferences.Editor edit = prefs.edit();
         edit.clear();

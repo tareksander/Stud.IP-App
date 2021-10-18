@@ -24,6 +24,8 @@ import org.studip.unofficial_app.ui.DeepLinkActivity;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import retrofit2.Response;
+
 public class NotificationWorker extends Worker
 {
     public static final String WORKER_ID = "notification";
@@ -43,58 +45,69 @@ public class NotificationWorker extends Worker
         API api = APIProvider.getAPI(getApplicationContext());
         Settings s = SettingsProvider.getSettings(getApplicationContext());
         if (api != null) {
+            api.refreshSessionIfNeeded();
             //s.last_notification_id = 0;
+            //System.out.println("last: "+s.last_notification_id);
             try {
-                StudipNotifications nots = api.dispatch.getNotifications().execute().body();
-                if (nots != null && nots.notifications != null) {
-                    Arrays.sort(nots.notifications, (o1, o2) -> (int) ((o1.personal_notification_id-o2.personal_notification_id)%Integer.MAX_VALUE));
-                    NotificationManagerCompat m = NotificationManagerCompat.from(getApplicationContext());
-                    for (StudipNotifications.Notification n : nots.notifications) {
-                        if (s.last_notification_id >= n.personal_notification_id) {
-                            continue;
+                Response<StudipNotifications> resp = api.dispatch.getNotifications().execute();
+                StudipNotifications nots = resp.body();
+                if (nots != null) {
+                    // compatibility with the newer dispatch route format
+                    if ((nots.notifications == null || nots.notifications.length == 0) &&
+                            nots.personalnotifications != null && nots.personalnotifications.notifications != null) {
+                        nots.notifications = nots.personalnotifications.notifications;
+                    }
+                    if (nots.notifications != null) {
+                        Arrays.sort(nots.notifications, (o1, o2) -> (int) ((o1.personal_notification_id - o2.personal_notification_id) % Integer.MAX_VALUE));
+                        NotificationManagerCompat m = NotificationManagerCompat.from(getApplicationContext());
+                        for (StudipNotifications.Notification n : nots.notifications) {
+                            //System.out.println(n.personal_notification_id);
+                            if (s.last_notification_id >= n.personal_notification_id) {
+                                continue;
+                            }
+                            s.last_notification_id = n.personal_notification_id;
+                            String channel = Notifications.CHANNEL_OTHER;
+                            int res = R.drawable.seminar_blue;
+                            if (n.url.contains("/plugins.php/opencast")) {
+                                // TODO notification category for opencast
+                                res = R.drawable.opencast_blue;
+                            }
+                            if (n.url.contains("files")) {
+                                channel = Notifications.CHANNEL_FILES;
+                                res = R.drawable.file_blue;
+                            }
+                            if (n.url.contains("forum")) {
+                                channel = Notifications.CHANNEL_FORUM;
+                                res = R.drawable.forum_blue;
+                            }
+                            if (n.url.contains("messages")) {
+                                channel = Notifications.CHANNEL_MESSAGES;
+                                res = R.drawable.mail_blue;
+                            }
+                            NotificationCompat.Builder b = new NotificationCompat.Builder(getApplicationContext(), channel);
+                            Notifications.setType(getApplicationContext(), b, channel);
+                            b.setSmallIcon(res);
+                            b.setContentTitle(n.text);
+                            b.setTicker(n.text);
+                            String text = Jsoup.parse(n.html).text();
+                            b.setContentText(text);
+                            b.setStyle(new NotificationCompat.BigTextStyle().bigText(text));
+                            int flags = PendingIntent.FLAG_ONE_SHOT;
+                            if (Build.VERSION.SDK_INT >= 23) {
+                                flags |= PendingIntent.FLAG_IMMUTABLE;
+                            }
+            
+                            Intent i = new Intent(getApplicationContext(), DeepLinkActivity.class);
+                            i.setAction(Intent.ACTION_VIEW);
+                            i.setData(Uri.parse(n.url));
+                            //System.out.println(n.url);
+                            i.putExtra(getApplicationContext().getPackageName() + ".notification_id", n.personal_notification_id);
+                            b.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, i, flags));
+            
+                            b.setVisibility(s.notification_visibility);
+            
+                            m.notify((int) (n.personal_notification_id % Integer.MAX_VALUE), b.build());
                         }
-                        s.last_notification_id = n.personal_notification_id;
-                        String channel = Notifications.CHANNEL_OTHER;
-                        int res = R.drawable.seminar_blue;
-                        if (n.url.contains("/plugins.php/opencast")) {
-                            // TODO notification category for opencast
-                            res = R.drawable.opencast_blue;
-                        }
-                        if (n.url.contains("files")) {
-                            channel = Notifications.CHANNEL_FILES;
-                            res = R.drawable.file_blue;
-                        }
-                        if (n.url.contains("forum")) {
-                            channel = Notifications.CHANNEL_FORUM;
-                            res = R.drawable.forum_blue;
-                        }
-                        if (n.url.contains("messages")) {
-                            channel = Notifications.CHANNEL_MESSAGES;
-                            res = R.drawable.mail_blue;
-                        }
-                        NotificationCompat.Builder b = new NotificationCompat.Builder(getApplicationContext(),channel);
-                        Notifications.setType(getApplicationContext(),b,channel);
-                        b.setSmallIcon(res);
-                        b.setContentTitle(n.text);
-                        b.setTicker(n.text);
-                        String text = Jsoup.parse(n.html).text();
-                        b.setContentText(text);
-                        b.setStyle(new NotificationCompat.BigTextStyle().bigText(text));
-                        int flags = PendingIntent.FLAG_ONE_SHOT;
-                        if (Build.VERSION.SDK_INT >= 23) {
-                            flags |= PendingIntent.FLAG_IMMUTABLE;
-                        }
-                        
-                        Intent i = new Intent(getApplicationContext(), DeepLinkActivity.class);
-                        i.setAction(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(n.url));
-                        //System.out.println(n.url);
-                        i.putExtra(getApplicationContext().getPackageName()+".notification_id",n.personal_notification_id);
-                        b.setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,i,flags));
-                        
-                        b.setVisibility(s.notification_visibility);
-                        
-                        m.notify((int) (n.personal_notification_id % Integer.MAX_VALUE),b.build());
                     }
                 }
             }
@@ -102,6 +115,7 @@ public class NotificationWorker extends Worker
             //System.out.println(s.last_notification_id);
             s.safe(SettingsProvider.getSettingsPreferences(getApplicationContext()));
         }
+        //System.out.println("finished");
         return Result.success();
     }
 }

@@ -11,6 +11,7 @@ import org.studip.unofficial_app.api.rest.StudipCollection;
 import org.studip.unofficial_app.api.rest.StudipCourse;
 import org.studip.unofficial_app.model.room.DB;
 
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 
@@ -46,6 +47,7 @@ public class CoursesResource extends NetworkResource<StudipCourse[]> {
     {
         StudipCollection<StudipCourse> res = (StudipCollection<StudipCourse>) o;
         DB db = DBProvider.getDB(c);
+        LinkedList<StudipCourse> clist = new LinkedList<>();
         for (Map.Entry<String,StudipCourse> entry : res.collection.entrySet()) {
             StudipCourse course = entry.getValue();
             Gson gson = GsonProvider.getGson();
@@ -58,7 +60,8 @@ public class CoursesResource extends NetworkResource<StudipCourse[]> {
                     course.modules_object = gson.fromJson(course.modules, StudipCourse.Modules.class);
                 } catch (JsonSyntaxException ignored) {}
             }
-            db.courseDao().updateInsert(course);
+            clist.add(course);
         }
+        db.courseDao().replaceCourses(clist.toArray(new StudipCourse[0]));
     }
 }

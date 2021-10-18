@@ -53,6 +53,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -66,6 +67,7 @@ import retrofit2.Response;
 
 import static android.provider.DocumentsContract.Document;
 import static android.provider.DocumentsContract.Root;
+import static android.provider.DocumentsContract.buildChildDocumentsUri;
 
 public class DocumentsProvider extends android.provider.DocumentsProvider
 {
@@ -720,7 +722,17 @@ public class DocumentsProvider extends android.provider.DocumentsProvider
         API api = APICheckLogin();
         
         //System.out.println("thumbnail");
-        
+    
+        try {
+            StudipFolder.FileRef f = Objects.requireNonNull(api.file.get(documentId).execute().body());
+            if (f.size > 1024*1024*5) {
+                throw new FileNotFoundException();
+            }
+        }
+        catch (Exception ignored) {
+            throw new FileNotFoundException();
+        }
+    
         File tmp = new File(new File(getContext().getCacheDir(), DOCSDIR),"/thumbnail-"+documentId);
         if (! tmp.exists()) {
             try (ResponseBody body = api.file.download(documentId).execute().body();

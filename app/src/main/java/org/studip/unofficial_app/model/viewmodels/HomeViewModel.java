@@ -32,6 +32,10 @@ public class HomeViewModel extends AndroidViewModel
     {
         if (user == null) {
             user = new MutableLiveData<>();
+            StudipUser dummy = new StudipUser();
+            dummy.name = new StudipUser.Name();
+            dummy.name.given = "";
+            user.setValue(dummy);
             //System.out.println("userID: "+APIProvider.getAPI(c).getUserID());
             API api = APIProvider.getAPI(c);
             if (api != null) {

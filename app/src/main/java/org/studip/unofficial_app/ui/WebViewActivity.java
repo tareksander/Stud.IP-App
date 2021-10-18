@@ -66,6 +66,13 @@ public class WebViewActivity extends AppCompatActivity
         recreateWebView();
         
         
+        try {
+            Thread t = new Thread(api::refreshSessionIfNeeded);
+            t.start();
+            t.join(1000);
+        }
+        catch (InterruptedException ignored) {}
+    
         boolean loaded = false;
         if (savedInstanceState != null) {
             try {

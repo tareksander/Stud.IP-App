@@ -6,19 +6,19 @@ import androidx.room.Query;
 
 import org.studip.unofficial_app.api.rest.StudipSemester;
 @Dao
-public interface SemesterDao extends BasicDao<StudipSemester>
+public abstract class SemesterDao implements BasicDao<StudipSemester>
 {
 
     @Query("SELECT * FROM semesters")
-    LiveData<StudipSemester[]> observeAll();
+    public abstract LiveData<StudipSemester[]> observeAll();
     
     @Query("SELECT * FROM semesters")
-    StudipSemester[] getAll();
+    public abstract StudipSemester[] getAll();
 
     @Query("SELECT * FROM semesters WHERE id = :id")
-    StudipSemester get(String id);
+    public abstract StudipSemester get(String id);
 
 
     @Query("SELECT * FROM semesters WHERE `begin` >= :time AND `end` <= :time")
-    StudipSemester getByUnixTime(String time);
+    public abstract StudipSemester getByUnixTime(String time);
 }

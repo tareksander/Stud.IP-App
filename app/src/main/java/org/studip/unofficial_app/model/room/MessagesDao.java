@@ -4,28 +4,40 @@ import androidx.lifecycle.LiveData;
 import androidx.paging.PagingSource;
 import androidx.room.Dao;
 import androidx.room.Query;
+import androidx.room.Transaction;
 
 import org.studip.unofficial_app.api.rest.StudipMessage;
 
 
 @Dao
-public interface MessagesDao extends BasicDao<StudipMessage>
+public abstract class MessagesDao implements BasicDao<StudipMessage>
 {
     
     @Query("SELECT * FROM messages ORDER BY mkdate DESC")
-    StudipMessage[] getAll();
+    public abstract StudipMessage[] getAll();
     
     
     @Query("SELECT * FROM messages WHERE message_id = :id")
-    LiveData<StudipMessage> observe(String id);
+    public abstract LiveData<StudipMessage> observe(String id);
     
     
     @Query("SELECT * FROM messages ORDER BY mkdate DESC")
-    LiveData<StudipMessage[]> observeAll();
+    public abstract LiveData<StudipMessage[]> observeAll();
 
 
     @Query("SELECT * FROM messages ORDER BY mkdate DESC")
-    PagingSource<Integer,StudipMessage> getPagedList();
+    public abstract PagingSource<Integer,StudipMessage> getPagedList();
+    
+    
+    
+    @Query("DELETE FROM messages")
+    public abstract void deleteAll();
+    
+    @Transaction
+    public void replaceMessages(StudipMessage[] m) {
+        deleteAll();
+        updateInsertMultiple(m);
+    }
     
     
 }

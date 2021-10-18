@@ -9,11 +9,12 @@ import org.studip.unofficial_app.api.rest.StudipForumCategory;
 import org.studip.unofficial_app.api.rest.StudipForumCategoryWithEntries;
 
 @Dao
-public interface ForumCategoryDao extends BasicDao<StudipForumCategory> {
+public abstract class ForumCategoryDao implements BasicDao<StudipForumCategory>
+{
     
     @Transaction
     @Query("SELECT * FROM forum_categories WHERE category_id = :id")
-    LiveData<StudipForumCategoryWithEntries> observeCategoryWithEntries(String id);
+    public abstract LiveData<StudipForumCategoryWithEntries> observeCategoryWithEntries(String id);
     
     
 }
