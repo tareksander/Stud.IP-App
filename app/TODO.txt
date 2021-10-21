@@ -56,8 +56,10 @@
             [ ] messages
                 [ ] add support for viewing the outbox
                 [ ] downloading message attachments
+            [ ] fix Courseware for Stud.IP 5.0
             [x] Document provider: only load an image preview if the file is < 5mb
             [x] bump version
+            [ ] fix proguard rules for release, networking doesn't seem to work somehow
             [ ] update help text
             [ ] new & more screenshots, with UI improvements
             [ ] update description
@@ -74,7 +76,6 @@
             [ ] app widgets
                 [ ] planner
                     [ ] updates automatically when the planner is updated in the app
-            [ ] fix Courseware for Stud.IP 5.0
             [ ] add in-memory caching for up to 10 seconds for results from the document provider
             [ ] support for multiple accounts
                 [ ] document provider: filenames have to include the server name and user id to be unique

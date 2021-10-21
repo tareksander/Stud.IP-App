@@ -81,7 +81,7 @@ public class Opencast
                 } else {
                     throw new Exception("could not find metadata");
                 }
-                Elements download_qualities = v.getElementsByAttributeValue("class","download presentation button");
+                Elements download_qualities = v.getElementsByAttributeValueMatching("class","download present(ation|er) button");
                 result[pos].versions = new OpencastVideo.VideoVersion[download_qualities.size()];
                 for (int i = 0;i<result[pos].versions.length;i++) {
                     result[pos].versions[i] = new OpencastVideo.VideoVersion();
