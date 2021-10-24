@@ -1,0 +1,7 @@
+Fehler behoben, bei dem Benachrichtigungen nicht angezeigt wurden
+Mehr Links können in der App geöffnet werden
+Veranstaltungsteilnehmerbildschirm wurde hinzugefügt
+Benutzer-Info-Dialog hinzugefügt
+Nachrichtenanhänge können jetzt heruntergeladen werden
+Neue Art nach neuen Nachrichten zu suchen, um mobile Daten zu schonen
+Vorschaubilder werden nur geladen, wenn sie kleiner als 5MB sind, um mobile Daten zu sparen

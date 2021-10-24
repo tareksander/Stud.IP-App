@@ -175,7 +175,9 @@ Mit dem Button oben können Sie ein weiteres Fenster für die App öffnen, wenn 
 Auf diesem Bildschirm können Sie Ihre Kurse für ein ausgewähltes Semester anschauen.<br>
 Die Symbole zu den Kursen funktionieren wie auf der Weboberfläche, aber für manche sind die Funktionen noch nicht implementiert.<br>
 Mit dem Flaggen-Symbol können Sie die Ankündigungen eines Kurses lesen.<br>
-Mit dem Datei-Symbol können Sie sich die Dateien eines Kurses anschauen, herunterladen und hochladen.<br><br>
+Mit dem Datei-Symbol können Sie sich die Dateien eines Kurses anschauen, herunterladen und hochladen.<br>
+Mit dem Personensymbol wird der Kursteilnehmerbildschirm geöffnet.<br>
+Wenn Sie dort auf eine Person tippen, öffnet sich der Benutzerdialog.<br><br>
 
 <h2 id="6" >6. Dateibildschirm</h2>
 Auf diesem Bildschirm können Sie Sich ihre Dateien auf dem System und die Dateien von Kursen ansehen.<br>
@@ -185,10 +187,13 @@ Durch Halten auf eine Datei oder ein Verzeichnis wird es gelöscht.<br><br>
 
 <h2 id="7" >7. Nachrichtenbildschirm</h2>
 Auf diesem Bildschirm können Sie Ihre Stud.IP-Nachrichten lesen und neue Verfassen.<br>
+Mit den beiden Tabs oben können Sie zwischen Ihren gesendeten und empfangenen Nachrichten umschalten.<br>
 Durch lange auf eine Nachricht halten wird diese gelöscht.<br>
 Beim Adressat auswählen schlägt die App Ihnen schon bekannte Benutzer vor.<br>
 Wenn Sie den "Suchen"-Button benutzen, sucht die App im System nach Benutzern mit dem im Adressat-Feld befindlichen Namen.<br>
 Ein Adressat wird hinzugefügt, indem Sie ihn in der Liste antippen.<br>
+Mit dem Synchronisieren-Button werden die Nachrichten komplett mit dem Server synchronisiert.<br>
+Das kann nützlich sein, wenn das Swipe-To-Refresh neue Nachrichten nicht erkennt.<br>
 Gedrückt halten auf einen hinzugefügten Adressaten löscht ihn wieder.<br><br>
 
 <h2 id="8" >8. Courseware-Plugin</h2>

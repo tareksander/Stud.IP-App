@@ -49,11 +49,10 @@
                 [x] downloading message attachments
             [x] Document provider: only load an image preview if the file is < 5mb
             [x] bump version
-            [ ] fix proguard rules for release, networking doesn't seem to work somehow
-            [ ] update help text
-            [ ] new & more screenshots, with UI improvements
-            [ ] update description
-            [ ] write changelog
+            [x] update help text
+            [x] new & more screenshots, with UI improvements
+            [x] update description
+            [x] write changelog
             [ ] update on play store
         1.1.0:
             [ ] fix Courseware for Stud.IP 5.0

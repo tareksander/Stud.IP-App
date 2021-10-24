@@ -1,0 +1,7 @@
+fixed notifications not displaying
+added support for more Stud.IP links to open in the app
+added the course member screen
+added the user info dialog
+you can now download message attachments
+new way to search for new messages that preserves mobile data
+Preview images are only loaded if they are smaller than 5MB, to preserve mobile data

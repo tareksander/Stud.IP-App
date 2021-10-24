@@ -172,7 +172,9 @@ You can open another window for the app by clicking the button at the top.<br>
 On this screen you can view your courses for a specific semester.<br>
 The icons for the courses work like on the website, but some features aren't implemented yet.<br>
 You can use the flag icon to view course news.<br>
-With the file icon you can view the files of a specific course.<br><br>
+With the file icon you can view the files of a specific course.<br>
+With the person icon you can open the course member screen.<br>
+If you click on a member in that screen the user dialog is opened.<br><br>
 
 
 
@@ -184,11 +186,14 @@ Long press on a file or folder to delete it.<br><br>
 
 <h2 id="7" >7. Messages</h2>
 On this screen you can view and write Stud.IP messages.<br>
+With the two tabs at the top you can switch between you send and received messages.<br>
 Long press on a message to delete it.<br>
 To choose the addressee the app searches for known users with a name like the one you wrote.<br>
 When you press the "Search" button, the app searches for new users with the specified name in the Stud.IP system.<br>
 Add the addressee by tapping it in the list.<br>
 Long press on an addressee to remove it.<br>
+With the "Full sync"-button you can synchronize the messages between the server and the device.<br>
+That can be useful if the swipe-to-refresh doesn't recognize a new message.<br>
 <br><br>
 
 <h2 id="8" >8. Courseware plugin</h2>
