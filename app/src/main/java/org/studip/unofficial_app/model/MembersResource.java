@@ -42,6 +42,7 @@ public class MembersResource extends NetworkResource<StudipCourseMemberWithUser[
         for (StudipCourseMember m : ms) {
             m.courseID = cid;
             m.id = m.member.user_id;
+            m.member.username = m.member.name.username;
             ud.updateInsert(m.member);
         }
         DBProvider.getDB(c).courseMemberDao().replaceCourse(ms, cid);

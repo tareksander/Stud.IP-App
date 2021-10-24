@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,12 +12,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import org.studip.unofficial_app.api.API;
+import org.studip.unofficial_app.api.rest.StudipFolder;
 import org.studip.unofficial_app.api.rest.StudipMessage;
 import org.studip.unofficial_app.databinding.DialogViewMessageBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.room.DB;
 import org.studip.unofficial_app.ui.HelpActivity;
+
+import java.util.HashMap;
 
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
@@ -80,6 +84,28 @@ public class MessageDialogFragment extends DialogFragment
             d.show(getParentFragmentManager(), "message_write");
             dismiss();
         });
+        
+        
+        if (m.attachments != null && api != null) {
+            for (String at : m.attachments) {
+                api.file.get(at).enqueue(new Callback<StudipFolder.FileRef>()
+                {
+                    @Override
+                    public void onResponse(@NonNull Call<StudipFolder.FileRef> call, @NonNull Response<StudipFolder.FileRef> response) {
+                        StudipFolder.FileRef f = response.body();
+                        if (f != null) {
+                            Button b = new Button(requireActivity());
+                            b.setText(f.name);
+                            b.setOnClickListener(l -> api.downloadFile(requireActivity(), f.id, f.name, false));
+                            binding.attachments.addView(b);
+                        }
+                    }
+                    @Override
+                    public void onFailure(@NonNull Call<StudipFolder.FileRef> call, @NonNull Throwable t) {}
+                });
+            }
+        }
+        
     
         b.setView(binding.getRoot());
         return b.create();

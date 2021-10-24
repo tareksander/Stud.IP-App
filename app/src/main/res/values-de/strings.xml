@@ -347,6 +347,7 @@ Wenn Sie den Zugriff erlaubt haben, kehren Sie hierher zurück und drücken Sie 
     <string name="inbox">Eingang</string>
     <string name="outbox">Gesendet</string>
     <string name="invalid_server_url">Ungültige Stud.IP URL</string>
+    <string name="delete_message_server_error">Konnte Nachricht nicht auf dem Server löschen</string>
 
 
 </resources>

@@ -334,6 +334,14 @@ After you accept, return here and click continue.
     <string name="duplicate">New window</string>
     <string name="start_semester">Start semester: %1$s</string>
     <string name="end_semester">End semester: %1$s</string>
+    <string name="user_dialog">User</string>
+    <string name="username_display">Username: %1$s</string>
+    <string name="user_fullname_display">Name: %1$s</string>
+    <string name="messages_sync">Full sync</string>
+    <string name="inbox">Inbox</string>
+    <string name="outbox">Outbox</string>
+    <string name="invalid_server_url">Invalid Stud.IP URL</string>
+    <string name="delete_message_server_error">Couldn\'t delete message from server</string>
 
 
 </resources>

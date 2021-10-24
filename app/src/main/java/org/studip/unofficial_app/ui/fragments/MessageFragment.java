@@ -1,16 +1,19 @@
 package org.studip.unofficial_app.ui.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.pm.ShortcutManagerCompat;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModelKt;
 import androidx.lifecycle.ViewModelProvider;
@@ -21,9 +24,15 @@ import androidx.paging.PagingLiveData;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.Operation;
+import androidx.work.WorkContinuation;
+import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
+
+import com.google.android.material.tabs.TabLayout;
 
 import org.jetbrains.annotations.NotNull;
 import org.studip.unofficial_app.R;
@@ -35,6 +44,8 @@ import org.studip.unofficial_app.databinding.MessageEntryBinding;
 import org.studip.unofficial_app.model.APIProvider;
 import org.studip.unofficial_app.model.DBProvider;
 import org.studip.unofficial_app.model.GetMessageUsersWork;
+import org.studip.unofficial_app.model.MessagesResource;
+import org.studip.unofficial_app.model.NewMessagesWork;
 import org.studip.unofficial_app.model.room.DB;
 import org.studip.unofficial_app.model.viewmodels.MessagesViewModel;
 import org.studip.unofficial_app.ui.HomeActivity;
@@ -70,7 +81,7 @@ public class MessageFragment extends SwipeRefreshFragment
         API api = APIProvider.getAPI(requireActivity());
         if (api != null && api.isFeatureEnabled(Features.FEATURE_MESSAGES)) {
             m.mes.getStatus().observe(getViewLifecycleOwner(), status -> HomeActivity.onStatusReturn(requireActivity(), status));
-            m.mes.isRefreshing().observe(getViewLifecycleOwner(), ref -> {
+            Observer<Boolean> refobs = ref -> {
                 binding.messagesRefresh.setRefreshing(ref);
                 String open = m.open.getValue();
                 if (! ref && open != null) {
@@ -83,7 +94,8 @@ public class MessageFragment extends SwipeRefreshFragment
                     });
                     m.open.setValue(null);
                 }
-            });
+            };
+            m.mes.isRefreshing().observe(getViewLifecycleOwner(), refobs);
     
             //ad = new MessageAdapter(requireActivity(),ArrayAdapter.IGNORE_ITEM_VIEW_TYPE);
             ad = new MessageAdapter();
@@ -94,7 +106,7 @@ public class MessageFragment extends SwipeRefreshFragment
             binding.messagesList.addItemDecoration(dividerItemDecoration);
     
     
-            m.mes.get().observe(getViewLifecycleOwner(), (messages) -> {
+            Observer<StudipMessage[]> mesobs = (messages) -> {
                 //System.out.println("messages");
                 if (messages.length == 0 && m.mes.getStatus().getValue() != null && m.mes.getStatus().getValue() == -1) {
                     //System.out.println("refreshing");
@@ -102,7 +114,8 @@ public class MessageFragment extends SwipeRefreshFragment
                     m.mes.refresh(requireActivity());
                 }
                 binding.messagesList.setAdapter(ad);
-            });
+            };
+            m.mes.get().observe(getViewLifecycleOwner(), mesobs);
             
             m.source.observe(getViewLifecycleOwner(), source -> {
                 if (source != null) {
@@ -123,20 +136,74 @@ public class MessageFragment extends SwipeRefreshFragment
                     m.source.setValue(null);
                 }
             });
-            
-            
+    
             PagingConfig conf = new PagingConfig(10, 10, true);
     
     
             DB db = DBProvider.getDB(requireActivity());
             PagingLiveData.cachedIn(PagingLiveData.getLiveData(new Pager<>(conf, null,
-                            () -> db.messagesDao().getPagedList())),
+                            () -> db.messagesDao().getPagedListNotSender(api.getUserID()))),
                     ViewModelKt.getViewModelScope(m)).observe(getViewLifecycleOwner(), (d) -> ad.submitData(getLifecycle(), d));
+            
+            binding.messagesSync.setOnClickListener((l) -> m.mes.refresh(requireActivity()));
+            binding.messageBoxes.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
+            {
+                @SuppressLint("NotifyDataSetChanged")
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    if (tab.equals(binding.messageBoxes.getTabAt(0))) {
+                        if (! "inbox".equals(m.mes.box)) {
+                            m.mes = new MessagesResource(requireActivity(), "inbox", api.getUserID());
+                            m.mes.get().observe(getViewLifecycleOwner(), mesobs);
+                            m.mes.getStatus().observe(getViewLifecycleOwner(), status -> HomeActivity.onStatusReturn(requireActivity(), status));
+                            m.mes.isRefreshing().observe(getViewLifecycleOwner(), refobs);
+                            PagingLiveData.cachedIn(PagingLiveData.getLiveData(new Pager<>(conf, null,
+                                            () -> db.messagesDao().getPagedListNotSender(api.getUserID()))),
+                                    ViewModelKt.getViewModelScope(m)).observe(getViewLifecycleOwner(), (d) -> ad.submitData(getLifecycle(), d));
+                            ad.notifyDataSetChanged();
+                        }
+                    }
+                    if (tab.equals(binding.messageBoxes.getTabAt(1))) {
+                        if (! "outbox".equals(m.mes.box)) {
+                            m.mes = new MessagesResource(requireActivity(), "outbox", api.getUserID());
+                            m.mes.get().observe(getViewLifecycleOwner(), mesobs);
+                            m.mes.getStatus().observe(getViewLifecycleOwner(), status -> HomeActivity.onStatusReturn(requireActivity(), status));
+                            m.mes.isRefreshing().observe(getViewLifecycleOwner(), refobs);
+                            PagingLiveData.cachedIn(PagingLiveData.getLiveData(new Pager<>(conf, null,
+                                            () -> db.messagesDao().getPagedListSender(api.getUserID()))),
+                                    ViewModelKt.getViewModelScope(m)).observe(getViewLifecycleOwner(), (d) -> ad.submitData(getLifecycle(), d));
+                            ad.notifyDataSetChanged();
+                        }
+                    }
+                }
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {}
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {}
+            });
+            
+            
+            
+            
             
     
             binding.messageWrite.setOnClickListener((v) -> new MessageWriteDialogFragment().show(getParentFragmentManager(), "message_write"));
             
-            binding.messagesRefresh.setOnRefreshListener(() -> m.mes.refresh(requireActivity()));
+            binding.messagesRefresh.setOnRefreshListener(() -> {
+                WorkContinuation cont = WorkManager.getInstance(requireActivity()).beginUniqueWork(NewMessagesWork.WORK_NAME
+                                + binding.messageBoxes.getSelectedTabPosition(),
+                        ExistingWorkPolicy.KEEP, new OneTimeWorkRequest.Builder(NewMessagesWork.class).setInputData(
+                                new Data.Builder().putString("box", m.mes.box).build())
+                                .build());
+                cont.enqueue();
+                cont.getWorkInfosLiveData().observe(getViewLifecycleOwner(), states -> {
+                    for (WorkInfo info : states) {
+                        if (info.getState().isFinished()) {
+                            binding.messagesRefresh.setRefreshing(false);
+                        }
+                    }
+                });
+            });
         } else {
             binding.messagesRefresh.setOnRefreshListener(() -> binding.messagesRefresh.setRefreshing(false));
         }
@@ -212,25 +279,21 @@ public class MessageFragment extends SwipeRefreshFragment
             layout.setOnClickListener((v) -> viewMessage(m));
 
             layout.setOnLongClickListener(v -> {
-                binding.messagesRefresh.setRefreshing(true);
+                DBProvider.getDB(requireActivity()).messagesDao().deleteAsync(m).subscribeOn(Schedulers.io()).subscribe();
                 API api = APIProvider.getAPI(requireActivity());
                 if (api != null) {
                     api.message.delete(m.message_id).enqueue(new Callback<Void>()
                     {
                         @Override
                         public void onResponse(@NotNull Call<Void> call, @NotNull Response<Void> response) {
-                            binding.messagesRefresh.setRefreshing(false);
-                            if (response.code() == 204 || response.code() == 404) {
-                                DBProvider.getDB(requireActivity()).messagesDao().deleteAsync(m).subscribeOn(Schedulers.io()).subscribe();
-                            }
-                            else {
-                                HomeActivity.onStatusReturn(requireActivity(), response.code());
+                            if (response.code() != 204 && response.code() != 404) {
+                                Toast.makeText(requireActivity(), R.string.delete_message_server_error, Toast.LENGTH_LONG).show();
                             }
                         }
         
                         @Override
                         public void onFailure(@NotNull Call<Void> call, @NotNull Throwable t) {
-                            binding.messagesRefresh.setRefreshing(false);
+                            Toast.makeText(requireActivity(), R.string.delete_message_server_error, Toast.LENGTH_LONG).show();
                         }
                     });
                 }

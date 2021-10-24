@@ -28,8 +28,9 @@ public abstract class UserDao implements BasicDao<StudipUser>
 
     @Query("SELECT * FROM users WHERE user_id = :id")
     public abstract LiveData<StudipUser> observe(String id);
-
-
+    
+    @Query("SELECT * FROM users WHERE username = :name")
+    public abstract LiveData<StudipUser> observeUsername(String name);
 
     @Query("SELECT * FROM users WHERE name_formatted LIKE '%:name%' OR username LIKE '%'+:name+'%'")
     public abstract LiveData<StudipUser> search(String name);

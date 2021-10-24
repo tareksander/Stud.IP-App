@@ -20,6 +20,7 @@ public abstract class CourseMemberDao implements BasicDao<StudipCourseMember>
         updateInsertMultiple(ms);
     }
     
+    @Transaction
     @Query("SELECT * FROM course_members WHERE courseID = :cid ORDER BY status = 'dozent' DESC, status = 'tutor' DESC, status = 'autor' DESC, (SELECT name_family FROM users WHERE user_id = id) ASC, (SELECT name_given FROM users WHERE user_id = id) ASC")
     public abstract LiveData<StudipCourseMemberWithUser[]> ObserveCourse(String cid);
 }

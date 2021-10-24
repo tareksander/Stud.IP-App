@@ -96,6 +96,13 @@ public class CourseMembersDialogFragment extends DialogFragment
                     b.name.setText(String.format("%s, %s", m.user.name.family, m.user.name.given));
                 }
             }
+            b.getRoot().setOnClickListener((l) -> {
+                Bundle args = new Bundle();
+                args.putString("uid", m.user.user_id);
+                UserDialogFragment u = new UserDialogFragment();
+                u.setArguments(args);
+                u.show(getParentFragmentManager(), "user_show");
+            });
             return b.getRoot();
         }
     }

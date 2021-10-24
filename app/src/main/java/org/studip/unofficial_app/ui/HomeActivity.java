@@ -54,6 +54,8 @@ import org.studip.unofficial_app.ui.fragments.FileFragment;
 import org.studip.unofficial_app.ui.fragments.HomeFragment;
 import org.studip.unofficial_app.ui.fragments.MessageFragment;
 import org.studip.unofficial_app.ui.fragments.dialog.CourseForumDialogFragment;
+import org.studip.unofficial_app.ui.fragments.dialog.CourseMembersDialogFragment;
+import org.studip.unofficial_app.ui.fragments.dialog.UserDialogFragment;
 import org.studip.unofficial_app.ui.plugins.MeetingsActivity;
 import org.studip.unofficial_app.ui.plugins.fragments.dialog.CourseOpencastDialog;
 import org.studip.unofficial_app.ui.plugins.fragments.dialog.CoursewareDialog;
@@ -78,8 +80,10 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
     
     public static final Pattern userFilePattern = Pattern.compile("/dispatch\\.php/files/index/(\\p{Alnum}+)$");
     
-    public static final Pattern fileDetailsPattern = Pattern.compile("/dispatch\\.php/file/details/(\\p{Alnum}+)(\\?cid=\\p{Alnum}+)??");
+    public static final Pattern fileDetailsPattern = Pattern.compile("/dispatch\\.php/file/details/(\\p{Alnum}+)(\\?cid=\\p{Alnum}+)??$");
     
+    
+    public static final Pattern userProfilePattern = Pattern.compile("/dispatch\\.php/profile\\?.*username=(\\p{Alnum}+)$");
     
     
     
@@ -88,7 +92,7 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
     public static final Pattern courseForumEntryPattern = Pattern.compile("/plugins\\.php/coreforum/index/(\\p{Alnum}+)\\?cid=(\\p{Alnum}+)$");
     public static final Pattern courseForumEntryPattern2 = Pattern.compile("/plugins\\.php/coreforum/index/index/(\\p{Alnum}+)\\?cid=(\\p{Alnum}+)$");
     
-    public static final Pattern courseMembersPattern = Pattern.compile("/dispatch\\.php/course/members\\?cid=(\\p{Alnum}+)$");
+    public static final Pattern courseMembersPattern = Pattern.compile("/dispatch\\.php/course/members/index\\?cid=(\\p{Alnum}+)$");
 
     public static final Pattern courseCoursewarePattern = 
             Pattern.compile("/plugins\\.php/courseware/courseware\\?cid=(\\p{Alnum}+)(&selected=(\\p{Alnum}+))?");
@@ -613,6 +617,29 @@ public class HomeActivity extends AppCompatActivity implements ComponentCallback
                     binding.pager.setCurrentItem(1);
                     handled = true;
                 }
+                
+                matcher = courseMembersPattern.matcher(path);
+                if (matcher.matches()) {
+                    Bundle args = new Bundle();
+                    args.putString("cid", matcher.group(1));
+                    CourseMembersDialogFragment m = new CourseMembersDialogFragment();
+                    m.setArguments(args);
+                    m.show(getSupportFragmentManager(), "course_members");
+                    binding.pager.setCurrentItem(1);
+                    handled = true;
+                }
+    
+                matcher = userProfilePattern.matcher(path);
+                if (matcher.matches()) {
+                    Bundle args = new Bundle();
+                    args.putString("username", matcher.group(1));
+                    UserDialogFragment u = new UserDialogFragment();
+                    u.setArguments(args);
+                    u.show(getSupportFragmentManager(), "user_show");
+                    binding.pager.setCurrentItem(1);
+                    handled = true;
+                }
+                
                 
                 
                 
