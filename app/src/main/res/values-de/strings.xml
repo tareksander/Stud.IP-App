@@ -21,8 +21,8 @@
     <string name="message_subject">Betreff</string>
     <string name="message_sender">Absender</string>
     <string name="message_time">Zeit</string>
-    <string name="message_new">Nachricht Schreiben</string>
-    <string name="message_delete_title">Nachricht Löschen</string>
+    <string name="message_new">Nachricht schreiben</string>
+    <string name="message_delete_title">Nachricht löschen</string>
     <string name="message_delete_msg">Diese Nachricht wirklich löschen:</string>
     <string name="message_search">Suchen</string>
     <string name="message_send">Senden</string>
@@ -340,6 +340,13 @@ Wenn Sie den Zugriff erlaubt haben, kehren Sie hierher zurück und drücken Sie 
     <string name="duplicate">Neues Fenster</string>
     <string name="start_semester">Startsemester: %1$s</string>
     <string name="end_semester">Endsemester: %1$s</string>
+    <string name="user_dialog">Benutzer</string>
+    <string name="username_display">Benutzername: %1$s</string>
+    <string name="user_fullname_display">Name: %1$s</string>
+    <string name="messages_sync">Synchronisieren</string>
+    <string name="inbox">Eingang</string>
+    <string name="outbox">Gesendet</string>
+    <string name="invalid_server_url">Ungültige Stud.IP URL</string>
 
 
 </resources>

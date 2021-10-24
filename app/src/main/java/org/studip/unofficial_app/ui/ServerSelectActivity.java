@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -73,8 +74,12 @@ public class ServerSelectActivity extends AppCompatActivity
         if (v.equals(binding.submitUrl))
         {
             TextView t = findViewById(R.id.server_url);
-            APIProvider.newAPI(t.getText().toString());
-            toLoginActivity();
+            try {
+                APIProvider.newAPI(t.getText().toString());
+                toLoginActivity();
+            } catch (IllegalArgumentException e) {
+                Toast.makeText(this, R.string.invalid_server_url, Toast.LENGTH_LONG).show();
+            }
         }
         else
         {
