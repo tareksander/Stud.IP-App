@@ -68,7 +68,7 @@
     <string name="auth_cookie">session cookie</string>
     <string name="auth_cookie_desc">This is the method browsers use. Username and password are used to fetch a session cookie, after that the password is deleted.\nOnly the cookie is saved on the device, with the same security as the password with HTTP Basic Authentication. If the cookie is leaked, someone can impersonate you for as long as the cookie lasts, but they cannot change your password.\nThe downside is that the cookie eventually expires and you have to log in again.</string>
     <string name="auth_oauth">OAuth</string>
-    <string name="auth_oauth_desc">The safest method: It works like a session cookie, but instead of entering the username and password in the app, you are redirected to the Stud.IP-Server and have to log in there.\nThe app only gets the authentication token afterwards, which works like a session cookie.</string>
+    <string name="auth_oauth_desc">The safest method: It works like a session cookie, but instead of entering the username and password in the app, you are redirected to the Stud.IP-Server and have to log in there.\nThe app only gets the authentication token afterwards, which works like a session cookie. Only works for systems for which OAuth data is available in the app.</string>
     <string name="settings_developer">Developer settings:\nThese settings could make the app unstable or lower the security. Use at your own risk.</string>
     <string name="semester_select">select semester</string>
     <string name="my_documents">Your files</string>

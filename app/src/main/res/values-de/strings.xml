@@ -72,8 +72,8 @@
     Es wird nur der Cookie auf dem Gerät gespeichert, mit der Gleichen Sicherheit wie das Passwort bei Basic Authentication. Wenn der Cookie von anderen Programmen genommen wird, könnten sich diese als Sie ausgeben, aber nicht ihr Passwort ändern.
     Der Nachteil ist, dass die Sitzung irgendwann abläuft und man sich wieder anmelden muss.</string>
     <string name="auth_oauth">OAuth</string>
-    <string name="auth_oauth_desc">Noch nicht implementiert. Die sicherste Methode: Sie funktioniert ähnlich wie der Session Cookies, aber anstatt das die App den Benutzernamen und das Passwort abfragt, werden sie zu der Seite ihrer Institution weitergeleitet und müssen sich bei ihr anmelden.
-    Die App bekommt dann nur am Ende das Authenticaton Token, das im prinzip wie der Session Cookie funktioniert</string>
+    <string name="auth_oauth_desc">Die sicherste Methode: Sie funktioniert ähnlich wie der Session Cookies, aber anstatt das die App den Benutzernamen und das Passwort abfragt, werden sie zu der Seite ihrer Institution weitergeleitet und müssen sich bei ihr anmelden.
+    Die App bekommt dann nur am Ende das Authenticaton Token, das im prinzip wie der Session Cookie funktioniert. Funktioniert nur bei Systemen, für die OAuth-Daten in der App vorhanden sind.</string>
     <string name="settings_developer">Entwicklereinstellungen:\nDiese Einstellungen können die App instabil machen oder die Sicherheit herabsetzen. Benutzen auf eigene Gefahr.</string>
     <string name="semester_select">Semester auswählen</string>
     <string name="my_documents">Deine Dateien</string>

@@ -29,6 +29,8 @@ public class OAuthUtils
         HashMap<String, OAuthData> h = new HashMap<>();
         h.put("studip.uni-osnabrueck.de", 
                 new OAuthData("2a45f0453b48d7424e342ead5314ee80", "f73e979bb772707c4d4627458fb1ed89060b3cb64"));
+        h.put("studip.tu-braunschweig.de",
+                new OAuthData("f122917afd176b6181e6fbdbff866379", "3c423baa22c9edf4e5ff8efd9e4d7d42062604808"));
         
         hosts = Collections.unmodifiableMap(h);
     }
