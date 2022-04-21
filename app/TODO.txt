@@ -23,37 +23,6 @@
     
     
     Roadmap:
-        1.0.0:
-            [x] fix the cache miss problem when logging in in the webview and using the back button, probably by excluding it from the history
-            [x] try to get a new session cookie before running the NotificationService
-                [x] also get a new cookie when the plugin pages return nothing/error, as this is the most likely cause, and try again once
-            [x] deep links improvements
-                [x] support for more link types
-                    [x] courseware
-                    [x] opencast
-                    [x] meetings
-                    [x] forum
-                [x] for messages, load the message if it isn't already, and view it
-                [x] link to the course info and member screens
-                [x] open unknown link patterns in the WebView for the server
-            [x] delete data which is not in a server response, but still in the database
-            [x] better updating of messages, so not every message is downloaded on update, only the ones until a saved one is found
-                [x] don't care about deleting messages deleted from the server, the user can just also delete them locally
-                [x] when a message is deleted, don't sync with the server, just send a delete and delete it from the database
-                [x] the user can still request a full sync via a button. The full sync deletes all messages, so make a confirmation dialog.
-            [x] add the course members dialog
-            [x] add the user info dialog
-                [x] open the user info dialog when you click on a username in a message or in the members dialog
-            [x] messages
-                [x] add support for viewing the outbox
-                [x] downloading message attachments
-            [x] Document provider: only load an image preview if the file is < 5mb
-            [x] bump version
-            [x] update help text
-            [x] new & more screenshots, with UI improvements
-            [x] update description
-            [x] write changelog
-            [ ] update on play store
         1.1.0:
             [ ] fix Courseware for Stud.IP 5.0
             [ ] add the option to search for new news and forum entries when refreshing courses and color the icon red, to get the same feature as

@@ -182,6 +182,16 @@
                 <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
             </intent-filter>
         </provider>
+
+        <service
+            android:name="androidx.sharetarget.ChooserTargetServiceCompat"
+            android:exported="false"
+            android:permission="android.permission.BIND_CHOOSER_TARGET_SERVICE" >
+            <intent-filter>
+                <action android:name="android.service.chooser.ChooserTargetService" />
+            </intent-filter>
+        </service>
+        
     </application>
 
 </manifest>
